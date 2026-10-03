@@ -1,0 +1,139 @@
+# ============================================================
+# ITSVA - Plataforma de Convocatorias
+# Laravel + Filament + PostgreSQL + Python/Scrapy
+# ============================================================
+
+
+# ------------------------------------------------------------
+# VARIABLES DE ENTORNO / CREDENCIALES
+# ------------------------------------------------------------
+
+.env
+.env.*
+!.env.example
+
+web/.env
+web/.env.*
+!web/.env.example
+
+extractor/.env
+extractor/.env.*
+!extractor/.env.example
+
+
+# ------------------------------------------------------------
+# LARAVEL / PHP
+# ------------------------------------------------------------
+
+web/vendor/
+web/node_modules/
+
+web/public/build/
+web/public/hot
+web/public/storage
+
+web/storage/*.key
+web/storage/logs/*.log
+web/storage/framework/cache/*
+web/storage/framework/sessions/*
+web/storage/framework/views/*
+
+web/bootstrap/cache/*.php
+
+web/.phpunit.cache/
+web/.phpunit.result.cache
+
+web/auth.json
+
+
+# ------------------------------------------------------------
+# PYTHON
+# ------------------------------------------------------------
+
+extractor/.venv/
+extractor/venv/
+extractor/env/
+
+__pycache__/
+*.py[cod]
+*$py.class
+
+*.so
+
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+*.egg-info/
+dist/
+build/
+
+
+# ------------------------------------------------------------
+# ARCHIVOS TEMPORALES DEL EXTRACTOR
+# ------------------------------------------------------------
+
+extractor/*.log
+extractor/*.tmp
+
+extractor/detalle_resultado.json
+extractor/detalle_proyecto.html
+
+extractor/data/extraidos/*.json
+extractor/data/temporales/
+
+
+# ------------------------------------------------------------
+# LOGS
+# ------------------------------------------------------------
+
+*.log
+logs/
+
+
+# ------------------------------------------------------------
+# EDITORES
+# ------------------------------------------------------------
+
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.fleet/
+
+
+# ------------------------------------------------------------
+# SISTEMA OPERATIVO
+# ------------------------------------------------------------
+
+.DS_Store
+Thumbs.db
+desktop.ini
+
+
+# ------------------------------------------------------------
+# WSL / WINDOWS
+# ------------------------------------------------------------
+
+*.Zone.Identifier
+
+
+# ------------------------------------------------------------
+# ARCHIVOS DE BACKUP CREADOS DURANTE DESARROLLO
+# ------------------------------------------------------------
+
+*.bak
+*.bak_*
+*.backup
+
+
+# ------------------------------------------------------------
+# OTROS TEMPORALES
+# ------------------------------------------------------------
+
+*.tmp
+*.temp
+.cache/
