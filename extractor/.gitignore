@@ -1,0 +1,183 @@
+# ============================================================
+# ITSVA - BOT DE EXTRACCIÓN DE CONVOCATORIAS
+# Python + Scrapy + PostgreSQL
+# ============================================================
+
+
+# ------------------------------------------------------------
+# VARIABLES DE ENTORNO / CREDENCIALES
+# ------------------------------------------------------------
+
+.env
+.env.*
+!.env.example
+
+
+# ------------------------------------------------------------
+# ENTORNOS VIRTUALES
+# ------------------------------------------------------------
+
+.venv/
+venv/
+env/
+ENV/
+
+
+# ------------------------------------------------------------
+# PYTHON
+# ------------------------------------------------------------
+
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+.coverage
+.coverage.*
+htmlcov/
+
+*.egg-info/
+.eggs/
+dist/
+build/
+
+
+# ------------------------------------------------------------
+# SCRAPY
+# ------------------------------------------------------------
+
+.scrapy/
+
+
+# ------------------------------------------------------------
+# ARCHIVOS GENERADOS POR EL BOT
+# ------------------------------------------------------------
+
+detalle_resultado.json
+detalle_proyecto.html
+
+data/extraidos/*.json
+data/temporales/
+data/descargas/
+
+*.json.tmp
+*.html.tmp
+
+
+# ------------------------------------------------------------
+# LOGS
+# ------------------------------------------------------------
+
+*.log
+logs/
+
+
+# ------------------------------------------------------------
+# ARCHIVOS TEMPORALES
+# ------------------------------------------------------------
+
+*.tmp
+*.temp
+*.bak
+*.bak_*
+*.backup
+
+.cache/
+
+
+# ------------------------------------------------------------
+# EDITORES
+# ------------------------------------------------------------
+
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+
+# ------------------------------------------------------------
+# WINDOWS / WSL / MACOS
+# ------------------------------------------------------------
+
+.DS_Store
+Thumbs.db
+desktop.ini
+*.Zone.Identifier
+# ============================================================
+# RESULTADOS Y ARCHIVOS DE PRUEBA DEL DESARROLLO
+# ============================================================
+
+# HTML descargado para inspección
+categoria_proyectos.html
+detalle_proyecto_actual.html
+detalle_proyecto.html
+
+# Resultados genéricos
+resultados.json
+categorias_detectadas.json
+detalles_secihti.json
+detalle_prueba.json
+detalle_resultado.json
+
+# Pruebas generadas
+prueba_*.json
+
+# Resultados de scraping manual
+scraping_*.json
+
+# Vistas previas generadas
+vista_previa_*.json
+
+
+# ============================================================
+# DATOS GENERADOS POR EL EXTRACTOR
+# ============================================================
+
+data/extraidos/*
+data/temporales/*
+data/descargas/*
+
+# Permitir archivos .gitkeep si los usamos
+!data/extraidos/.gitkeep
+!data/temporales/.gitkeep
+!data/descargas/.gitkeep
+
+# ============================================================
+# DATOS GENERADOS POR EL BOT
+# ============================================================
+
+data/extraidos/*
+data/resultados/*
+data/pdfs/*
+data/textos/*
+data/descargas/*
+data/temporales/*
+
+!data/extraidos/.gitkeep
+!data/resultados/.gitkeep
+!data/pdfs/.gitkeep
+!data/textos/.gitkeep
+!data/descargas/.gitkeep
+!data/temporales/.gitkeep
+
+
+# ============================================================
+# SCRIPTS DE PRUEBA Y DIAGNOSTICO
+# ============================================================
+
+app/probar_*.py
+app/diagnosticar_*.py
+
+# Utilidades manuales de desarrollo
+inspeccionar_detalle.py
+app/inspeccionar_aviso.py
+app/listar_categorias.py
+
+# Copias rotas o temporales de código
+*.roto_*
+*.roto
