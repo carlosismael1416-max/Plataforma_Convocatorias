@@ -2,11 +2,9 @@ from __future__ import annotations
 
 import argparse
 import hashlib
-import ipaddress
 import json
 import re
 import time
-import socket
 import subprocess
 import sys
 import unicodedata
@@ -29,6 +27,11 @@ from app.extraer_cierre_pdf import (
 
 from app.descubrimiento.guardar_descubrimientos import (
     conectar,
+)
+
+from app.seguridad_red import (
+    descargar_mismo_dominio,
+    mismo_dominio,
 )
 
 
@@ -197,167 +200,24 @@ def host_url(
         return ""
 
 
-def mismo_dominio(
-    url_a: str,
-    url_b: str,
-) -> bool:
-    a = host_url(
-        url_a
-    )
-
-    b = host_url(
-        url_b
-    )
-
-    if not a or not b:
-        return False
-
-    return (
-        a == b
-        or a.endswith(
-            "." + b
-        )
-        or b.endswith(
-            "." + a
-        )
-    )
-
-
-def validar_host_publico(
-    url: str,
-) -> None:
-    parsed = urlparse(
-        url
-    )
-
-    if parsed.scheme not in {
-        "http",
-        "https",
-    }:
-        raise ValueError(
-            "Esquema URL no permitido."
-        )
-
-    host = parsed.hostname
-
-    if not host:
-        raise ValueError(
-            "URL sin hostname."
-        )
-
-    resultados = socket.getaddrinfo(
-        host,
-        parsed.port
-        or (
-            443
-            if parsed.scheme == "https"
-            else 80
-        ),
-        type=socket.SOCK_STREAM,
-    )
-
-    for resultado in resultados:
-        ip_texto = (
-            resultado[4][0]
-        )
-
-        ip = ipaddress.ip_address(
-            ip_texto
-        )
-
-        if not ip.is_global:
-            raise ValueError(
-                "La URL resuelve a una "
-                "dirección no pública."
-            )
-
-
 def descargar_pdf_seguro(
     url: str,
     url_base: str,
 ) -> bytes:
-    actual = url
-
-    sesion = requests.Session()
-
-    headers = {
-        "User-Agent":
-            (
-                "Mozilla/5.0 "
-                "(compatible; ITSVA-Convocatorias/1.0)"
-            ),
-    }
-
-    for _ in range(5):
-        validar_host_publico(
-            actual
-        )
-
-        if not mismo_dominio(
-            actual,
-            url_base,
-        ):
-            raise ValueError(
-                "El PDF está fuera del "
-                "dominio institucional."
-            )
-
-        respuesta = sesion.get(
-            actual,
-            headers=headers,
-            timeout=(
-                10,
-                40,
-            ),
-            allow_redirects=False,
-        )
-
-        if respuesta.status_code in {
-            301,
-            302,
-            303,
-            307,
-            308,
-        }:
-            destino = respuesta.headers.get(
-                "Location"
-            )
-
-            if not destino:
-                raise ValueError(
-                    "Redirección sin Location."
-                )
-
-            actual = urljoin(
-                actual,
-                destino,
-            )
-
-            continue
-
-        respuesta.raise_for_status()
-
-        contenido = respuesta.content
-
-        if len(
-            contenido
-        ) > MAX_PDF_BYTES:
-            raise ValueError(
-                "PDF superior a 20 MB."
-            )
-
-        if not contenido.startswith(
-            b"%PDF"
-        ):
-            raise ValueError(
-                "La respuesta no es un PDF."
-            )
-
-        return contenido
-
-    raise ValueError(
-        "Demasiadas redirecciones."
+    _, contenido, _ = descargar_mismo_dominio(
+        url,
+        url_base,
+        max_bytes=MAX_PDF_BYTES,
     )
+
+    if not contenido.startswith(
+        b"%PDF"
+    ):
+        raise ValueError(
+            "La respuesta no es un PDF."
+        )
+
+    return contenido
 
 
 def cargar_contexto(
@@ -1311,88 +1171,29 @@ def descargar_html_pagina_segura(
     mismo dominio.
     """
 
-    actual = url
-
-    sesion = requests.Session()
-
-    headers = {
-        "User-Agent":
-            (
-                "Mozilla/5.0 "
-                "(compatible; "
-                "ITSVA-Convocatorias/1.0)"
-            ),
-    }
-
-    for _ in range(5):
-        validar_host_publico(
-            actual
-        )
-
-        if not mismo_dominio(
-            actual,
+    url_final, contenido, tipo = (
+        descargar_mismo_dominio(
+            url,
             url_base,
-        ):
-            raise RuntimeError(
-                "La página salió del dominio "
-                "institucional permitido."
-            )
-
-        respuesta = sesion.get(
-            actual,
-            headers=headers,
-            timeout=(10, 40),
-            allow_redirects=False,
+            max_bytes=5 * 1024 * 1024,
         )
+    )
 
-        if respuesta.status_code in {
-            301,
-            302,
-            303,
-            307,
-            308,
-        }:
-            destino = (
-                respuesta.headers.get(
-                    "Location"
-                )
-            )
-
-            if not destino:
-                raise RuntimeError(
-                    "Redirección sin Location."
-                )
-
-            actual = urljoin(
-                actual,
-                destino,
-            )
-
-            continue
-
-        respuesta.raise_for_status()
-
-        contenido = respuesta.content
-
-        if len(contenido) > (
-            5 * 1024 * 1024
-        ):
-            raise RuntimeError(
-                "La página HTML supera "
-                "el tamaño permitido."
-            )
-
-        return (
-            actual,
-            contenido.decode(
-                respuesta.encoding
-                or "utf-8",
-                errors="replace",
-            ),
+    codificacion = (
+        requests.utils.get_encoding_from_headers(
+            {
+                "content-type": tipo,
+            }
         )
+        or "utf-8"
+    )
 
-    raise RuntimeError(
-        "Demasiadas redirecciones."
+    return (
+        url_final,
+        contenido.decode(
+            codificacion,
+            errors="replace",
+        ),
     )
 
 

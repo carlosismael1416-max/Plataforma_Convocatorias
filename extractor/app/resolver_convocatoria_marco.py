@@ -4,14 +4,12 @@ import argparse
 import hashlib
 import io
 import re
-import time
 import unicodedata
 
 from datetime import date
 from urllib.parse import urljoin, urlparse
 
 import pytesseract
-import requests
 
 from PIL import Image, ImageOps
 from selectolax.parser import HTMLParser
@@ -24,8 +22,8 @@ from app.procesar_hijas_marco import (
     procesar_hijas_marco,
 )
 
-from app.enriquecer_convocatoria import (
-    validar_host_publico,
+from app.seguridad_red import (
+    descargar_mismo_dominio,
     mismo_dominio,
 )
 
@@ -118,164 +116,11 @@ def descargar_seguro(
     bytes,
     str,
 ]:
-    actual = url
-
-    sesion = requests.Session()
-
-    headers = {
-        "User-Agent":
-            (
-                "Mozilla/5.0 "
-                "(compatible; "
-                "ITSVA-Convocatorias/1.0)"
-            ),
-    }
-
-    for _ in range(5):
-        validar_host_publico(
-            actual
-        )
-
-        if not mismo_dominio(
-            actual,
-            base,
-        ):
-            raise ValueError(
-                "Redirección fuera del "
-                "dominio institucional."
-            )
-
-        respuesta = None
-        ultimo_error = None
-
-        for intento in range(3):
-            try:
-                respuesta = sesion.get(
-                    actual,
-                    headers=headers,
-                    timeout=(10, 40),
-                    allow_redirects=False,
-                )
-
-                if respuesta.status_code in {
-                    429,
-                    500,
-                    502,
-                    503,
-                    504,
-                }:
-                    if intento < 2:
-                        espera = (
-                            2
-                            * (
-                                intento
-                                + 1
-                            )
-                        )
-
-                        print(
-                            "Respuesta temporal",
-                            respuesta.status_code,
-                            "- reintento en",
-                            espera,
-                            "s:",
-                            actual,
-                        )
-
-                        time.sleep(
-                            espera
-                        )
-
-                        continue
-
-                break
-
-            except (
-                requests.exceptions.Timeout,
-                requests.exceptions.ConnectionError,
-            ) as error:
-                ultimo_error = error
-
-                if intento >= 2:
-                    raise
-
-                espera = (
-                    2
-                    * (
-                        intento
-                        + 1
-                    )
-                )
-
-                print(
-                    "Error temporal de red - "
-                    "reintento",
-                    intento + 2,
-                    "de 3 en",
-                    espera,
-                    "s:",
-                    type(error).__name__,
-                )
-
-                time.sleep(
-                    espera
-                )
-
-        if respuesta is None:
-            if ultimo_error:
-                raise ultimo_error
-
-            raise RuntimeError(
-                "No se obtuvo respuesta HTTP."
-            )
-
-        if respuesta.status_code in {
-            301,
-            302,
-            303,
-            307,
-            308,
-        }:
-            destino = (
-                respuesta.headers.get(
-                    "Location"
-                )
-            )
-
-            if not destino:
-                raise ValueError(
-                    "Redirección sin Location."
-                )
-
-            actual = urljoin(
-                actual,
-                destino,
-            )
-
-            continue
-
-        respuesta.raise_for_status()
-
-        contenido = respuesta.content
-
-        if len(
-            contenido
-        ) > max_bytes:
-            raise ValueError(
-                "Respuesta demasiado grande."
-            )
-
-        return (
-            actual,
-            contenido,
-            respuesta.headers.get(
-                "Content-Type",
-                "",
-            ),
-        )
-
-    raise ValueError(
-        "Demasiadas redirecciones."
+    return descargar_mismo_dominio(
+        url,
+        base,
+        max_bytes=max_bytes,
+        reintentos=3,
     )
 
 
