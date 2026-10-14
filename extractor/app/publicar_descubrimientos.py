@@ -4,6 +4,7 @@ import argparse
 import json
 import subprocess
 import sys
+import time
 
 from difflib import SequenceMatcher
 from urllib.parse import urlparse
@@ -1711,9 +1712,22 @@ def procesar_descubrimiento(
     )
 
 
+# Peor caso de un descubrimiento: extracción (300 s) + resolvedor
+# marco (900 s) + enriquecimiento (300 s).
+SEGUNDOS_MAX_POR_DESCUBRIMIENTO = 1500
+
+
 def procesar_aprobados(
     limite: int = 5,
+    *,
+    terminar_antes_de: float | None = None,
 ) -> dict:
+    """
+    terminar_antes_de: instante (time.monotonic()) en que el ciclo
+    debe haber terminado. No se empieza un descubrimiento que, en el
+    peor caso, no alcance a terminar; queda para el siguiente ciclo.
+    """
+
     aprobados = obtener_aprobados(
         limite
     )
@@ -1729,10 +1743,33 @@ def procesar_aprobados(
         "revision_final": 0,
         "temporales": 0,
         "errores": 0,
+        "pospuestos": 0,
         "resultados": [],
     }
 
-    for descubrimiento in aprobados:
+    for posicion, descubrimiento in enumerate(
+        aprobados
+    ):
+        if (
+            terminar_antes_de is not None
+            and time.monotonic()
+            + SEGUNDOS_MAX_POR_DESCUBRIMIENTO
+            > terminar_antes_de
+        ):
+            resumen["pospuestos"] = (
+                len(aprobados)
+                - posicion
+            )
+
+            print()
+            print(
+                "Tiempo del ciclo agotado: "
+                f"{resumen['pospuestos']} "
+                "descubrimiento(s) quedan para "
+                "el siguiente ciclo."
+            )
+            break
+
         print()
         print(
             "=" * 70

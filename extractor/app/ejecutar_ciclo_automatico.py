@@ -35,6 +35,10 @@ BASE_DIR = (
 
 LOCK_ID = 9262028
 
+# systemd corta el ciclo a los 3600 s (TimeoutStartSec en
+# extractor/systemd/convocatorias-itsva.service); 5 min de margen.
+SEGUNDOS_MAX_CICLO = 3600 - 300
+
 
 def adquirir_lock(
     conexion,
@@ -382,6 +386,11 @@ def ejecutar_ciclo(
     max_dominios: int,
     max_publicaciones: int,
 ) -> dict:
+    terminar_antes_de = (
+        time.monotonic()
+        + SEGUNDOS_MAX_CICLO
+    )
+
     conexion_lock = conectar()
 
     if not adquirir_lock(
@@ -499,7 +508,9 @@ def ejecutar_ciclo(
         publicacion = (
             procesar_aprobados(
                 limite=
-                    max_publicaciones
+                    max_publicaciones,
+                terminar_antes_de=
+                    terminar_antes_de,
             )
         )
 
@@ -530,6 +541,14 @@ def ejecutar_ciclo(
             publicacion[
                 "errores"
             ],
+        )
+
+        print(
+            "Pospuestos por tiempo:",
+            publicacion.get(
+                "pospuestos",
+                0,
+            ),
         )
 
         fin = (
