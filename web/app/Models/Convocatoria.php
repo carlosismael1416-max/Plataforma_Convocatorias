@@ -160,11 +160,49 @@ class Convocatoria extends Model
 
             $convocatoria->url_original = $url;
 
-            $convocatoria->url_hash = hash(
-                'sha256',
-                $url
-            );
+            $convocatoria->url_hash = static::hashUrl($url);
         });
+    }
+
+    /**
+     * Misma normalización que extractor/app/urls.py: esquema y host en
+     * minúsculas, sin "www.", sin puerto ni fragmento, sin barra final
+     * (salvo la raíz) y conservando la query. Ambos lados deben producir
+     * el mismo url_hash para que el índice único detecte duplicados.
+     */
+    public static function normalizarUrl(string $url): string
+    {
+        $partes = parse_url(trim($url));
+
+        if ($partes === false || ! isset($partes['host'])) {
+            return rtrim(trim($url), '/');
+        }
+
+        $host = strtolower($partes['host']);
+
+        if (str_starts_with($host, 'www.')) {
+            $host = substr($host, 4);
+        }
+
+        $ruta = ($partes['path'] ?? '') !== '' ? $partes['path'] : '/';
+
+        if ($ruta !== '/') {
+            $ruta = rtrim($ruta, '/');
+        }
+
+        $resultado = strtolower($partes['scheme'] ?? 'https')
+            . '://' . $host . $ruta;
+
+        if (($partes['query'] ?? '') !== '') {
+            $resultado .= '?' . $partes['query'];
+        }
+
+        return $resultado;
+    }
+
+    public static function hashUrl(string $url): string
+    {
+        return hash('sha256', static::normalizarUrl($url));
     }
 public function propuestas(): HasMany
 {

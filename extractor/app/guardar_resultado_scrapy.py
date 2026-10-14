@@ -1,4 +1,3 @@
-import hashlib
 import os
 
 from pathlib import Path
@@ -6,6 +5,9 @@ from urllib.parse import urldefrag
 
 import psycopg
 from dotenv import load_dotenv
+
+from app.urls import hash_url
+
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -30,12 +32,6 @@ def normalizar_url(url):
     url, _ = urldefrag(url)
 
     return url.strip().rstrip("/")
-
-
-def hash_url(url):
-    return hashlib.sha256(
-        url.encode("utf-8")
-    ).hexdigest()
 
 
 def obtener_fecha_cierre(resultado):

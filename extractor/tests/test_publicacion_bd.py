@@ -17,8 +17,12 @@ import uuid
 from app.descubrimiento.guardar_descubrimientos import (
     conectar,
 )
+from app.urls import (
+    hash_url,
+)
 from app.publicar_descubrimientos import (
     MAX_INTENTOS,
+    buscar_convocatoria_exacta,
     cerrar_publicadas_vencidas,
     cerrar_temporales_agotados,
     descartar_temporales_no_elegibles,
@@ -258,6 +262,43 @@ class BarridosPublicadorTest(unittest.TestCase):
             self.estado_convocatoria(padre_abierto),
             "PUBLICADA",
         )
+
+    def test_busqueda_exacta_por_url_hash_ignora_variantes(self):
+        url = "https://secihti.mx/prueba-hash/" + uuid.uuid4().hex
+
+        self.cursor.execute(
+            """
+            INSERT INTO convocatorias (
+                titulo, estado, origen, url_original, url_hash,
+                created_at, updated_at
+            )
+            VALUES ('Prueba', 'PENDIENTE_REVISION', 'SCRAPING',
+                    %s, %s, NOW(), NOW())
+            RETURNING id
+            """,
+            (url, hash_url(url)),
+        )
+        convocatoria_id = self.cursor.fetchone()[0]
+
+        variante = url.replace("https://", "https://www.") + "/"
+        encontrada = buscar_convocatoria_exacta(self.conexion, variante)
+
+        self.assertIsNotNone(encontrada)
+        self.assertEqual(encontrada["id"], convocatoria_id)
+
+        # La misma URL con otra forma choca con el índice único.
+        with self.assertRaises(Exception):
+            self.cursor.execute(
+                """
+                INSERT INTO convocatorias (
+                    titulo, estado, origen, url_original, url_hash,
+                    created_at, updated_at
+                )
+                VALUES ('Duplicada', 'PENDIENTE_REVISION', 'SCRAPING',
+                        %s, %s, NOW(), NOW())
+                """,
+                (variante, hash_url(variante)),
+            )
 
 
 if __name__ == "__main__":
