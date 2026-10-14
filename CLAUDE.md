@@ -12,7 +12,9 @@ No agregar funciones nuevas hasta que ese ciclo esté demostrado con registros r
 - `extractor/` — Python: Scrapy, FastAPI/Uvicorn (puerto 8001), selectolax, googlenewsdecoder.
 - `database/schema.sql` — esquema PostgreSQL.
 - Automatización: systemd `convocatorias-itsva.service` + `convocatorias-itsva.timer` (00:00, 06:00, 12:00, 18:00; `Persistent=true`). En WSL solo corre mientras WSL está encendido. Copias versionadas de las units en `extractor/systemd/` (la instalada en `/etc/systemd/system/` es la que rige).
-- Pruebas: `cd extractor && ./.venv/bin/python -m unittest discover -s tests -t .` (sin red ni BD).
+- Pruebas del extractor: `cd extractor && ./.venv/bin/python -m unittest discover -s tests -t .` (38; `test_publicacion_bd.py` usa PostgreSQL en transacción revertida y se omite sin conexión).
+- Verificaciones de la web (PHPUnit no corre: `phpunit.xml` usa SQLite y varias migraciones tienen SQL de PostgreSQL): `cd web && php tests/Verificacion/<script>.php` — `todas_las_paginas.php` (77 rutas GET), `permisos_por_rol.php`, `docente_no_ve_vencidas.php`, `propuesta_id_bloqueado.php`, `convocatoria_dependencias.php`. Usan usuarios id 1 (admin), 2 (docente), 3 (directivo) y revierten sus datos.
+- No regenerar con `make:filament-resource`: los recursos de Convocatorias (admin, directivo, docente), Fuentes, Roles y Users tienen autorización y flujos propios (`can*`, `getEloquentQuery`, `handleRecordCreation/Update`).
 - Entorno virtual Python: `extractor/.venv`.
 
 Versiones registradas; confirmarlas antes de asumirlas (`php artisan --version`, `pip list`).
@@ -68,16 +70,23 @@ cd extractor && ./.venv/bin/python -m json.tool ciclo_automatico_ultimo.json
 cd web && php artisan migrate:status && php artisan route:list --path=admin
 ```
 
-## Problemas conocidos (al 13-oct-2026)
+## Problemas conocidos (al 14-oct-2026)
 
-- Último ciclo (13-oct 21:04): 0 aprobados, 0 publicados, 4 en revisión. Con el filtro de elegibilidad, el siguiente ciclo descartará FECTI (Chihuahua), CALAS (Argentina) y COQHCYT (ID 2, Quintana Roo); las becas federales a Japón siguen en revisión (aplican a docentes).
-- `estado_temporal` del descubrimiento sale del año en el título, no de la fecha de cierre; la vigencia real la decide `validar_convocatoria.py` (bloquea fecha pasada o ausente).
-- La API del puerto 8001 no está corriendo; probada a mano (`/health`, `/db-check` y alcanzable desde Laravel). Falta instalar su unit (requiere sudo). `.env` de `extractor/` y `web/` con permisos 600 (Laravel no corre como `www-data`; Apache solo sirve `/var/www/html`).
-- La elegibilidad usa solo título, URL y dominio; una convocatoria estatal publicada en un medio nacional sin mencionar el estado en el título no se detecta (la revisión humana sigue siendo necesaria).
+- Ciclo del 14-oct 00:00: 0 aprobados y 0 publicados, decisión correcta. FECTI, COQHCYT y CALAS quedaron `DESCARTADO` por elegibilidad; solo siguen en revisión dos becas federales (ID 4 y 6).
+- Ninguna convocatoria real supera hoy el validador (70). La única vigente (ID 4, revistas de acceso abierto, cierra el 23-oct) obtiene 60 por falta de organismo, montos y objetivo. No se demostró aún una publicación automática real de principio a fin.
+- `estado_temporal` del descubrimiento sale del año en el título, no de la fecha de cierre; la vigencia real la decide `validar_convocatoria.py` (bloquea fecha pasada o ausente) y el docente solo ve `noVencidas()`.
+- Nada pasa a `CERRADA` una convocatoria `PUBLICADA` cuando vence (solo las hijas de un marco); la web la oculta, pero la BD no refleja el cierre. Pendiente de decisión.
+- `url_hash` se calcula distinto en `guardar_resultado_scrapy.py` (sin normalizar `www.`/mayúsculas) y en `resolver_convocatoria_marco.py`; la misma URL con y sin `www.` evade el índice único. `buscar_convocatoria_exacta` compensa leyendo toda la tabla. Unificar requiere recalcular hashes existentes.
+- La API (8001) y el ciclo usan bloqueos distintos; si coinciden, la asociación por `max(id)` del publicador podría tomar una fila ajena (mitigado por fuente y similitud de título).
+- El peor caso del ciclo (~7.500 s) supera `TimeoutStartSec=3600`; los `EN_PROCESO` abandonados se recuperan a las 2 h, pero el ciclo queda cortado.
+- La API del puerto 8001 no está corriendo: falta instalar su unit (requiere sudo).
+- Elegibilidad y clasificación usan solo título, URL y dominio; no el contenido del artículo (que ya se descarga). Siglas de fondos sin estado en el título no se reconocen.
+- El descubrimiento ID 4 conserva el título "edición 54" (la mejora de títulos aplica a descubrimientos nuevos).
+- `ConvocatoriaResource::tieneDependencias` no considera hijas (`convocatoria_padre_id`): un padre con hijas se puede borrar.
+- Código sin uso: 32 módulos del extractor (6.863 líneas, `probar_*`, `diagnosticar_*`, flujo ECOS), 28 `.bak` en `web/app/Filament`, Vite/npm sin uso; Playwright instalado sin uso (658 MB de navegadores).
+- OCR (tesseract) activo solo en la ruta de convocatorias marco (`leer_imagen_calendario`).
 - Migraciones duplicadas de `convocatoria_padre_id` (`2026_10_09_204500` y `2026_10_09_205003`); ambas aplicadas, la segunda es idempotente.
-- PDF de SECIHTI con título "edición 54": mejorar extracción de título (metadatos, encabezados, página que lo enlaza); si sigue ambiguo → revisión.
-- Clasificación por palabras clave (título + último segmento de URL; ya normaliza acentos y compara palabras completas). No usa el contenido de la página, por eso siglas de fondos (FECTI) no se reconocen.
-- Pruebas automáticas: solo clasificador, evaluador y validador (`extractor/tests/`). Falta cubrir publicación, reintentos y extracción.
+- `APP_DEBUG=true` en `web/.env` (aceptable solo en desarrollo). Se consulta el estado `ACTIVA`, que no existe en el flujo.
 
 ## Criterio de terminado
 
