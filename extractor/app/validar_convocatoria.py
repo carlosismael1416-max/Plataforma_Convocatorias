@@ -6,6 +6,10 @@ import unicodedata
 from datetime import date
 from urllib.parse import urlparse
 
+from app.descubrimiento.clasificar_objetivo import (
+    contiene_palabra,
+)
+
 from app.descubrimiento.guardar_descubrimientos import (
     conectar,
 )
@@ -31,6 +35,8 @@ PALABRAS_BLOQUEO = (
     "diplomado",
     "beca",
     "becas",
+    "becario",
+    "becaria",
 )
 
 
@@ -306,7 +312,10 @@ def evaluar_convocatoria(
         )
 
     for palabra in PALABRAS_BLOQUEO:
-        if palabra in titulo_normalizado:
+        if contiene_palabra(
+            titulo_normalizado,
+            palabra,
+        ):
             bloqueos.append(
                 "El título corresponde a una "
                 "categoría no publicable "

@@ -67,12 +67,27 @@ def ultimo_segmento(
         return ""
 
 
+def contiene_palabra(
+    texto: str,
+    palabra: str,
+) -> bool:
+    # Palabra completa con plural opcional (-s/-es), para que
+    # "curso" no coincida dentro de "recursos" ni "foro" en "aforo".
+    return re.search(
+        rf"\b{re.escape(palabra)}(?:s|es)?\b",
+        texto,
+    ) is not None
+
+
 def contiene(
     texto: str,
     palabras: tuple[str, ...],
 ) -> bool:
     return any(
-        palabra in texto
+        contiene_palabra(
+            texto,
+            palabra,
+        )
         for palabra in palabras
     )
 
@@ -117,6 +132,7 @@ def clasificar_objetivo_convocatoria(
             "investigaciones",
             "investigador",
             "investigadores",
+            "investigadora",
             "cientifica",
             "cientifico",
             "cientificas",
@@ -142,6 +158,8 @@ def clasificar_objetivo_convocatoria(
             "financiacion",
             "financiar",
             "financia",
+            "financiado",
+            "financiada",
             "fondo",
             "fondos",
             "subvencion",
@@ -179,6 +197,8 @@ def clasificar_objetivo_convocatoria(
         (
             "beca",
             "becas",
+            "becario",
+            "becaria",
         ),
     )
 
