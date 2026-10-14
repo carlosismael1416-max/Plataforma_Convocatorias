@@ -1,0 +1,23 @@
+[Unit]
+Description=Ciclo automático de convocatorias ITSVA
+After=network-online.target postgresql.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=carlos_ismael
+Group=carlos_ismael
+WorkingDirectory=/home/carlos_ismael/proyectos/convocatorias-itsva/extractor
+
+ExecStart=/home/carlos_ismael/proyectos/convocatorias-itsva/extractor/.venv/bin/python -m app.ejecutar_ciclo_automatico --cantidad-google 6 --max-dominios 5 --max-publicaciones 5
+
+Environment=PYTHONUNBUFFERED=1
+Environment=PYTHONPATH=/home/carlos_ismael/proyectos/convocatorias-itsva/extractor
+
+TimeoutStartSec=3600
+Restart=no
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,15 @@
+[Unit]
+Description=Ejecutar ciclo ITSVA cada 6 horas
+
+[Timer]
+OnCalendar=*-*-* 00,06,12,18:00:00
+Persistent=true
+
+# Evita que muchas máquinas ejecuten exactamente
+# en el mismo segundo al arrancar. Máximo 5 minutos.
+RandomizedDelaySec=300
+
+Unit=convocatorias-itsva.service
+
+[Install]
+WantedBy=timers.target

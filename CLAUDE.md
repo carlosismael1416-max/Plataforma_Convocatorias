@@ -11,7 +11,8 @@ No agregar funciones nuevas hasta que ese ciclo esté demostrado con registros r
 - `web/` — Laravel 13 + Filament 5 + Livewire 4, PHP 8.3. Paneles: docente, directivo, admin. (`web/CLAUDE.md` contiene las guías de Laravel Boost.)
 - `extractor/` — Python: Scrapy, FastAPI/Uvicorn (puerto 8001), selectolax, googlenewsdecoder.
 - `database/schema.sql` — esquema PostgreSQL.
-- Automatización: systemd `convocatorias-itsva.service` + `convocatorias-itsva.timer` (00:00, 06:00, 12:00, 18:00; `Persistent=true`). En WSL solo corre mientras WSL está encendido.
+- Automatización: systemd `convocatorias-itsva.service` + `convocatorias-itsva.timer` (00:00, 06:00, 12:00, 18:00; `Persistent=true`). En WSL solo corre mientras WSL está encendido. Copias versionadas de las units en `extractor/systemd/` (la instalada en `/etc/systemd/system/` es la que rige).
+- Pruebas: `cd extractor && ./.venv/bin/python -m unittest discover -s tests -t .` (sin red ni BD).
 - Entorno virtual Python: `extractor/.venv`.
 
 Versiones registradas; confirmarlas antes de asumirlas (`php artisan --version`, `pip list`).
@@ -27,7 +28,7 @@ Versiones registradas; confirmarlas antes de asumirlas (`php artisan --version`,
 | `app/validar_convocatoria.py` | Validación final del contenido extraído (umbral 70, bloqueos: resultados, premios, eventos, becas no aplicables). |
 | `app/ejecutar_scraping.py`, `app/ejecutar_fuente.py` | Extractor. Flags: `--fuente-id --url --limite --guardar --modo --vigencia --fecha --analizar-pdf --buscar-pdf`. `--analizar-pdf` es incompatible con `--guardar`. |
 | `app/ejecutar_ciclo_automatico.py` | Ciclo completo. Reporte en `extractor/ciclo_automatico_ultimo.json`. Límites: `--cantidad-google 6 --max-dominios 5 --max-publicaciones 5`. |
-| `app/main.py` | API: `GET /health`, `GET /db-check`, `POST /scraping/ejecutar`. Laravel la usa vía `EXTRACTOR_API_URL=http://127.0.0.1:8001`. No tiene unit de systemd; hay que arrancarla aparte. |
+| `app/main.py` | API: `GET /health`, `GET /db-check`, `POST /scraping/ejecutar`. Laravel la usa vía `EXTRACTOR_API_URL=http://127.0.0.1:8001` (página admin `MotorExtraccion`). Sin autenticación: escuchar solo en 127.0.0.1. Unit: `extractor/systemd/convocatorias-itsva-api.service`. |
 
 ## Base de datos (PostgreSQL)
 
@@ -68,13 +69,17 @@ cd web && php artisan migrate:status && php artisan route:list --path=admin
 
 ## Problemas conocidos (al 13-oct-2026)
 
-- Último ciclo (13-oct 21:04): 0 aprobados, 0 publicados, 4 en revisión. Revisado: dos son becas (CALAS, BEXT JICA), así que es correcto no publicarlas; FECTI Chihuahua salió con `categoria_valida=False`, probable fallo de clasificación.
+- Último ciclo (13-oct 21:04): 0 aprobados, 0 publicados, 4 en revisión. Correcto: dos son becas (CALAS, BEXT JICA); FECTI Chihuahua (fondo estatal, cerró el 17-jul-2026) queda en revisión porque el título no menciona financiamiento.
+- `estado_temporal` del descubrimiento sale del año en el título, no de la fecha de cierre; la vigencia real la decide `validar_convocatoria.py` (bloquea fecha pasada o ausente).
+- Sin decidir: elegibilidad geográfica. Fondos estatales de otros estados (FECTI-Chihuahua, COQHCYT-Quintana Roo) probablemente no aplican a ITSVA (Yucatán); hoy no se filtran.
 - Descubrimiento ID 2 (COQHCYT): 3/3 intentos agotados; `cgc.qroo.gob.mx` no responde (timeout, incluso `robots.txt`). El siguiente ciclo lo pasará a `FUENTE_INACCESIBLE`; buscar un canal oficial alterno.
-- La API del puerto 8001 no está corriendo; Laravel la necesita para `POST /scraping/ejecutar`.
+- La API del puerto 8001 no está corriendo; probada a mano (`/health`, `/db-check` y alcanzable desde Laravel). Falta instalar su unit (requiere sudo).
+- `ejecuciones_scraping` en `INICIADO`/`EJECUTANDO` no caduca: si el extractor muere a mitad, la API responde 409 para siempre. Hoy no hay ninguna atascada.
+- `extractor/.env` tiene permisos 644 y contiene la contraseña de la BD; debería ser 600.
 - Migraciones duplicadas de `convocatoria_padre_id` (`2026_10_09_204500` y `2026_10_09_205003`); ambas aplicadas, la segunda es idempotente.
 - PDF de SECIHTI con título "edición 54": mejorar extracción de título (metadatos, encabezados, página que lo enlaza); si sigue ambiguo → revisión.
-- Clasificación por palabras clave confunde becas, eventos, portales y financiamiento. Necesita normalización de acentos, uso del contenido y pruebas.
-- Pruebas automáticas insuficientes.
+- Clasificación por palabras clave (título + último segmento de URL; ya normaliza acentos y compara palabras completas). No usa el contenido de la página, por eso siglas de fondos (FECTI) no se reconocen.
+- Pruebas automáticas: solo clasificador, evaluador y validador (`extractor/tests/`). Falta cubrir publicación, reintentos y extracción.
 
 ## Criterio de terminado
 
