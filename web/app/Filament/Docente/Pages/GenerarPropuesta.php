@@ -43,14 +43,14 @@ class GenerarPropuesta extends Page
             && $usuario->tieneRol('DOCENTE');
     }
 
-    public function mount(): void
+    public function mount(): mixed
     {
         $id = request()->integer(
             'convocatoria'
         );
 
         if ($id <= 0) {
-            return;
+            return null;
         }
 
         /*
@@ -81,7 +81,25 @@ class GenerarPropuesta extends Page
                 ->warning()
                 ->send();
 
-            return;
+            return null;
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | "Ver / continuar propuesta": si ya existe, ir directo a ella
+        |--------------------------------------------------------------------------
+        */
+
+        $existente = Propuesta::query()
+            ->where('user_id', auth()->id())
+            ->where('convocatoria_id', $convocatoria->id)
+            ->value('id');
+
+        if ($existente) {
+            return redirect()->route(
+                'filament.docente.pages.editor-propuesta',
+                ['propuesta' => $existente]
+            );
         }
 
         $this->convocatoriaId =
@@ -90,6 +108,8 @@ class GenerarPropuesta extends Page
         $this->tituloPropuesta =
             'Propuesta - '
             . $convocatoria->titulo;
+
+        return null;
     }
 
     public function updatedConvocatoriaId(): void
@@ -228,16 +248,20 @@ class GenerarPropuesta extends Page
                                     ),
 
                                 /*
-                                | La descripción sirve como
-                                | borrador inicial del resumen.
-                                | El Docente podrá editarla.
+                                | Borradores iniciales tomados de la
+                                | convocatoria; el docente los edita.
+                                | El objetivo describe mejor el
+                                | propósito que la descripción, que
+                                | suele empezar con el fundamento legal.
                                 */
                                 'resumen' =>
-                                    $convocatoria
-                                        ->descripcion,
+                                    $convocatoria->objetivo
+                                    ?: $convocatoria->descripcion,
 
                                 'justificacion' =>
-                                    null,
+                                    $this->justificacionInicial(
+                                        $convocatoria
+                                    ),
 
                                 'metodologia' =>
                                     null,
@@ -450,6 +474,33 @@ class GenerarPropuesta extends Page
             'propuestaExistente' =>
                 $propuestaExistente,
         ];
+    }
+
+    private function justificacionInicial(
+        Convocatoria $convocatoria
+    ): string {
+        $texto = 'Esta propuesta responde a la convocatoria «'
+            . $convocatoria->titulo . '»';
+
+        if ($convocatoria->organismo) {
+            $texto .= ', emitida por '
+                . $convocatoria->organismo->nombre;
+        }
+
+        $texto .= '.';
+
+        if ($convocatoria->fecha_cierre) {
+            $texto .= ' Fecha de cierre: '
+                . $convocatoria->fecha_cierre->format('d/m/Y') . '.';
+        }
+
+        if (filled($convocatoria->objetivo)) {
+            $texto .= "\n\nObjetivo de la convocatoria: "
+                . trim($convocatoria->objetivo);
+        }
+
+        return $texto
+            . "\n\n[Describe aquí por qué el proyecto del ITSVA atiende ese objetivo.]";
     }
 
     private function obtenerOCrearBase(
