@@ -137,3 +137,15 @@ desktop.ini
 *.tmp
 *.temp
 .cache/
+
+
+# ------------------------------------------------------------
+# SALIDAS DEL CICLO AUTOMÁTICO Y RESPALDOS LOCALES
+# ------------------------------------------------------------
+
+extractor/ciclo_automatico_ultimo.json
+extractor/descubrimiento_vista_previa.json
+extractor/descubrimiento_google_vista_previa.json
+extractor/google_news_url_cache.json
+extractor/backups/
+find-skills.txt
