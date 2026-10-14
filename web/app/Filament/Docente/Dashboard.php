@@ -50,7 +50,8 @@ class Dashboard extends BaseDashboard
         ];
 
         $consultaDisponibles = Convocatoria::query()
-            ->whereIn('estado', $estadosDisponibles);
+            ->whereIn('estado', $estadosDisponibles)
+            ->noVencidas();
 
         /*
         |--------------------------------------------------------------------------

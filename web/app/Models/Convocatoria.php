@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -42,6 +43,19 @@ class Convocatoria extends Model
         'convocatoria_id'
     );
 }
+
+    /**
+     * Excluye las convocatorias cuya fecha de cierre ya pasó.
+     * Las que no tienen fecha se conservan (filtro "sin fecha").
+     */
+    public function scopeNoVencidas(Builder $query): Builder
+    {
+        return $query->where(
+            fn (Builder $consulta) => $consulta
+                ->whereNull('fecha_cierre')
+                ->orWhereDate('fecha_cierre', '>=', today())
+        );
+    }
 
     protected function casts(): array
     {

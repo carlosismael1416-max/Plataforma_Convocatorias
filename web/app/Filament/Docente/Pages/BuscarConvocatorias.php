@@ -191,7 +191,8 @@ class BuscarConvocatorias extends Page
                     'PUBLICADA',
                     'ACTIVA',
                 ]
-            );
+            )
+            ->noVencidas();
 
         $this->aplicarBusqueda($query);
 
