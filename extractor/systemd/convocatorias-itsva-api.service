@@ -1,0 +1,26 @@
+[Unit]
+Description=API del motor de extracción ITSVA (FastAPI, puerto 8001)
+After=network-online.target postgresql.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=carlos_ismael
+Group=carlos_ismael
+WorkingDirectory=/home/carlos_ismael/proyectos/convocatorias-itsva/extractor
+
+# Solo 127.0.0.1: la API no tiene autenticación y únicamente
+# la consume Laravel en la misma máquina.
+ExecStart=/home/carlos_ismael/proyectos/convocatorias-itsva/extractor/.venv/bin/python -m uvicorn app.main:app --host 127.0.0.1 --port 8001 --workers 1
+
+Environment=PYTHONUNBUFFERED=1
+Environment=PYTHONPATH=/home/carlos_ismael/proyectos/convocatorias-itsva/extractor
+
+Restart=on-failure
+RestartSec=10
+
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
