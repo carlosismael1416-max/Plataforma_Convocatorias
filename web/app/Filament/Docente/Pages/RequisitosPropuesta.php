@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Livewire\WithFileUploads;
+use Livewire\Attributes\Locked;
 
 class RequisitosPropuesta extends Page
 {
@@ -30,6 +31,9 @@ class RequisitosPropuesta extends Page
     protected string $view =
         'filament.docente.pages.requisitos-propuesta';
 
+    // El navegador no puede cambiarla: identifica la propuesta
+    // del usuario validada en mount().
+    #[Locked]
     public int $propuestaId;
 
     public array $cumplidos = [];

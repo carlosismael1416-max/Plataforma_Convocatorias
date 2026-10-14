@@ -16,6 +16,7 @@ use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
+use Livewire\Attributes\Locked;
 
 class CronogramaPropuesta extends Page
 {
@@ -37,6 +38,9 @@ class CronogramaPropuesta extends Page
         'CANCELADA' => 'Cancelada',
     ];
 
+    // El navegador no puede cambiarla: identifica la propuesta
+    // del usuario validada en mount().
+    #[Locked]
     public int $propuestaId;
 
     public ?int $actividadEditandoId = null;
