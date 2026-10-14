@@ -23,6 +23,7 @@ from app.urls import (
 from app.publicar_descubrimientos import (
     MAX_INTENTOS,
     buscar_convocatoria_exacta,
+    cerrar_pendientes_vencidas,
     cerrar_publicadas_vencidas,
     cerrar_temporales_agotados,
     descartar_temporales_no_elegibles,
@@ -299,6 +300,39 @@ class BarridosPublicadorTest(unittest.TestCase):
                 """,
                 (variante, hash_url(variante)),
             )
+
+    def test_pendientes_vencidas_de_scraping_se_cierran(self):
+        def crear(origen, fecha):
+            self.cursor.execute(
+                """
+                INSERT INTO convocatorias (
+                    titulo, estado, origen, url_hash, fecha_cierre,
+                    created_at, updated_at
+                )
+                VALUES ('Prueba', 'PENDIENTE_REVISION', %s, %s,
+                        %s::date, NOW(), NOW())
+                RETURNING id
+                """,
+                (origen, uuid.uuid4().hex, fecha),
+            )
+            return self.cursor.fetchone()[0]
+
+        scraping_vencida = crear("SCRAPING", "2020-01-01")
+        scraping_vigente = crear("SCRAPING", "2999-01-01")
+        manual_vencida = crear("MANUAL", "2020-01-01")
+
+        cerrar_pendientes_vencidas(self.cursor)
+
+        self.assertEqual(self.estado_convocatoria(scraping_vencida), "CERRADA")
+        self.assertEqual(
+            self.estado_convocatoria(scraping_vigente),
+            "PENDIENTE_REVISION",
+        )
+        # Las manuales las revisa un directivo.
+        self.assertEqual(
+            self.estado_convocatoria(manual_vencida),
+            "PENDIENTE_REVISION",
+        )
 
 
 if __name__ == "__main__":

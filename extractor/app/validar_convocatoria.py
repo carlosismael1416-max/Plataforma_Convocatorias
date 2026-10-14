@@ -4,7 +4,7 @@ import re
 import unicodedata
 
 from datetime import date
-from urllib.parse import urlparse
+from urllib.parse import unquote, urlparse
 
 from app.descubrimiento.clasificar_objetivo import (
     contiene_palabra,
@@ -322,6 +322,31 @@ def evaluar_convocatoria(
         ):
             bloqueos.append(
                 "El título corresponde a una "
+                "categoría no publicable "
+                f"automáticamente: {palabra}."
+            )
+            break
+
+    # La ruta también clasifica: /convocatoria/becas-nacionales/...
+    # (caso real: "Apoyo Complementario SECIHTI-OEA", un apoyo a
+    # estudiantes extranjeros sin "beca" en el título).
+    ruta_normalizada = normalizar_texto(
+        re.sub(
+            r"[/_\-]+",
+            " ",
+            unquote(
+                urlparse(url).path
+            ),
+        )
+    )
+
+    for palabra in PALABRAS_BLOQUEO:
+        if contiene_palabra(
+            ruta_normalizada,
+            palabra,
+        ):
+            bloqueos.append(
+                "La URL corresponde a una "
                 "categoría no publicable "
                 f"automáticamente: {palabra}."
             )
