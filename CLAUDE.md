@@ -21,7 +21,7 @@ Versiones registradas; confirmarlas antes de asumirlas (`php artisan --version`,
 
 | Archivo | Función |
 |---|---|
-| `app/descubrimiento/ejecutar_descubrimiento.py` | Punto de entrada del descubrimiento (Google News RSS, sitemaps, WordPress, HTML ligero, enlaces directos). |
+| `app/ejecutar_descubrimiento.py` | Punto de entrada del descubrimiento (Google News RSS, sitemaps, WordPress, HTML ligero, enlaces directos). |
 | `app/descubrimiento/clasificar_objetivo.py` | Clasificación por reglas → categoría + decisión `ACEPTAR` / `REVISION` / `DESCARTAR`. |
 | `app/descubrimiento/elegibilidad.py` | ¿Puede participar ITSVA (Yucatán, TecNM)? No elegibles: otros estados (nombre, gentilicio, siglas del consejo estatal o dominio `*.gob.mx`), instituciones extranjeras sin apertura a México, vacantes/plazas/admisiones. Elegibles: Yucatán, sur-sureste, nacionales, TecNM. Ignora el sufijo " - Medio" de Google News. Ante la duda, elegible. |
 | `app/evaluar_descubrimientos.py` | Puntaje; aprobación automática con ≥ 80 **y** condiciones obligatorias (incluye `elegible`); no elegible → `DESCARTADO`. Reevalúa `NUEVO`, `REVISION` y `APROBADO`. |
