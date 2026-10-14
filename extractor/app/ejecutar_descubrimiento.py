@@ -1966,6 +1966,11 @@ def ejecutar(
                     "url",
                     ""
                 ),
+                # pop: el texto no se guarda ni va a la vista previa.
+                contexto=candidato.pop(
+                    "contexto",
+                    "",
+                ),
             )
         )
 

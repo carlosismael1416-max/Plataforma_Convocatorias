@@ -270,6 +270,7 @@ def construir_candidato(
     pagina_origen: str | None,
     estado_fuente: str,
     evidencia_google: dict,
+    contexto: str = "",
 ) -> dict:
     relevancia = (
         analizar_relevancia_tematica(
@@ -295,6 +296,11 @@ def construir_candidato(
     return {
         "titulo":
             titulo,
+
+        # Texto de la nota que lo contiene; solo lo usa el
+        # clasificador y no se guarda.
+        "contexto":
+            contexto,
 
         "url":
             url,
@@ -620,6 +626,12 @@ def procesar_resultados_google(
                     metodo=
                         "GOOGLE_NEWS_INSTITUCIONAL",
 
+                    contexto=
+                        articulo.get(
+                            "texto",
+                            "",
+                        ),
+
                     pagina_origen=
                         item.get(
                             "url_google"
@@ -842,6 +854,12 @@ def procesar_resultados_google(
 
                     metodo=
                         "ENLACE_INSTITUCIONAL_DESDE_NOTICIA",
+
+                    contexto=
+                        articulo.get(
+                            "texto",
+                            "",
+                        ),
 
                     pagina_origen=
                         url_original,

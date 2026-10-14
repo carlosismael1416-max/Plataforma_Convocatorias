@@ -22,10 +22,14 @@ from app.descubrimiento.buscar_html_ligero import (
     permitido_por_robots,
 )
 
+from selectolax.parser import HTMLParser
+
 
 USER_AGENT = "ITSVA-Convocatorias/1.0"
 
 MAX_HTML_BYTES = 2_000_000
+
+MAX_TEXTO_CONTEXTO = 4000
 
 
 DOMINIOS_SOCIALES = {
@@ -609,6 +613,42 @@ def descargar_articulo(
         }
 
 
+def extraer_texto_principal(
+    html: str,
+    max_caracteres: int = MAX_TEXTO_CONTEXTO,
+) -> str:
+    # Texto de la nota para dar contexto al clasificador. Se prefiere
+    # <article>/<main>: menús y barras laterales traen palabras de
+    # otras notas.
+    try:
+        arbol = HTMLParser(
+            html
+        )
+
+    except Exception:
+        return ""
+
+    for nodo in arbol.css(
+        "script, style, noscript, nav, header, footer, aside, form"
+    ):
+        nodo.decompose()
+
+    principal = (
+        arbol.css_first("article")
+        or arbol.css_first("main")
+        or arbol.body
+    )
+
+    if principal is None:
+        return ""
+
+    return " ".join(
+        principal.text(
+            separator=" "
+        ).split()
+    )[:max_caracteres]
+
+
 def analizar_articulo(
     url: str,
 ) -> dict:
@@ -649,6 +689,8 @@ def analizar_articulo(
 
         "enlaces_relevantes":
             [],
+        "texto":
+            "",
     }
 
     if descarga[
@@ -673,6 +715,10 @@ def analizar_articulo(
         ] = str(error)
 
         return resultado
+
+    resultado["texto"] = extraer_texto_principal(
+        descarga["html"]
+    )
 
     dominio_articulo = dominio_de(
         descarga[

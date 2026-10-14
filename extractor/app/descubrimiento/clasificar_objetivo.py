@@ -92,9 +92,77 @@ def contiene(
     )
 
 
+PALABRAS_INVESTIGACION = (
+    "investigacion",
+    "investigaciones",
+    "investigador",
+    "investigadores",
+    "investigadora",
+    "cientifica",
+    "cientifico",
+    "cientificas",
+    "cientificos",
+    "humanistica",
+    "humanistico",
+    "investigacion aplicada",
+)
+
+
+PALABRAS_PROYECTO = (
+    "proyecto",
+    "proyectos",
+)
+
+
+PALABRAS_FINANCIAMIENTO = (
+    "financiamiento",
+    "financiacion",
+    "financiar",
+    "financia",
+    "financiado",
+    "financiada",
+    "fondo",
+    "fondos",
+    "subvencion",
+    "subvenciones",
+    "grant",
+    "funding",
+    "recursos",
+    "apoyo economico",
+    "apoyos economicos",
+    "millon de pesos",
+    "millones de pesos",
+)
+
+
+PALABRAS_BECA = (
+    "beca",
+    "becas",
+    "becario",
+    "becaria",
+)
+
+
+PALABRAS_EVENTO = (
+    "congreso",
+    "concurso",
+    "premio",
+    "reconocimiento",
+    "seminario",
+    "diplomado",
+    "curso",
+    "taller",
+    "encuentro",
+    "foro",
+    "feria",
+    "simposio",
+)
+
+
 def clasificar_objetivo_convocatoria(
     titulo: str,
     url: str,
+    contexto: str = "",
 ) -> dict:
     """
     Clasifica una URL según el objetivo
@@ -127,51 +195,17 @@ def clasificar_objetivo_convocatoria(
 
     investigacion = contiene(
         texto,
-        (
-            "investigacion",
-            "investigaciones",
-            "investigador",
-            "investigadores",
-            "investigadora",
-            "cientifica",
-            "cientifico",
-            "cientificas",
-            "cientificos",
-            "humanistica",
-            "humanistico",
-            "investigacion aplicada",
-        ),
+        PALABRAS_INVESTIGACION,
     )
 
     proyecto = contiene(
         texto,
-        (
-            "proyecto",
-            "proyectos",
-        ),
+        PALABRAS_PROYECTO,
     )
 
     financiamiento = contiene(
         texto,
-        (
-            "financiamiento",
-            "financiacion",
-            "financiar",
-            "financia",
-            "financiado",
-            "financiada",
-            "fondo",
-            "fondos",
-            "subvencion",
-            "subvenciones",
-            "grant",
-            "funding",
-            "recursos",
-            "apoyo economico",
-            "apoyos economicos",
-            "millon de pesos",
-            "millones de pesos",
-        ),
+        PALABRAS_FINANCIAMIENTO,
     )
 
     ciencia_tecnologia = contiene(
@@ -194,30 +228,12 @@ def clasificar_objetivo_convocatoria(
 
     beca = contiene(
         texto,
-        (
-            "beca",
-            "becas",
-            "becario",
-            "becaria",
-        ),
+        PALABRAS_BECA,
     )
 
     evento = contiene(
         texto,
-        (
-            "congreso",
-            "concurso",
-            "premio",
-            "reconocimiento",
-            "seminario",
-            "diplomado",
-            "curso",
-            "taller",
-            "encuentro",
-            "foro",
-            "feria",
-            "simposio",
-        ),
+        PALABRAS_EVENTO,
     )
 
     razones = []
@@ -388,6 +404,63 @@ def clasificar_objetivo_convocatoria(
             "razones_objetivo":
                 razones,
         }
+
+    # ==================================
+    # Contexto de la nota
+    # ==================================
+    #
+    # Un título general ("Abre FECTI 2026 convocatorias
+    # para impulsar la ciencia") no dice qué se financia;
+    # si el texto de la nota habla de financiar
+    # investigación o proyectos, se acepta. Solo sube
+    # desde REVISION: eventos y becas ya se resolvieron.
+
+    if convocatoria and contexto:
+        texto_contexto = normalizar(
+            contexto
+        )
+
+        # Una nota sobre becas o eventos no sube: el título
+        # puede no decirlo (p. ej. el nombre de un PDF).
+        if (
+            not contiene(
+                texto_contexto,
+                PALABRAS_BECA + PALABRAS_EVENTO,
+            )
+            and contiene(
+                texto_contexto,
+                PALABRAS_FINANCIAMIENTO,
+            )
+            and (
+                contiene(
+                    texto_contexto,
+                    PALABRAS_INVESTIGACION,
+                )
+                or contiene(
+                    texto_contexto,
+                    PALABRAS_PROYECTO,
+                )
+            )
+        ):
+            razones.append(
+                "+contexto: la nota describe "
+                "financiamiento de investigación "
+                "o proyectos"
+            )
+
+            return {
+                "categoria_objetivo":
+                    "FINANCIAMIENTO_INVESTIGACION",
+
+                "decision_objetivo":
+                    "ACEPTAR",
+
+                "puntaje_objetivo":
+                    puntaje,
+
+                "razones_objetivo":
+                    razones,
+            }
 
     # ==================================
     # Ciencia/tecnología demasiado general
