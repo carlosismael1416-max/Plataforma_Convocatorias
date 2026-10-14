@@ -399,9 +399,7 @@
 
                     <select
                         class="gp-select"
-                        wire:model.live="
-                            convocatoriaId
-                        "
+                        wire:model.live="convocatoriaId"
                     >
 
                         <option value="">
@@ -413,10 +411,11 @@
                             as $convocatoria
                         )
 
+                            {{-- Marcada desde el servidor: la preselección
+                                 no depende de que Livewire cargue. --}}
                             <option
-                                value="{{
-                                    $convocatoria->id
-                                }}"
+                                value="{{ $convocatoria->id }}"
+                                @selected((string) $convocatoria->id === $convocatoriaId)
                             >
                                 {{ $convocatoria->titulo }}
                             </option>
@@ -444,9 +443,8 @@
                         <input
                             type="text"
                             class="gp-input"
-                            wire:model="
-                                tituloPropuesta
-                            "
+                            wire:model="tituloPropuesta"
+                            value="{{ $tituloPropuesta }}"
                             maxlength="500"
                         >
 
