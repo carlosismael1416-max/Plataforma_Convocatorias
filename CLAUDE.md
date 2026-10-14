@@ -23,12 +23,13 @@ Versiones registradas; confirmarlas antes de asumirlas (`php artisan --version`,
 |---|---|
 | `app/descubrimiento/ejecutar_descubrimiento.py` | Punto de entrada del descubrimiento (Google News RSS, sitemaps, WordPress, HTML ligero, enlaces directos). |
 | `app/descubrimiento/clasificar_objetivo.py` | Clasificación por reglas → categoría + decisión `ACEPTAR` / `REVISION` / `DESCARTAR`. |
-| `app/evaluar_descubrimientos.py` | Puntaje; aprobación automática con ≥ 80 **y** condiciones obligatorias. Reevalúa `NUEVO`, `REVISION` y `APROBADO`. |
-| `app/publicar_descubrimientos.py` | Extracción persistente, deduplicación, validación, publicación. Reintentos: espera 5 h (el timer corre cada 6 h), máx. 3 intentos (`MAX_INTENTOS`); al agotarse pasa a `FUENTE_INACCESIBLE`. |
-| `app/validar_convocatoria.py` | Validación final del contenido extraído (umbral 70, bloqueos: resultados, premios, eventos, becas no aplicables). |
+| `app/descubrimiento/elegibilidad.py` | ¿Puede participar ITSVA (Yucatán, TecNM)? No elegibles: otros estados (nombre, gentilicio, siglas del consejo estatal o dominio `*.gob.mx`), instituciones extranjeras sin apertura a México, vacantes/plazas/admisiones. Elegibles: Yucatán, sur-sureste, nacionales, TecNM. Ignora el sufijo " - Medio" de Google News. Ante la duda, elegible. |
+| `app/evaluar_descubrimientos.py` | Puntaje; aprobación automática con ≥ 80 **y** condiciones obligatorias (incluye `elegible`); no elegible → `DESCARTADO`. Reevalúa `NUEVO`, `REVISION` y `APROBADO`. |
+| `app/publicar_descubrimientos.py` | Extracción persistente, deduplicación, validación, publicación. Reintentos: espera 5 h (el timer corre cada 6 h), máx. 3 intentos (`MAX_INTENTOS`); al agotarse pasa a `FUENTE_INACCESIBLE`. Antes de reintentar, los `ERROR_TEMPORAL` no elegibles pasan a `DESCARTADO`. |
+| `app/validar_convocatoria.py` | Validación final del contenido extraído (umbral 70, bloqueos: resultados, premios, eventos, becas no aplicables, no elegible para ITSVA). |
 | `app/ejecutar_scraping.py`, `app/ejecutar_fuente.py` | Extractor. Flags: `--fuente-id --url --limite --guardar --modo --vigencia --fecha --analizar-pdf --buscar-pdf`. `--analizar-pdf` es incompatible con `--guardar`. |
 | `app/ejecutar_ciclo_automatico.py` | Ciclo completo. Reporte en `extractor/ciclo_automatico_ultimo.json`. Límites: `--cantidad-google 6 --max-dominios 5 --max-publicaciones 5`. |
-| `app/main.py` | API: `GET /health`, `GET /db-check`, `POST /scraping/ejecutar`. Laravel la usa vía `EXTRACTOR_API_URL=http://127.0.0.1:8001` (página admin `MotorExtraccion`). Sin autenticación: escuchar solo en 127.0.0.1. Unit: `extractor/systemd/convocatorias-itsva-api.service`. |
+| `app/main.py` | API: `GET /health`, `GET /db-check`, `POST /scraping/ejecutar`. Laravel la usa vía `EXTRACTOR_API_URL=http://127.0.0.1:8001` (página admin `MotorExtraccion`). Sin autenticación: escuchar solo en 127.0.0.1. Unit: `extractor/systemd/convocatorias-itsva-api.service`. Al reservar, las ejecuciones con más de 60 min en `INICIADO`/`EJECUTANDO` se marcan `FALLIDO` y se registran en `bitacora_errores`. |
 
 ## Base de datos (PostgreSQL)
 
@@ -69,13 +70,10 @@ cd web && php artisan migrate:status && php artisan route:list --path=admin
 
 ## Problemas conocidos (al 13-oct-2026)
 
-- Último ciclo (13-oct 21:04): 0 aprobados, 0 publicados, 4 en revisión. Correcto: dos son becas (CALAS, BEXT JICA); FECTI Chihuahua (fondo estatal, cerró el 17-jul-2026) queda en revisión porque el título no menciona financiamiento.
+- Último ciclo (13-oct 21:04): 0 aprobados, 0 publicados, 4 en revisión. Con el filtro de elegibilidad, el siguiente ciclo descartará FECTI (Chihuahua), CALAS (Argentina) y COQHCYT (ID 2, Quintana Roo); las becas federales a Japón siguen en revisión (aplican a docentes).
 - `estado_temporal` del descubrimiento sale del año en el título, no de la fecha de cierre; la vigencia real la decide `validar_convocatoria.py` (bloquea fecha pasada o ausente).
-- Sin decidir: elegibilidad geográfica. Fondos estatales de otros estados (FECTI-Chihuahua, COQHCYT-Quintana Roo) probablemente no aplican a ITSVA (Yucatán); hoy no se filtran.
-- Descubrimiento ID 2 (COQHCYT): 3/3 intentos agotados; `cgc.qroo.gob.mx` no responde (timeout, incluso `robots.txt`). El siguiente ciclo lo pasará a `FUENTE_INACCESIBLE`; buscar un canal oficial alterno.
-- La API del puerto 8001 no está corriendo; probada a mano (`/health`, `/db-check` y alcanzable desde Laravel). Falta instalar su unit (requiere sudo).
-- `ejecuciones_scraping` en `INICIADO`/`EJECUTANDO` no caduca: si el extractor muere a mitad, la API responde 409 para siempre. Hoy no hay ninguna atascada.
-- `extractor/.env` tiene permisos 644 y contiene la contraseña de la BD; debería ser 600.
+- La API del puerto 8001 no está corriendo; probada a mano (`/health`, `/db-check` y alcanzable desde Laravel). Falta instalar su unit (requiere sudo). `.env` de `extractor/` y `web/` con permisos 600 (Laravel no corre como `www-data`; Apache solo sirve `/var/www/html`).
+- La elegibilidad usa solo título, URL y dominio; una convocatoria estatal publicada en un medio nacional sin mencionar el estado en el título no se detecta (la revisión humana sigue siendo necesaria).
 - Migraciones duplicadas de `convocatoria_padre_id` (`2026_10_09_204500` y `2026_10_09_205003`); ambas aplicadas, la segunda es idempotente.
 - PDF de SECIHTI con título "edición 54": mejorar extracción de título (metadatos, encabezados, página que lo enlaza); si sigue ambiguo → revisión.
 - Clasificación por palabras clave (título + último segmento de URL; ya normaliza acentos y compara palabras completas). No usa el contenido de la página, por eso siglas de fondos (FECTI) no se reconocen.
