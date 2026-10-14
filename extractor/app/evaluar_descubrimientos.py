@@ -3,6 +3,9 @@ from __future__ import annotations
 import argparse
 import json
 
+from app.descubrimiento.elegibilidad import (
+    evaluar_elegibilidad,
+)
 from app.descubrimiento.guardar_descubrimientos import (
     conectar,
 )
@@ -126,6 +129,17 @@ def evaluar_fila(
         )
         or ""
     ).upper()
+
+    elegibilidad = evaluar_elegibilidad(
+        fila.get("titulo"),
+        fila.get("url_original"),
+    )
+
+    if not elegibilidad["elegible"]:
+        razones.append(
+            "No elegible para ITSVA: "
+            + elegibilidad["motivo"]
+        )
 
     # =========================================================
     # PUNTAJE
@@ -265,6 +279,9 @@ def evaluar_fila(
         "no_historica":
             temporal
             != "HISTORICA",
+
+        "elegible":
+            elegibilidad["elegible"],
     }
 
     cumple_obligatorias = all(
@@ -277,6 +294,7 @@ def evaluar_fila(
 
     if (
         decision == "DESCARTAR"
+        or not elegibilidad["elegible"]
         or categoria
         in {
             "EVENTO",

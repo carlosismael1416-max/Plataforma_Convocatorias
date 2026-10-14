@@ -8,6 +8,10 @@ import sys
 from difflib import SequenceMatcher
 from urllib.parse import urlparse
 
+from app.descubrimiento.elegibilidad import (
+    evaluar_elegibilidad,
+)
+
 from app.descubrimiento.guardar_descubrimientos import (
     conectar,
 )
@@ -156,17 +160,76 @@ def cerrar_temporales_agotados(
     return cursor.rowcount
 
 
+def descartar_temporales_no_elegibles(
+    cursor,
+) -> int:
+    # El evaluador no revisa los ERROR_TEMPORAL; sin esto se
+    # reintentaría una convocatoria en la que ITSVA no participa.
+    cursor.execute(
+        """
+        SELECT id, titulo, url_original
+        FROM descubrimientos_web
+        WHERE estado = 'ERROR_TEMPORAL'
+        """
+    )
+
+    descartados = 0
+
+    for (
+        descubrimiento_id,
+        titulo,
+        url,
+    ) in cursor.fetchall():
+        elegibilidad = evaluar_elegibilidad(
+            titulo,
+            url,
+        )
+
+        if elegibilidad["elegible"]:
+            continue
+
+        cursor.execute(
+            """
+            UPDATE descubrimientos_web
+            SET
+                estado = 'DESCARTADO',
+                error_ultimo = %s,
+                updated_at = NOW()
+            WHERE id = %s
+            """,
+            (
+                "No elegible para ITSVA: "
+                + elegibilidad["motivo"],
+                descubrimiento_id,
+            ),
+        )
+
+        descartados += 1
+
+    return descartados
+
+
 def obtener_aprobados(
     limite: int,
 ) -> list[dict]:
     conexion = conectar()
     cursor = conexion.cursor()
 
+    no_elegibles = descartar_temporales_no_elegibles(
+        cursor
+    )
+
     cerrados = cerrar_temporales_agotados(
         cursor
     )
 
     conexion.commit()
+
+    if no_elegibles:
+        print(
+            "Descartados por no ser elegibles "
+            f"para ITSVA: {no_elegibles}"
+        )
 
     if cerrados:
         print(
