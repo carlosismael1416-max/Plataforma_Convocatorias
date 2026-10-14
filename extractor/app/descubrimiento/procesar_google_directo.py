@@ -4,6 +4,7 @@ import re
 
 from urllib.parse import (
     parse_qsl,
+    unquote,
     urlencode,
     urlsplit,
     urlunsplit,
@@ -141,6 +142,67 @@ def limpiar_titulo(
         ).strip()
 
     return titulo
+
+
+# Palabras que no describen el contenido de un enlace
+# ("edición 54", "Descargar PDF", "Consulta aquí las bases").
+PALABRAS_ENLACE_GENERICO = {
+    "aqui", "clic", "click", "descargar", "descarga",
+    "consulta", "consultar", "consultala", "ver", "mas",
+    "pdf", "enlace", "liga", "link", "documento", "archivo",
+    "edicion", "leer", "bases", "pagina", "sitio", "nota",
+    "convocatoria", "convocatorias",
+}
+
+
+def palabras_informativas(
+    texto: str,
+) -> int:
+    return sum(
+        1
+        for palabra in normalizar_texto(texto).split()
+        if len(palabra) >= 3
+        and not palabra.isdigit()
+        and palabra not in PALABRAS_ENLACE_GENERICO
+    )
+
+
+def titulo_desde_archivo(
+    url: str,
+) -> str:
+    # Convocatoria_BEXT_ET_JICA_2026-20260728T005548.pdf
+    # -> "Convocatoria BEXT ET JICA 2026"
+    nombre = unquote(urlsplit(url).path).rsplit("/", 1)[-1]
+    nombre = re.sub(r"\.pdf$", "", nombre, flags=re.I)
+    nombre = re.sub(r"[-_]?\d{8}T\d{6}", "", nombre)
+    nombre = re.sub(r"[_\-+]+", " ", nombre)
+
+    return " ".join(nombre.split())
+
+
+def elegir_titulo_candidato(
+    texto_enlace: str,
+    titulo_articulo: str,
+    url: str,
+) -> str:
+    """
+    Título para un enlace hallado dentro de una noticia: el
+    texto del enlace solo si describe algo; si es genérico, el
+    nombre del PDF o, en último caso, el título de la noticia.
+    """
+
+    texto_enlace = (texto_enlace or "").strip()
+
+    if palabras_informativas(texto_enlace) >= 2:
+        return texto_enlace
+
+    if urlsplit(url).path.lower().endswith(".pdf"):
+        desde_archivo = titulo_desde_archivo(url)
+
+        if palabras_informativas(desde_archivo) >= 2:
+            return desde_archivo
+
+    return titulo_articulo or texto_enlace
 
 
 def tipo_url(
@@ -763,11 +825,11 @@ def procesar_resultados_google(
                 continue
 
             titulo_candidato = (
-                texto_enlace
-                if len(
-                    texto_enlace
-                ) >= 8
-                else titulo
+                elegir_titulo_candidato(
+                    texto_enlace,
+                    titulo,
+                    enlace_url,
+                )
             )
 
             candidato = (
