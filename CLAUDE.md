@@ -74,7 +74,8 @@ cd web && php artisan migrate:status && php artisan route:list --path=admin
 
 ## Problemas conocidos (al 14-oct-2026)
 
-- Ninguna convocatoria real supera hoy el validador (70). La única vigente (ID 4, revistas de acceso abierto SECIHTI, cierra el 23-oct) obtiene 60 por falta de organismo, montos y objetivo. Aún no se demuestra una publicación automática real de principio a fin.
+- Prueba integral positiva (14-oct): la convocatoria 4 (SECIHTI, revistas de acceso abierto, cierra 23-oct) se extrajo de la fuente oficial, se enriqueció (descripción y objetivo desde la página y 2 PDF), el validador le dio 80/70 sin bloqueos y quedó `PUBLICADA`; el docente la ve en buscador, dashboard, detalle y calendario. El enriquecimiento y la publicación se ejecutaron a mano con las mismas funciones del ciclo; falta verla pasar a `CERRADA` sola tras el 23-oct.
+- Le faltan organismo y categoría (el enriquecimiento no los resuelve para SECIHTI); el validador los puntúa pero no los exige.
 - Requieren sudo (pendientes de instalar):
   - API: `sudo cp extractor/systemd/convocatorias-itsva-api.service /etc/systemd/system/ && sudo systemctl daemon-reload && sudo systemctl enable --now convocatorias-itsva-api.service`
   - `MemoryMax=1G` del ciclo: `sudo cp extractor/systemd/convocatorias-itsva.service /etc/systemd/system/ && sudo systemctl daemon-reload`
