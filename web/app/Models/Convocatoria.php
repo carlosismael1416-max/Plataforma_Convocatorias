@@ -11,7 +11,8 @@ class Convocatoria extends Model
     protected $table = 'convocatorias';
 
     protected $fillable = [
-        'titulo',
+                'convocatoria_padre_id',
+'titulo',
         'descripcion',
         'objetivo',
         'fecha_publicacion',
@@ -53,6 +54,22 @@ class Convocatoria extends Model
             'monto_minimo' => 'decimal:2',
             'monto_maximo' => 'decimal:2',
         ];
+    }
+
+    public function padre(): BelongsTo
+    {
+        return $this->belongsTo(
+            self::class,
+            'convocatoria_padre_id'
+        );
+    }
+
+    public function capitulos(): HasMany
+    {
+        return $this->hasMany(
+            self::class,
+            'convocatoria_padre_id'
+        )->orderBy('id');
     }
 
     public function categoria(): BelongsTo
