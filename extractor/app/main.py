@@ -96,6 +96,100 @@ def obtener_fuente(fuente_id: int):
     }
 
 
+MINUTOS_MAX_EJECUCION = 60
+
+
+def liberar_ejecuciones_vencidas(cursor) -> int:
+    """
+    Si el extractor muere (reinicio de WSL, de la API o
+    del equipo), su ejecución queda en INICIADO/EJECUTANDO
+    y bloquearía todas las siguientes con 409. Las que
+    superan MINUTOS_MAX_EJECUCION se marcan FALLIDO y se
+    registran en bitacora_errores.
+    """
+
+    cursor.execute(
+        """
+        UPDATE ejecuciones_scraping
+        SET
+            fecha_fin = NOW(),
+            estado = 'FALLIDO',
+            total_errores = total_errores + 1,
+            updated_at = NOW()
+        WHERE estado IN (
+            'INICIADO',
+            'EJECUTANDO'
+        )
+          AND fecha_inicio < NOW()
+              - make_interval(mins => %s)
+        RETURNING id
+        """,
+        (MINUTOS_MAX_EJECUCION,),
+    )
+
+    vencidas = [
+        fila[0]
+        for fila in cursor.fetchall()
+    ]
+
+    if not vencidas:
+        return 0
+
+    cursor.execute(
+        """
+        UPDATE ejecucion_fuentes
+        SET
+            fecha_fin = NOW(),
+            estado = 'ERROR',
+            errores = errores + 1,
+            updated_at = NOW()
+        WHERE ejecucion_scraping_id = ANY(%s)
+          AND estado IN (
+              'PENDIENTE',
+              'EJECUTANDO'
+          )
+        """,
+        (vencidas,),
+    )
+
+    cursor.execute(
+        """
+        INSERT INTO bitacora_errores (
+            ejecucion_scraping_id,
+            fuente_id,
+            tipo_error,
+            codigo_error,
+            mensaje,
+            resuelto,
+            created_at,
+            updated_at
+        )
+        SELECT
+            es.id,
+            ef.fuente_id,
+            'EJECUCION',
+            'EJECUCION_ABANDONADA',
+            %s,
+            false,
+            NOW(),
+            NOW()
+        FROM ejecuciones_scraping es
+        LEFT JOIN ejecucion_fuentes ef
+            ON ef.ejecucion_scraping_id = es.id
+        WHERE es.id = ANY(%s)
+        """,
+        (
+            "La ejecución no terminó en "
+            f"{MINUTOS_MAX_EJECUCION} minutos; "
+            "se marcó FALLIDO para liberar "
+            "la reserva.",
+            vencidas,
+        ),
+    )
+
+    return len(vencidas)
+
+
 def reservar_ejecucion(fuente_id: int):
     """
     Reserva una ejecución dentro de una transacción.
@@ -116,6 +210,10 @@ def reservar_ejecucion(fuente_id: int):
                         9262026
                     )
                     """
+                )
+
+                liberar_ejecuciones_vencidas(
+                    cursor
                 )
 
                 cursor.execute(
