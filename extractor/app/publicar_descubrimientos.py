@@ -1935,6 +1935,188 @@ def procesar_aprobados(
     return resumen
 
 
+# Revalidación de convocatorias pendientes que llegaron por scraping
+# (no por un descubrimiento). Sin este paso nadie las volvía a
+# enriquecer ni validar. Las MANUAL las revisa un directivo.
+MAX_REVALIDACIONES = 3
+HORAS_ENTRE_REVALIDACIONES = 20
+# Extracción en vista previa (300 s) + PDF del enriquecimiento.
+SEGUNDOS_MAX_POR_REVALIDACION = 600
+
+
+def cerrar_pendientes_vencidas(
+    cursor,
+) -> int:
+    cursor.execute(
+        """
+        UPDATE convocatorias
+        SET
+            estado = 'CERRADA',
+            updated_at = NOW()
+        WHERE estado = 'PENDIENTE_REVISION'
+          AND origen = 'SCRAPING'
+          AND fecha_cierre < CURRENT_DATE
+        """
+    )
+
+    return cursor.rowcount
+
+
+def marcar_revisada(
+    convocatoria_id: int,
+) -> None:
+    # updated_at ordena la rotación: la siguiente revisión de esta
+    # convocatoria será en HORAS_ENTRE_REVALIDACIONES.
+    conexion = conectar()
+    cursor = conexion.cursor()
+
+    cursor.execute(
+        """
+        UPDATE convocatorias
+        SET updated_at = NOW()
+        WHERE id = %s
+        """,
+        (
+            convocatoria_id,
+        ),
+    )
+
+    conexion.commit()
+    conexion.close()
+
+
+def revalidar_pendientes(
+    limite: int = MAX_REVALIDACIONES,
+    *,
+    terminar_antes_de: float | None = None,
+) -> dict:
+    conexion = conectar()
+    cursor = conexion.cursor()
+
+    cerradas = cerrar_pendientes_vencidas(
+        cursor
+    )
+
+    cursor.execute(
+        """
+        SELECT id, titulo
+        FROM convocatorias
+        WHERE estado = 'PENDIENTE_REVISION'
+          AND origen = 'SCRAPING'
+          AND (
+                fecha_cierre IS NULL
+                OR fecha_cierre >= CURRENT_DATE
+              )
+          AND updated_at < NOW()
+              - make_interval(hours => %s)
+        ORDER BY updated_at, id
+        LIMIT %s
+        """,
+        (
+            HORAS_ENTRE_REVALIDACIONES,
+            limite,
+        ),
+    )
+
+    pendientes = cursor.fetchall()
+
+    conexion.commit()
+    conexion.close()
+
+    resumen = {
+        "cerradas_vencidas": cerradas,
+        "revisadas": 0,
+        "publicadas": 0,
+        "siguen_pendientes": 0,
+        "errores": 0,
+        "pospuestas": 0,
+        "resultados": [],
+    }
+
+    for posicion, (convocatoria_id, titulo) in enumerate(
+        pendientes
+    ):
+        if (
+            terminar_antes_de is not None
+            and time.monotonic()
+            + SEGUNDOS_MAX_POR_REVALIDACION
+            > terminar_antes_de
+        ):
+            resumen["pospuestas"] = (
+                len(pendientes)
+                - posicion
+            )
+            break
+
+        print()
+        print(
+            "REVALIDANDO CONVOCATORIA",
+            convocatoria_id,
+        )
+        print(
+            titulo
+        )
+
+        resumen["revisadas"] += 1
+
+        try:
+            contexto = cargar_contexto(
+                convocatoria_id,
+                None,
+            )
+
+            aplicar_enriquecimiento(
+                contexto,
+                construir_enriquecimiento(
+                    contexto
+                ),
+            )
+
+            validacion = validar_convocatoria(
+                convocatoria_id,
+                None,
+                publicar=True,
+            )
+
+        except Exception as error:
+            resumen["errores"] += 1
+            resumen["resultados"].append({
+                "convocatoria_id": convocatoria_id,
+                "estado": "ERROR",
+                "error": f"{type(error).__name__}: {error}",
+            })
+            marcar_revisada(
+                convocatoria_id
+            )
+            continue
+
+        if validacion["publicable"]:
+            resumen["publicadas"] += 1
+            estado = "PUBLICADA"
+
+        else:
+            resumen["siguen_pendientes"] += 1
+            estado = "PENDIENTE_REVISION"
+            marcar_revisada(
+                convocatoria_id
+            )
+
+        print(
+            "Resultado:",
+            estado,
+            f"({validacion['score']}/{validacion['umbral']})",
+        )
+
+        resumen["resultados"].append({
+            "convocatoria_id": convocatoria_id,
+            "estado": estado,
+            "score": validacion["score"],
+            "bloqueos": validacion["bloqueos"],
+        })
+
+    return resumen
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(
         description=(

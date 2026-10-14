@@ -23,6 +23,7 @@ from app.evaluar_descubrimientos import (
 
 from app.publicar_descubrimientos import (
     procesar_aprobados,
+    revalidar_pendientes,
 )
 
 
@@ -430,7 +431,7 @@ def ejecutar_ciclo(
 
         print()
         print(
-            "FASE 1/3: DESCUBRIMIENTO"
+            "FASE 1/4: DESCUBRIMIENTO"
         )
 
         descubrimiento = (
@@ -457,7 +458,7 @@ def ejecutar_ciclo(
 
         print()
         print(
-            "FASE 2/3: "
+            "FASE 2/4: "
             "EVALUACIÓN AUTOMÁTICA"
         )
 
@@ -501,7 +502,7 @@ def ejecutar_ciclo(
 
         print()
         print(
-            "FASE 3/3: "
+            "FASE 3/4: "
             "EXTRACCIÓN Y PUBLICACIÓN"
         )
 
@@ -551,6 +552,33 @@ def ejecutar_ciclo(
             ),
         )
 
+        # =====================================================
+        # 4. REVALIDAR CONVOCATORIAS PENDIENTES
+        # =====================================================
+
+        print()
+        print(
+            "FASE 4/4: "
+            "REVALIDACIÓN DE PENDIENTES"
+        )
+
+        revalidacion = revalidar_pendientes(
+            terminar_antes_de=
+                terminar_antes_de,
+        )
+
+        for etiqueta, clave in (
+            ("Pendientes vencidas cerradas:", "cerradas_vencidas"),
+            ("Revisadas:", "revisadas"),
+            ("Publicadas:", "publicadas"),
+            ("Siguen pendientes:", "siguen_pendientes"),
+            ("Errores:", "errores"),
+        ):
+            print(
+                etiqueta,
+                revalidacion[clave],
+            )
+
         fin = (
             datetime.now()
             .astimezone()
@@ -561,6 +589,9 @@ def ejecutar_ciclo(
                 "ok"
             ]
             or publicacion[
+                "errores"
+            ] > 0
+            or revalidacion[
                 "errores"
             ] > 0
         )
@@ -587,6 +618,9 @@ def ejecutar_ciclo(
 
             "publicacion":
                 publicacion,
+
+            "revalidacion":
+                revalidacion,
         }
 
         archivo = (

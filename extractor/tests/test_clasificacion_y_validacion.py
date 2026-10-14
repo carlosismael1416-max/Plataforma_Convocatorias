@@ -284,6 +284,34 @@ class EvaluarConvocatoriaTest(unittest.TestCase):
 
         self.assertFalse(resultado["publicable"])
 
+    def test_beca_en_la_ruta_se_bloquea_aunque_el_titulo_no_lo_diga(self):
+        # Caso real (convocatoria 5): apoyo a estudiantes extranjeros
+        # publicado bajo /becas-nacionales/.
+        resultado = evaluar_convocatoria(
+            self.convocatoria(
+                titulo="Convocatoria 2026 Apoyo Complementario SECIHTI-OEA",
+                url_original=(
+                    "https://www.secihti.mx/convocatoria/becas-nacionales/"
+                    "convocatoria-2026-apoyo-complementario-secihti-oea"
+                ),
+            )
+        )
+
+        self.assertFalse(resultado["publicable"])
+
+        # La convocatoria 4 (ruta ciencias-y-humanidades) sigue pasando.
+        self.assertTrue(
+            evaluar_convocatoria(
+                self.convocatoria(
+                    url_original=(
+                        "https://www.secihti.mx/convocatoria/"
+                        "ciencias-y-humanidades/convocatoria-para-el-"
+                        "fortalecimiento-de-revistas-2026"
+                    ),
+                )
+            )["publicable"]
+        )
+
     def test_recursos_no_se_bloquea_como_curso(self):
         resultado = evaluar_convocatoria(
             self.convocatoria(
