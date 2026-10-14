@@ -12,8 +12,10 @@ No agregar funciones nuevas hasta que ese ciclo esté demostrado con registros r
 - `extractor/` — Python: Scrapy, FastAPI/Uvicorn (puerto 8001), selectolax, googlenewsdecoder.
 - `database/schema.sql` — esquema PostgreSQL.
 - Automatización: systemd `convocatorias-itsva.service` + `convocatorias-itsva.timer` (00:00, 06:00, 12:00, 18:00; `Persistent=true`). En WSL solo corre mientras WSL está encendido. Copias versionadas de las units en `extractor/systemd/` (la instalada en `/etc/systemd/system/` es la que rige).
-- Pruebas del extractor: `cd extractor && ./.venv/bin/python -m unittest discover -s tests -t .` (38; `test_publicacion_bd.py` usa PostgreSQL en transacción revertida y se omite sin conexión).
-- Verificaciones de la web (PHPUnit no corre: `phpunit.xml` usa SQLite y varias migraciones tienen SQL de PostgreSQL): `cd web && php tests/Verificacion/<script>.php` — `todas_las_paginas.php` (77 rutas GET), `permisos_por_rol.php`, `docente_no_ve_vencidas.php`, `propuesta_id_bloqueado.php`, `convocatoria_dependencias.php`. Usan usuarios id 1 (admin), 2 (docente), 3 (directivo) y revierten sus datos.
+- Pruebas del extractor: `cd extractor && ./.venv/bin/python -m unittest discover -s tests -t .` (52; `test_publicacion_bd.py` usa PostgreSQL en transacción revertida y se omite sin conexión).
+- Pruebas de la web: `cd web && php artisan test` (17, PHPUnit sobre PostgreSQL). La base se fuerza a `convocatorias_itsva_test` y `tests/TestCase.php` aborta si no termina en `_test` (RefreshDatabase la vacía). Requiere crear esa base una vez (ver Problemas conocidos).
+- Verificaciones contra la base real (revierten sus datos): `cd web && php tests/Verificacion/<script>.php` — `todas_las_paginas.php` (75 rutas GET), `permisos_por_rol.php`, `docente_no_ve_vencidas.php`, `propuesta_id_bloqueado.php`, `convocatoria_dependencias.php`. Usan usuarios id 1 (admin), 2 (docente), 3 (directivo).
+- `convocatorias.url_hash` = sha256 de la URL normalizada (`extractor/app/urls.py` y `Convocatoria::hashUrl()` deben coincidir; si cambias la regla, corre `extractor/scripts/recalcular_url_hash.py`).
 - No regenerar con `make:filament-resource`: los recursos de Convocatorias (admin, directivo, docente), Fuentes, Roles y Users tienen autorización y flujos propios (`can*`, `getEloquentQuery`, `handleRecordCreation/Update`).
 - Entorno virtual Python: `extractor/.venv`.
 
@@ -24,10 +26,10 @@ Versiones registradas; confirmarlas antes de asumirlas (`php artisan --version`,
 | Archivo | Función |
 |---|---|
 | `app/ejecutar_descubrimiento.py` | Punto de entrada del descubrimiento (Google News RSS, sitemaps, WordPress, HTML ligero, enlaces directos). |
-| `app/descubrimiento/clasificar_objetivo.py` | Clasificación por reglas → categoría + decisión `ACEPTAR` / `REVISION` / `DESCARTAR`. |
+| `app/descubrimiento/clasificar_objetivo.py` | Clasificación por reglas (título + URL; palabras completas) → categoría + decisión `ACEPTAR` / `REVISION` / `DESCARTAR`. El texto de la nota (contexto) solo sube de `REVISION` a `ACEPTAR` si habla de financiar investigación/proyectos y no de becas o eventos. |
 | `app/descubrimiento/elegibilidad.py` | ¿Puede participar ITSVA (Yucatán, TecNM)? No elegibles: otros estados (nombre, gentilicio, siglas del consejo estatal o dominio `*.gob.mx`), instituciones extranjeras sin apertura a México, vacantes/plazas/admisiones. Elegibles: Yucatán, sur-sureste, nacionales, TecNM. Ignora el sufijo " - Medio" de Google News. Ante la duda, elegible. |
 | `app/evaluar_descubrimientos.py` | Puntaje; aprobación automática con ≥ 80 **y** condiciones obligatorias (incluye `elegible`); no elegible → `DESCARTADO`. Reevalúa `NUEVO`, `REVISION` y `APROBADO`. |
-| `app/publicar_descubrimientos.py` | Extracción persistente, deduplicación, validación, publicación. Reintentos: espera 5 h (el timer corre cada 6 h), máx. 3 intentos (`MAX_INTENTOS`); al agotarse pasa a `FUENTE_INACCESIBLE`. Antes de reintentar, los `ERROR_TEMPORAL` no elegibles pasan a `DESCARTADO`. |
+| `app/publicar_descubrimientos.py` | Extracción persistente, deduplicación (por `url_hash`), validación, publicación. Al iniciar: cierra `PUBLICADA` vencidas (y padres con todas sus hijas cerradas), recupera `EN_PROCESO` de más de 2 h, descarta `ERROR_TEMPORAL` no elegibles. No empieza un descubrimiento que no alcance a terminar antes del plazo del ciclo (3.300 s). Reintentos: espera 5 h (el timer corre cada 6 h), máx. 3 intentos (`MAX_INTENTOS`); al agotarse pasa a `FUENTE_INACCESIBLE`. Antes de reintentar, los `ERROR_TEMPORAL` no elegibles pasan a `DESCARTADO`. |
 | `app/validar_convocatoria.py` | Validación final del contenido extraído (umbral 70, bloqueos: resultados, premios, eventos, becas no aplicables, no elegible para ITSVA). |
 | `app/ejecutar_scraping.py`, `app/ejecutar_fuente.py` | Extractor. Flags: `--fuente-id --url --limite --guardar --modo --vigencia --fecha --analizar-pdf --buscar-pdf`. `--analizar-pdf` es incompatible con `--guardar`. |
 | `app/ejecutar_ciclo_automatico.py` | Ciclo completo. Reporte en `extractor/ciclo_automatico_ultimo.json`. Límites: `--cantidad-google 6 --max-dominios 5 --max-publicaciones 5`. |
@@ -72,21 +74,19 @@ cd web && php artisan migrate:status && php artisan route:list --path=admin
 
 ## Problemas conocidos (al 14-oct-2026)
 
-- Ciclo del 14-oct 00:00: 0 aprobados y 0 publicados, decisión correcta. FECTI, COQHCYT y CALAS quedaron `DESCARTADO` por elegibilidad; solo siguen en revisión dos becas federales (ID 4 y 6).
-- Ninguna convocatoria real supera hoy el validador (70). La única vigente (ID 4, revistas de acceso abierto, cierra el 23-oct) obtiene 60 por falta de organismo, montos y objetivo. No se demostró aún una publicación automática real de principio a fin.
-- `estado_temporal` del descubrimiento sale del año en el título, no de la fecha de cierre; la vigencia real la decide `validar_convocatoria.py` (bloquea fecha pasada o ausente) y el docente solo ve `noVencidas()`.
-- Nada pasa a `CERRADA` una convocatoria `PUBLICADA` cuando vence (solo las hijas de un marco); la web la oculta, pero la BD no refleja el cierre. Pendiente de decisión.
-- `url_hash` se calcula distinto en `guardar_resultado_scrapy.py` (sin normalizar `www.`/mayúsculas) y en `resolver_convocatoria_marco.py`; la misma URL con y sin `www.` evade el índice único. `buscar_convocatoria_exacta` compensa leyendo toda la tabla. Unificar requiere recalcular hashes existentes.
-- La API (8001) y el ciclo usan bloqueos distintos; si coinciden, la asociación por `max(id)` del publicador podría tomar una fila ajena (mitigado por fuente y similitud de título).
-- El peor caso del ciclo (~7.500 s) supera `TimeoutStartSec=3600`; los `EN_PROCESO` abandonados se recuperan a las 2 h, pero el ciclo queda cortado.
-- La API del puerto 8001 no está corriendo: falta instalar su unit (requiere sudo).
-- Elegibilidad y clasificación usan solo título, URL y dominio; no el contenido del artículo (que ya se descarga). Siglas de fondos sin estado en el título no se reconocen.
+- Ninguna convocatoria real supera hoy el validador (70). La única vigente (ID 4, revistas de acceso abierto SECIHTI, cierra el 23-oct) obtiene 60 por falta de organismo, montos y objetivo. Aún no se demuestra una publicación automática real de principio a fin.
+- Requieren sudo (pendientes de instalar):
+  - API: `sudo cp extractor/systemd/convocatorias-itsva-api.service /etc/systemd/system/ && sudo systemctl daemon-reload && sudo systemctl enable --now convocatorias-itsva-api.service`
+  - `MemoryMax=1G` del ciclo: `sudo cp extractor/systemd/convocatorias-itsva.service /etc/systemd/system/ && sudo systemctl daemon-reload`
+  - Base de pruebas: `sudo -u postgres createdb -O <DB_USERNAME de web/.env> convocatorias_itsva_test`
+- `estado_temporal` del descubrimiento sale del año en el título; la vigencia real la decide el validador y la web (`noVencidas()`), y el ciclo cierra las publicadas vencidas.
+- La API (8001) y el ciclo usan bloqueos distintos; si coinciden, la asociación tras extraer usa primero `url_hash` y solo después la heurística de `max(id)`.
+- Elegibilidad por título, URL y dominio: una convocatoria estatal publicada en un medio nacional sin mencionar el estado no se detecta.
 - El descubrimiento ID 4 conserva el título "edición 54" (la mejora de títulos aplica a descubrimientos nuevos).
-- `ConvocatoriaResource::tieneDependencias` no considera hijas (`convocatoria_padre_id`): un padre con hijas se puede borrar.
-- Código sin uso: 32 módulos del extractor (6.863 líneas, `probar_*`, `diagnosticar_*`, flujo ECOS), 28 `.bak` en `web/app/Filament`, Vite/npm sin uso; Playwright instalado sin uso (658 MB de navegadores).
+- Se consulta el estado `ACTIVA`, que nada produce (se dejó como alias inofensivo de `PUBLICADA`; quitarlo toca 26 archivos). La publicación manual permite convocatorias sin fecha de cierre (decisión del directivo). `APP_DEBUG=true` (solo desarrollo).
 - OCR (tesseract) activo solo en la ruta de convocatorias marco (`leer_imagen_calendario`).
-- Migraciones duplicadas de `convocatoria_padre_id` (`2026_10_09_204500` y `2026_10_09_205003`); ambas aplicadas, la segunda es idempotente.
-- `APP_DEBUG=true` en `web/.env` (aceptable solo en desarrollo). Se consulta el estado `ACTIVA`, que no existe en el flujo.
+- Migraciones duplicadas de `convocatoria_padre_id` (`2026_10_09_204500` y `2026_10_09_205003`); ambas aplicadas, la segunda es idempotente. `convocatoria_padre_id` no tiene llave foránea.
+- Respaldos fuera de git: `extractor/backups/legado_2026-10-14/` (scripts `probar_*`/`diagnosticar_*` y 75 `.bak`) y `extractor/backups/url_hash_antes_2026-10-14.csv`.
 
 ## Criterio de terminado
 
