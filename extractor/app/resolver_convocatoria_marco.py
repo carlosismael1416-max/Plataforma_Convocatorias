@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import argparse
-import hashlib
 import io
 import re
 import unicodedata
@@ -25,6 +24,11 @@ from app.procesar_hijas_marco import (
 from app.seguridad_red import (
     descargar_mismo_dominio,
     mismo_dominio,
+)
+
+from app.urls import (
+    hash_url,
+    normalizar_url,
 )
 
 
@@ -1087,58 +1091,6 @@ def resolver_capitulo(
 
 
 
-def normalizar_url_registro(
-    url: str,
-) -> str:
-    parsed = urlparse(
-        url.strip()
-    )
-
-    esquema = (
-        parsed.scheme.lower()
-        or "https"
-    )
-
-    host = (
-        parsed.hostname
-        or ""
-    ).lower().removeprefix(
-        "www."
-    )
-
-    ruta = (
-        parsed.path
-        or "/"
-    )
-
-    if ruta != "/":
-        ruta = ruta.rstrip("/")
-
-    resultado = (
-        f"{esquema}://{host}{ruta}"
-    )
-
-    if parsed.query:
-        resultado += (
-            "?"
-            + parsed.query
-        )
-
-    return resultado
-
-
-def hash_url_registro(
-    url: str,
-) -> str:
-    return hashlib.sha256(
-        normalizar_url_registro(
-            url
-        ).encode(
-            "utf-8"
-        )
-    ).hexdigest()
-
-
 def obtener_datos_padre(
     convocatoria_padre_id: int,
 ) -> dict:
@@ -1287,13 +1239,13 @@ def crear_o_actualizar_capitulos(
                 continue
 
             url_normalizada = (
-                normalizar_url_registro(
+                normalizar_url(
                     url
                 )
             )
 
             url_hash = (
-                hash_url_registro(
+                hash_url(
                     url
                 )
             )

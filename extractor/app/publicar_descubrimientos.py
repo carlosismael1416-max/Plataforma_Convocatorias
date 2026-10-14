@@ -20,6 +20,11 @@ from app.seguridad_red import (
     validar_url_publica,
 )
 
+from app.urls import (
+    hash_url,
+    normalizar_url,
+)
+
 from app.validar_convocatoria import (
     validar_convocatoria,
 )
@@ -30,49 +35,6 @@ from app.enriquecer_convocatoria import (
     construir_enriquecimiento,
 )
 
-
-
-def normalizar_url(
-    url: str | None,
-) -> str:
-    if not url:
-        return ""
-
-    try:
-        parsed = urlparse(
-            url.strip()
-        )
-
-        host = (
-            parsed.hostname
-            or ""
-        ).lower().removeprefix(
-            "www."
-        )
-
-        path = (
-            parsed.path
-            or "/"
-        )
-
-        if path != "/":
-            path = path.rstrip("/")
-
-        resultado = (
-            f"{parsed.scheme.lower() or 'https'}"
-            f"://{host}{path}"
-        )
-
-        if parsed.query:
-            resultado += (
-                "?"
-                + parsed.query
-            )
-
-        return resultado
-
-    except Exception:
-        return url.strip().rstrip("/")
 
 
 def dominio_url(
@@ -656,13 +618,12 @@ def buscar_convocatoria_exacta(
     conexion,
     url: str,
 ) -> dict | None:
-    objetivo = normalizar_url(
-        url
-    )
-
     cursor = conexion.cursor()
 
-    cursor.execute("""
+    # url_hash es único e indexado y se calcula con la misma
+    # normalización en todo el sistema (app/urls.py).
+    cursor.execute(
+        """
         SELECT
             id,
             titulo,
@@ -670,36 +631,34 @@ def buscar_convocatoria_exacta(
             fuente_id,
             estado
         FROM convocatorias
-        WHERE url_original IS NOT NULL
-        ORDER BY id DESC
-    """)
+        WHERE url_hash = %s
+        LIMIT 1
+        """,
+        (
+            hash_url(
+                url
+            ),
+        ),
+    )
 
-    for fila in cursor.fetchall():
-        if normalizar_url(
-            fila[2]
-        ) == objetivo:
-            cursor.close()
-
-            return {
-                "id":
-                    fila[0],
-
-                "titulo":
-                    fila[1],
-
-                "url":
-                    fila[2],
-
-                "fuente_id":
-                    fila[3],
-
-                "estado":
-                    fila[4],
-            }
-
+    fila = cursor.fetchone()
     cursor.close()
 
-    return None
+    if fila is None:
+        return None
+
+    return {
+        "id":
+            fila[0],
+        "titulo":
+            fila[1],
+        "url":
+            fila[2],
+        "fuente_id":
+            fila[3],
+        "estado":
+            fila[4],
+    }
 
 
 def buscar_nuevas(
