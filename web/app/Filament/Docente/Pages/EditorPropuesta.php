@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Models\UsuarioConvocatoria;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
+use Livewire\Attributes\Locked;
 
 class EditorPropuesta extends Page
 {
@@ -18,6 +19,9 @@ class EditorPropuesta extends Page
     protected string $view =
         'filament.docente.pages.editor-propuesta';
 
+    // El navegador no puede cambiarla: identifica la propuesta
+    // del usuario validada en mount().
+    #[Locked]
     public int $propuestaId;
 
     public string $titulo = '';

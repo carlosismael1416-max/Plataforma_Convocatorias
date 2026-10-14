@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use OpenSpout\Common\Entity\Row;
 use OpenSpout\Writer\XLSX\Writer;
+use Livewire\Attributes\Locked;
 
 class VistaPreviaPropuesta extends Page
 {
@@ -32,6 +33,9 @@ class VistaPreviaPropuesta extends Page
     protected string $view =
         'filament.docente.pages.vista-previa-propuesta';
 
+    // El navegador no puede cambiarla: identifica la propuesta
+    // del usuario validada en mount().
+    #[Locked]
     public int $propuestaId;
 
     public static function canAccess(): bool

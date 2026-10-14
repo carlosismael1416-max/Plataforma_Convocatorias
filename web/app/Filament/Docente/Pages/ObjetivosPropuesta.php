@@ -9,6 +9,7 @@ use App\Models\UsuarioConvocatoria;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Illuminate\Support\Facades\DB;
+use Livewire\Attributes\Locked;
 
 class ObjetivosPropuesta extends Page
 {
@@ -23,6 +24,9 @@ class ObjetivosPropuesta extends Page
     protected string $view =
         'filament.docente.pages.objetivos-propuesta';
 
+    // El navegador no puede cambiarla: identifica la propuesta
+    // del usuario validada en mount().
+    #[Locked]
     public int $propuestaId;
 
     public string $objetivoGeneral = '';

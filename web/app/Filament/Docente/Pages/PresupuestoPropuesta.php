@@ -9,6 +9,7 @@ use App\Models\UsuarioConvocatoria;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Illuminate\Validation\Rule;
+use Livewire\Attributes\Locked;
 
 class PresupuestoPropuesta extends Page
 {
@@ -33,6 +34,9 @@ class PresupuestoPropuesta extends Page
         'OTRO' => 'Otro',
     ];
 
+    // El navegador no puede cambiarla: identifica la propuesta
+    // del usuario validada en mount().
+    #[Locked]
     public int $propuestaId;
 
     public ?int $itemEditandoId = null;

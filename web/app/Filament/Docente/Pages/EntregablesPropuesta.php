@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Livewire\WithFileUploads;
+use Livewire\Attributes\Locked;
 
 class EntregablesPropuesta extends Page
 {
@@ -42,6 +43,9 @@ class EntregablesPropuesta extends Page
         'RECHAZADO' => 'Rechazado',
     ];
 
+    // El navegador no puede cambiarla: identifica la propuesta
+    // del usuario validada en mount().
+    #[Locked]
     public int $propuestaId;
 
     public ?int $entregableEditandoId = null;

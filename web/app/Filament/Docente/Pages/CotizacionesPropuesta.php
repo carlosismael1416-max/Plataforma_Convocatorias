@@ -12,6 +12,7 @@ use Filament\Pages\Page;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Livewire\WithFileUploads;
+use Livewire\Attributes\Locked;
 
 class CotizacionesPropuesta extends Page
 {
@@ -28,6 +29,9 @@ class CotizacionesPropuesta extends Page
     protected string $view =
         'filament.docente.pages.cotizaciones-propuesta';
 
+    // El navegador no puede cambiarla: identifica la propuesta
+    // del usuario validada en mount().
+    #[Locked]
     public int $propuestaId;
 
     public ?int $cotizacionEditandoId = null;
