@@ -160,6 +160,39 @@ def cerrar_temporales_agotados(
     return cursor.rowcount
 
 
+HORAS_MAX_EN_PROCESO = 2
+
+
+def recuperar_en_proceso_abandonados(
+    cursor,
+) -> int:
+    # Si systemd corta el ciclo (TimeoutStartSec) o WSL se apaga,
+    # el descubrimiento queda en EN_PROCESO y nada lo vuelve a
+    # tomar. Un intento tarda como máximo ~25 min (extracción,
+    # marco y enriquecimiento); pasadas 2 h se considera
+    # abandonado. El intento ya se contó al pasar a EN_PROCESO.
+    cursor.execute(
+        """
+        UPDATE descubrimientos_web
+        SET
+            estado = 'ERROR_TEMPORAL',
+            error_ultimo =
+                'ERROR_TEMPORAL: el procesamiento '
+                || 'se interrumpió (EN_PROCESO '
+                || 'abandonado).',
+            updated_at = NOW()
+        WHERE estado = 'EN_PROCESO'
+          AND updated_at < NOW()
+              - make_interval(hours => %s)
+        """,
+        (
+            HORAS_MAX_EN_PROCESO,
+        ),
+    )
+
+    return cursor.rowcount
+
+
 def descartar_temporales_no_elegibles(
     cursor,
 ) -> int:
@@ -215,6 +248,10 @@ def obtener_aprobados(
     conexion = conectar()
     cursor = conexion.cursor()
 
+    recuperados = recuperar_en_proceso_abandonados(
+        cursor
+    )
+
     no_elegibles = descartar_temporales_no_elegibles(
         cursor
     )
@@ -224,6 +261,12 @@ def obtener_aprobados(
     )
 
     conexion.commit()
+
+    if recuperados:
+        print(
+            "Recuperados de EN_PROCESO "
+            f"abandonado: {recuperados}"
+        )
 
     if no_elegibles:
         print(
