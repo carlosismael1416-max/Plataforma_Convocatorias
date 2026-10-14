@@ -154,9 +154,11 @@ def es_institucional(
     return False
 
 
-def validar_url_publica(
+def parece_url_publica(
     url: str,
 ) -> bool:
+    # Filtro barato de candidatos (sin DNS). La validación SSRF
+    # real ocurre al descargar, con SesionSegura.
     try:
         parsed = urlparse(
             url
@@ -394,7 +396,7 @@ def puntuar_enlace(
 def descargar_articulo(
     url: str,
 ) -> dict:
-    if not validar_url_publica(
+    if not parece_url_publica(
         url
     ):
         return {
@@ -702,7 +704,7 @@ def analizar_articulo(
             href,
         )
 
-        if not validar_url_publica(
+        if not parece_url_publica(
             absoluta
         ):
             continue

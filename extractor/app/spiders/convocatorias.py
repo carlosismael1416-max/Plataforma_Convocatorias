@@ -18,6 +18,10 @@ class ConvocatoriasSpider(scrapy.Spider):
         "DOWNLOAD_DELAY": 2,
         "CONCURRENT_REQUESTS_PER_DOMAIN": 1,
         "DOWNLOAD_TIMEOUT": 25,
+        # Sin esto Scrapy acepta hasta 1 GB por respuesta (p. ej. un
+        # PDF enorme). 20 MB es el mismo tope del enriquecimiento.
+        "DOWNLOAD_MAXSIZE": 20 * 1024 * 1024,
+        "DOWNLOAD_WARNSIZE": 5 * 1024 * 1024,
         "LOG_LEVEL": "WARNING",
         "TELNETCONSOLE_ENABLED": False,
     }

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import ipaddress
 import socket
+import time
 
 from urllib.parse import (
     urljoin,
@@ -281,3 +282,268 @@ class SesionSegura(
         )
 
         return destino
+
+
+USER_AGENT = (
+    "Mozilla/5.0 "
+    "(compatible; ITSVA-Convocatorias/1.0)"
+)
+
+CODIGOS_REDIRECCION = {
+    301,
+    302,
+    303,
+    307,
+    308,
+}
+
+CODIGOS_TEMPORALES = {
+    429,
+    500,
+    502,
+    503,
+    504,
+}
+
+
+def _host_sin_www(
+    url: str | None,
+) -> str:
+    try:
+        return (
+            urlparse(
+                url or ""
+            ).hostname
+            or ""
+        ).lower().removeprefix(
+            "www."
+        )
+
+    except Exception:
+        return ""
+
+
+def mismo_dominio(
+    url_a: str,
+    url_b: str,
+) -> bool:
+    a = _host_sin_www(
+        url_a
+    )
+    b = _host_sin_www(
+        url_b
+    )
+
+    if not a or not b:
+        return False
+
+    return (
+        a == b
+        or a.endswith(
+            "." + b
+        )
+        or b.endswith(
+            "." + a
+        )
+    )
+
+
+def _get_con_reintentos(
+    sesion: requests.Session,
+    url: str,
+    *,
+    timeout: tuple[int, int],
+    reintentos: int,
+) -> requests.Response:
+    for intento in range(
+        reintentos
+    ):
+        ultimo = intento >= reintentos - 1
+
+        try:
+            respuesta = sesion.get(
+                url,
+                headers={
+                    "User-Agent":
+                        USER_AGENT,
+                },
+                timeout=timeout,
+                allow_redirects=False,
+                stream=True,
+            )
+
+        except (
+            requests.exceptions.Timeout,
+            requests.exceptions.ConnectionError,
+        ) as error:
+            if ultimo:
+                raise
+
+            espera = 2 * (
+                intento + 1
+            )
+
+            print(
+                "Error temporal de red - "
+                f"reintento {intento + 2} de "
+                f"{reintentos} en {espera}s:",
+                type(error).__name__,
+            )
+
+            time.sleep(
+                espera
+            )
+            continue
+
+        if (
+            respuesta.status_code
+            in CODIGOS_TEMPORALES
+            and not ultimo
+        ):
+            respuesta.close()
+
+            espera = 2 * (
+                intento + 1
+            )
+
+            print(
+                "Respuesta temporal",
+                respuesta.status_code,
+                "- reintento en",
+                espera,
+                "s:",
+                url,
+            )
+
+            time.sleep(
+                espera
+            )
+            continue
+
+        return respuesta
+
+    raise RuntimeError(
+        "No se obtuvo respuesta HTTP."
+    )
+
+
+def _leer_limitado(
+    respuesta: requests.Response,
+    max_bytes: int,
+) -> bytes:
+    # El límite se aplica mientras se descarga: una respuesta
+    # enorme no llega a cargarse completa en memoria.
+    declarado = respuesta.headers.get(
+        "Content-Length"
+    )
+
+    if (
+        declarado
+        and declarado.isdigit()
+        and int(declarado) > max_bytes
+    ):
+        raise ValueError(
+            "Respuesta superior a "
+            f"{max_bytes} bytes."
+        )
+
+    partes = []
+    total = 0
+
+    for parte in respuesta.iter_content(
+        chunk_size=65536
+    ):
+        total += len(parte)
+
+        if total > max_bytes:
+            raise ValueError(
+                "Respuesta superior a "
+                f"{max_bytes} bytes."
+            )
+
+        partes.append(
+            parte
+        )
+
+    return b"".join(
+        partes
+    )
+
+
+def descargar_mismo_dominio(
+    url: str,
+    url_base: str,
+    *,
+    max_bytes: int,
+    reintentos: int = 1,
+    timeout: tuple[int, int] = (10, 40),
+) -> tuple[str, bytes, str]:
+    """
+    Descarga una URL institucional siguiendo solo
+    redirecciones públicas y del mismo dominio que
+    url_base, sin leer más de max_bytes.
+
+    Devuelve (url_final, contenido, content_type).
+    """
+
+    actual = url
+
+    with requests.Session() as sesion:
+        for _ in range(5):
+            validar_url_publica(
+                actual
+            )
+
+            if not mismo_dominio(
+                actual,
+                url_base,
+            ):
+                raise URLNoSeguraError(
+                    "La URL salió del dominio "
+                    "institucional permitido."
+                )
+
+            respuesta = _get_con_reintentos(
+                sesion,
+                actual,
+                timeout=timeout,
+                reintentos=reintentos,
+            )
+
+            with respuesta:
+                if (
+                    respuesta.status_code
+                    in CODIGOS_REDIRECCION
+                ):
+                    destino = respuesta.headers.get(
+                        "Location"
+                    )
+
+                    if not destino:
+                        raise ValueError(
+                            "Redirección sin Location."
+                        )
+
+                    actual = urljoin(
+                        actual,
+                        destino,
+                    )
+                    continue
+
+                respuesta.raise_for_status()
+
+                return (
+                    actual,
+                    _leer_limitado(
+                        respuesta,
+                        max_bytes,
+                    ),
+                    respuesta.headers.get(
+                        "Content-Type",
+                        "",
+                    ),
+                )
+
+    raise ValueError(
+        "Demasiadas redirecciones."
+    )
