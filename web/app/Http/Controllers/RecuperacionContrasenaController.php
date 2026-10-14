@@ -1,0 +1,89 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\User;
+use Illuminate\Auth\Events\PasswordReset;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Str;
+use Illuminate\Validation\Rules\Password as ReglaContrasena;
+use Illuminate\Validation\ValidationException;
+use Illuminate\View\View;
+
+class RecuperacionContrasenaController extends Controller
+{
+    private const MENSAJE_ENVIO =
+        'Si el correo pertenece a una cuenta activa, recibirás un enlace '
+        . 'para restablecer tu contraseña. Revisa también tu carpeta de spam.';
+
+    public function solicitar(): View
+    {
+        return view('auth.olvide-contrasena');
+    }
+
+    public function enviar(Request $request): RedirectResponse
+    {
+        $datos = $request->validate([
+            'email' => ['required', 'email'],
+        ]);
+
+        // Solo cuentas activas; el mensaje es el mismo en todos los casos
+        // para no revelar qué correos existen.
+        $activa = User::query()
+            ->where('email', $datos['email'])
+            ->where('estado', true)
+            ->exists();
+
+        if ($activa) {
+            Password::sendResetLink(['email' => $datos['email']]);
+        }
+
+        return back()->with('status', self::MENSAJE_ENVIO);
+    }
+
+    public function formulario(Request $request, string $token): View
+    {
+        return view('auth.restablecer-contrasena', [
+            'token' => $token,
+            'email' => (string) $request->query('email', ''),
+        ]);
+    }
+
+    public function restablecer(Request $request): RedirectResponse
+    {
+        $datos = $request->validate([
+            'token' => ['required', 'string'],
+            'email' => ['required', 'email'],
+            'password' => [
+                'required',
+                'confirmed',
+                ReglaContrasena::min(8)->letters()->numbers(),
+            ],
+        ]);
+
+        $estado = Password::reset(
+            $datos,
+            function (User $usuario, string $contrasena): void {
+                $usuario->forceFill([
+                    'password' => Hash::make($contrasena),
+                    'remember_token' => Str::random(60),
+                ])->save();
+
+                event(new PasswordReset($usuario));
+            }
+        );
+
+        if ($estado !== Password::PASSWORD_RESET) {
+            throw ValidationException::withMessages([
+                'email' => 'El enlace no es válido o ya expiró. Solicita uno nuevo.',
+            ]);
+        }
+
+        return redirect()
+            ->route('login')
+            ->with('status', 'Tu contraseña se actualizó. Ya puedes iniciar sesión.');
+    }
+}

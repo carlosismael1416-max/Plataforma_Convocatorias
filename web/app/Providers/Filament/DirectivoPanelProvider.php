@@ -26,7 +26,6 @@ class DirectivoPanelProvider extends PanelProvider
         return $panel
             ->id('directivo')
             ->path('directivo')
-            ->login()
 
             ->brandName('Convocatorias ITSVA')
 

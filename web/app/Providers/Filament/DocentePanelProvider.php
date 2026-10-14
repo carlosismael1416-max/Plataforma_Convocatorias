@@ -26,7 +26,6 @@ class DocentePanelProvider extends PanelProvider
         return $panel
             ->id('docente')
             ->path('docente')
-            ->login()
 
             ->brandName('Convocatorias ITSVA')
 
