@@ -18,7 +18,6 @@ use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema as DatabaseSchema;
 
 class ConvocatoriaResource extends Resource
 {
@@ -137,35 +136,48 @@ class ConvocatoriaResource extends Resource
             'convocatoria_apoyos',
             'notificaciones',
             'notificacions',
-            'evento_calendarios',
+            'eventos_calendario',
             'api_eventos',
         ];
 
-        foreach ($tablas as $tabla) {
-            if (
-                ! DatabaseSchema::hasTable($tabla)
-                || ! DatabaseSchema::hasColumn(
-                    $tabla,
-                    'convocatoria_id'
-                )
-            ) {
-                continue;
-            }
+        // canDelete() se evalúa por cada fila de la tabla: la lista de
+        // tablas existentes se calcula una vez por petición y cada fila
+        // se resuelve con una sola consulta.
+        static::$tablasDependientes ??= DB::table(
+            'information_schema.columns'
+        )
+            ->whereRaw('table_schema = current_schema()')
+            ->where('column_name', 'convocatoria_id')
+            ->whereIn('table_name', $tablas)
+            ->pluck('table_name')
+            ->all();
 
-            if (
-                DB::table($tabla)
-                    ->where(
-                        'convocatoria_id',
-                        $convocatoria->id
-                    )
-                    ->exists()
-            ) {
-                return true;
-            }
+        if (static::$tablasDependientes === []) {
+            return false;
         }
 
-        return false;
+        $gramatica = DB::getQueryGrammar();
+
+        $condiciones = array_map(
+            fn (string $tabla): string =>
+                'EXISTS (SELECT 1 FROM '
+                . $gramatica->wrapTable($tabla)
+                . ' WHERE convocatoria_id = ?)',
+            static::$tablasDependientes
+        );
+
+        return (bool) DB::selectOne(
+            'SELECT (' . implode(' OR ', $condiciones) . ') AS tiene',
+            array_fill(
+                0,
+                count($condiciones),
+                $convocatoria->id
+            )
+        )->tiene;
     }
+
+    /** @var list<string>|null */
+    private static ?array $tablasDependientes = null;
 
     public static function getRelations(): array
     {
