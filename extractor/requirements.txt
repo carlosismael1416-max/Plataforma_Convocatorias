@@ -57,3 +57,5 @@ uvicorn==0.53.0
 w3lib==2.4.1
 yarl==1.25.1
 zope.interface==8.6
+googlenewsdecoder==0.2.1
+selectolax==0.4.13

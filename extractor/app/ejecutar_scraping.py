@@ -75,6 +75,11 @@ def ejecutar(
         "SOLO_LECTURA": not guardar,
         "TELNETCONSOLE_ENABLED": False,
         "LOG_LEVEL": "WARNING",
+
+        "DOWNLOADER_MIDDLEWARES": {
+            "app.middlewares.SSRFProtectionMiddleware":
+                50,
+        },
         "FEEDS": {
             str(archivo_salida): {
                 "format": "json",
