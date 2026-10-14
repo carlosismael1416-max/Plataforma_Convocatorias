@@ -152,10 +152,6 @@ class ConvocatoriaResource extends Resource
             ->pluck('table_name')
             ->all();
 
-        if (static::$tablasDependientes === []) {
-            return false;
-        }
-
         $gramatica = DB::getQueryGrammar();
 
         $condiciones = array_map(
@@ -165,6 +161,11 @@ class ConvocatoriaResource extends Resource
                 . ' WHERE convocatoria_id = ?)',
             static::$tablasDependientes
         );
+
+        // Un padre (convocatoria marco) conserva a sus hijas.
+        $condiciones[] =
+            'EXISTS (SELECT 1 FROM convocatorias'
+            . ' WHERE convocatoria_padre_id = ?)';
 
         return (bool) DB::selectOne(
             'SELECT (' . implode(' OR ', $condiciones) . ') AS tiene',
