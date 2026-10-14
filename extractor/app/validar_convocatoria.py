@@ -10,6 +10,10 @@ from app.descubrimiento.clasificar_objetivo import (
     contiene_palabra,
 )
 
+from app.descubrimiento.elegibilidad import (
+    evaluar_elegibilidad,
+)
+
 from app.descubrimiento.guardar_descubrimientos import (
     conectar,
 )
@@ -322,6 +326,17 @@ def evaluar_convocatoria(
                 f"automáticamente: {palabra}."
             )
             break
+
+    elegibilidad = evaluar_elegibilidad(
+        titulo,
+        url,
+    )
+
+    if not elegibilidad["elegible"]:
+        bloqueos.append(
+            "No elegible para ITSVA: "
+            + elegibilidad["motivo"]
+        )
 
     # =========================================================
     # URL
