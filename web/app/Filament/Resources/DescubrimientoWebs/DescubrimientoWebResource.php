@@ -2,11 +2,8 @@
 
 namespace App\Filament\Resources\DescubrimientoWebs;
 
-use App\Filament\Resources\DescubrimientoWebs\Pages\CreateDescubrimientoWeb;
-use App\Filament\Resources\DescubrimientoWebs\Pages\EditDescubrimientoWeb;
 use App\Filament\Resources\DescubrimientoWebs\Pages\ListDescubrimientoWebs;
 use App\Filament\Resources\DescubrimientoWebs\Pages\ViewDescubrimientoWeb;
-use App\Filament\Resources\DescubrimientoWebs\Schemas\DescubrimientoWebForm;
 use App\Filament\Resources\DescubrimientoWebs\Schemas\DescubrimientoWebInfolist;
 use App\Filament\Resources\DescubrimientoWebs\Tables\DescubrimientoWebsTable;
 use App\Models\DescubrimientoWeb;
@@ -15,6 +12,7 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
 
 class DescubrimientoWebResource extends Resource
 {
@@ -22,9 +20,28 @@ class DescubrimientoWebResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    public static function form(Schema $schema): Schema
+    /*
+     * Solo lectura: los estados e intentos los maneja el extractor;
+     * editarlos a mano rompe el ciclo (regla 3 de CLAUDE.md).
+     */
+    public static function canCreate(): bool
     {
-        return DescubrimientoWebForm::configure($schema);
+        return false;
+    }
+
+    public static function canEdit(Model $record): bool
+    {
+        return false;
+    }
+
+    public static function canDelete(Model $record): bool
+    {
+        return false;
+    }
+
+    public static function canDeleteAny(): bool
+    {
+        return false;
     }
 
     public static function infolist(Schema $schema): Schema
@@ -48,9 +65,7 @@ class DescubrimientoWebResource extends Resource
     {
         return [
             'index' => ListDescubrimientoWebs::route('/'),
-            'create' => CreateDescubrimientoWeb::route('/create'),
             'view' => ViewDescubrimientoWeb::route('/{record}'),
-            'edit' => EditDescubrimientoWeb::route('/{record}/edit'),
         ];
     }
 }
