@@ -19,6 +19,9 @@ Environment=PYTHONPATH=/home/carlos_ismael/proyectos/convocatorias-itsva/extract
 Restart=on-failure
 RestartSec=10
 
+# Picos medidos: descubrimiento ~60 MB, Scrapy ~140 MB, API ~60 MB.
+MemoryMax=512M
+
 StandardOutput=journal
 StandardError=journal
 
