@@ -118,11 +118,61 @@ def es_error_temporal(
     )
 
 
+MAX_INTENTOS = 3
+
+
+def cerrar_temporales_agotados(
+    cursor,
+) -> int:
+    # Un ERROR_TEMPORAL sin intentos restantes ya no se
+    # reintenta; se marca la fuente como inaccesible para
+    # buscar un canal oficial alterno (no evadir bloqueos).
+    cursor.execute(
+        """
+        UPDATE descubrimientos_web
+        SET
+            estado = 'FUENTE_INACCESIBLE',
+
+            error_ultimo =
+                'FUENTE_INACCESIBLE: se agotaron '
+                || intentos_procesamiento
+                || ' intentos. Buscar un canal '
+                || 'oficial alterno. Último error: '
+                || COALESCE(
+                    error_ultimo,
+                    ''
+                ),
+
+            updated_at = NOW()
+
+        WHERE estado = 'ERROR_TEMPORAL'
+          AND intentos_procesamiento >= %s
+        """,
+        (
+            MAX_INTENTOS,
+        ),
+    )
+
+    return cursor.rowcount
+
+
 def obtener_aprobados(
     limite: int,
 ) -> list[dict]:
     conexion = conectar()
     cursor = conexion.cursor()
+
+    cerrados = cerrar_temporales_agotados(
+        cursor
+    )
+
+    conexion.commit()
+
+    if cerrados:
+        print(
+            "Marcados como FUENTE_INACCESIBLE "
+            f"(intentos agotados): {cerrados}"
+        )
 
     cursor.execute(
         """
@@ -143,10 +193,13 @@ def obtener_aprobados(
                 OR (
                     estado = 'ERROR_TEMPORAL'
                     AND evaluacion_score >= 80
-                    AND intentos_procesamiento < 3
+                    AND intentos_procesamiento < %s
+                    -- El timer corre cada 6 h y updated_at se
+                    -- guarda al final del ciclo; con 6 h exactas
+                    -- se saltaría un ciclo. 5 h deja margen.
                     AND updated_at <= (
                         NOW()
-                        - INTERVAL '6 hours'
+                        - INTERVAL '5 hours'
                     )
                 )
               )
@@ -156,6 +209,7 @@ def obtener_aprobados(
         LIMIT %s
         """,
         (
+            MAX_INTENTOS,
             limite,
         ),
     )
@@ -919,6 +973,7 @@ def finalizar_convocatoria_automatica(
     convocatoria: dict,
     fuente_id: int,
     salida: str | None = None,
+    intento_registrado: bool = False,
 ) -> dict:
     """
     Fase final del ciclo automático:
@@ -1107,7 +1162,8 @@ def finalizar_convocatoria_automatica(
                     resultado_marco.get(
                         "salida"
                     ),
-                incrementar_intento=True,
+                # Si la extracción ya contó este intento, no sumar otro.
+                incrementar_intento=not intento_registrado,
             )
 
             return {
@@ -1180,7 +1236,8 @@ def finalizar_convocatoria_automatica(
                 )
             ),
             salida=salida,
-            incrementar_intento=True,
+            # Si la extracción ya contó este intento, no sumar otro.
+            incrementar_intento=not intento_registrado,
         )
 
         return {
@@ -1537,6 +1594,8 @@ def procesar_descubrimiento(
 
         salida=
             salida,
+
+        intento_registrado=True,
     )
 
 
