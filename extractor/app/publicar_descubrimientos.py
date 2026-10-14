@@ -160,6 +160,43 @@ def cerrar_temporales_agotados(
     return cursor.rowcount
 
 
+def cerrar_publicadas_vencidas(
+    cursor,
+) -> int:
+    # Una convocatoria PUBLICADA no cambiaba de estado al vencer.
+    # Se cierran las que ya pasaron su fecha de cierre y los
+    # padres cuyas hijas están todas cerradas.
+    cursor.execute(
+        """
+        UPDATE convocatorias padre
+        SET
+            estado = 'CERRADA',
+            updated_at = NOW()
+        WHERE padre.estado = 'PUBLICADA'
+          AND (
+                padre.fecha_cierre < CURRENT_DATE
+                OR (
+                    EXISTS (
+                        SELECT 1
+                        FROM convocatorias hija
+                        WHERE hija.convocatoria_padre_id
+                              = padre.id
+                    )
+                    AND NOT EXISTS (
+                        SELECT 1
+                        FROM convocatorias hija
+                        WHERE hija.convocatoria_padre_id
+                              = padre.id
+                          AND hija.estado <> 'CERRADA'
+                    )
+                )
+              )
+        """
+    )
+
+    return cursor.rowcount
+
+
 HORAS_MAX_EN_PROCESO = 2
 
 
@@ -248,6 +285,10 @@ def obtener_aprobados(
     conexion = conectar()
     cursor = conexion.cursor()
 
+    vencidas = cerrar_publicadas_vencidas(
+        cursor
+    )
+
     recuperados = recuperar_en_proceso_abandonados(
         cursor
     )
@@ -261,6 +302,12 @@ def obtener_aprobados(
     )
 
     conexion.commit()
+
+    if vencidas:
+        print(
+            "Convocatorias publicadas cerradas "
+            f"por vencimiento: {vencidas}"
+        )
 
     if recuperados:
         print(

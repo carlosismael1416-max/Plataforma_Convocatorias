@@ -19,6 +19,7 @@ from app.descubrimiento.guardar_descubrimientos import (
 )
 from app.publicar_descubrimientos import (
     MAX_INTENTOS,
+    cerrar_publicadas_vencidas,
     cerrar_temporales_agotados,
     descartar_temporales_no_elegibles,
     recuperar_en_proceso_abandonados,
@@ -166,6 +167,96 @@ class BarridosPublicadorTest(unittest.TestCase):
         self.assertEqual(
             self.estado(descubrimiento),
             "FUENTE_INACCESIBLE",
+        )
+
+    def convocatoria(
+        self,
+        *,
+        estado: str,
+        fecha_cierre: str | None = None,
+        padre: int | None = None,
+    ) -> int:
+        self.cursor.execute(
+            """
+            INSERT INTO convocatorias (
+                titulo, estado, origen, url_hash,
+                fecha_cierre, convocatoria_padre_id,
+                created_at, updated_at
+            )
+            VALUES (
+                'Prueba', %s, 'MANUAL', %s,
+                %s::date, %s, NOW(), NOW()
+            )
+            RETURNING id
+            """,
+            (
+                estado,
+                uuid.uuid4().hex,
+                fecha_cierre,
+                padre,
+            ),
+        )
+
+        return self.cursor.fetchone()[0]
+
+    def estado_convocatoria(
+        self,
+        convocatoria_id: int,
+    ) -> str:
+        self.cursor.execute(
+            "SELECT estado FROM convocatorias WHERE id = %s",
+            (convocatoria_id,),
+        )
+
+        return self.cursor.fetchone()[0]
+
+    def test_publicada_vencida_se_cierra(self):
+        vencida = self.convocatoria(
+            estado="PUBLICADA",
+            fecha_cierre="2020-01-01",
+        )
+        vigente = self.convocatoria(
+            estado="PUBLICADA",
+            fecha_cierre="2999-01-01",
+        )
+        sin_fecha = self.convocatoria(estado="PUBLICADA")
+        pendiente_vencida = self.convocatoria(
+            estado="PENDIENTE_REVISION",
+            fecha_cierre="2020-01-01",
+        )
+
+        cerrar_publicadas_vencidas(self.cursor)
+
+        self.assertEqual(self.estado_convocatoria(vencida), "CERRADA")
+        self.assertEqual(self.estado_convocatoria(vigente), "PUBLICADA")
+        self.assertEqual(self.estado_convocatoria(sin_fecha), "PUBLICADA")
+        self.assertEqual(
+            self.estado_convocatoria(pendiente_vencida),
+            "PENDIENTE_REVISION",
+        )
+
+    def test_padre_con_hijas_cerradas_se_cierra(self):
+        padre_cerrable = self.convocatoria(estado="PUBLICADA")
+        for _ in range(3):
+            self.convocatoria(estado="CERRADA", padre=padre_cerrable)
+
+        padre_abierto = self.convocatoria(estado="PUBLICADA")
+        self.convocatoria(estado="CERRADA", padre=padre_abierto)
+        self.convocatoria(
+            estado="PUBLICADA",
+            fecha_cierre="2999-01-01",
+            padre=padre_abierto,
+        )
+
+        cerrar_publicadas_vencidas(self.cursor)
+
+        self.assertEqual(
+            self.estado_convocatoria(padre_cerrable),
+            "CERRADA",
+        )
+        self.assertEqual(
+            self.estado_convocatoria(padre_abierto),
+            "PUBLICADA",
         )
 
 
