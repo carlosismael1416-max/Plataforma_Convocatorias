@@ -26,7 +26,7 @@
         }
 
         .fuente-stat {
-            min-height: 190px;
+
             padding: 22px;
 
             background: #FFFFFF;
@@ -76,7 +76,7 @@
             color: #B45309;
         }
 
-        .stat-number {
+        .stat-value {
             margin-top: 24px;
 
             color: #020617;
@@ -86,7 +86,7 @@
             font-weight: 900;
         }
 
-        .stat-title {
+        .stat-label {
             margin-top: 11px;
 
             color: #334155;
@@ -134,22 +134,20 @@
 
         <div class="fuentes-summary">
 
-            <div class="fuente-stat">
+            <div class="stat fuente-stat">
 
                 <div
                     class="
                         stat-icon
                         icon-total
                     "
-                >
-                    F
-                </div>
+                >{!! \App\Filament\Apariencia\Iconos::svg('globo', 20) !!}</div>
 
-                <div class="stat-number">
+                <div class="stat-value">
                     {{ $totalFuentes }}
                 </div>
 
-                <div class="stat-title">
+                <div class="stat-label">
                     Fuentes registradas
                 </div>
 
@@ -161,22 +159,20 @@
             </div>
 
 
-            <div class="fuente-stat">
+            <div class="stat fuente-stat">
 
                 <div
                     class="
                         stat-icon
                         icon-active
                     "
-                >
-                    ✓
-                </div>
+                >{!! \App\Filament\Apariencia\Iconos::svg('aprobado', 20) !!}</div>
 
-                <div class="stat-number">
+                <div class="stat-value">
                     {{ $fuentesActivas }}
                 </div>
 
-                <div class="stat-title">
+                <div class="stat-label">
                     Fuentes activas
                 </div>
 
@@ -188,22 +184,20 @@
             </div>
 
 
-            <div class="fuente-stat">
+            <div class="stat fuente-stat">
 
                 <div
                     class="
                         stat-icon
                         icon-inactive
                     "
-                >
-                    —
-                </div>
+                >{!! \App\Filament\Apariencia\Iconos::svg('rechazado', 20) !!}</div>
 
-                <div class="stat-number">
+                <div class="stat-value">
                     {{ $fuentesInactivas }}
                 </div>
 
-                <div class="stat-title">
+                <div class="stat-label">
                     Fuentes inactivas
                 </div>
 
@@ -215,22 +209,20 @@
             </div>
 
 
-            <div class="fuente-stat">
+            <div class="stat fuente-stat">
 
                 <div
                     class="
                         stat-icon
                         icon-js
                     "
-                >
-                    JS
-                </div>
+                >{!! \App\Filament\Apariencia\Iconos::svg('cpu', 20) !!}</div>
 
-                <div class="stat-number">
+                <div class="stat-value">
                     {{ $fuentesJavascript }}
                 </div>
 
-                <div class="stat-title">
+                <div class="stat-label">
                     Requieren JavaScript
                 </div>
 

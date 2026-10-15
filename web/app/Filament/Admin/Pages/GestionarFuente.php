@@ -15,6 +15,11 @@ class GestionarFuente extends Page
     protected string $view =
         'filament.admin.pages.gestionar-fuente';
 
+    // El título ya aparece en el header del panel.
+    protected ?string $heading = '';
+
+    protected static ?string $title = 'Gestionar fuente';
+
     protected static ?string $slug =
         'gestionar-fuente/{record}';
 

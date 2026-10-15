@@ -13,6 +13,11 @@ class DetalleError extends Page
     protected string $view =
         'filament.admin.pages.detalle-error';
 
+    // El título ya aparece en el header del panel.
+    protected ?string $heading = '';
+
+    protected static ?string $title = 'Detalle de error';
+
     protected static ?string $slug =
         'detalle-error/{record}';
 

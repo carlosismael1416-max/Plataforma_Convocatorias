@@ -307,7 +307,7 @@
         <div class="stats">
 
             <div class="stat">
-                <div class="stat-icon green">C</div>
+                <div class="stat-icon green">{!! \App\Filament\Apariencia\Iconos::svg('libro', 20) !!}</div>
                 <div class="stat-value">{{ $totalConvocatorias }}</div>
                 <div class="stat-label">Convocatorias</div>
                 <div class="stat-help">
@@ -317,21 +317,21 @@
             </div>
 
             <div class="stat">
-                <div class="stat-icon yellow">R</div>
+                <div class="stat-icon yellow">{!! \App\Filament\Apariencia\Iconos::svg('portapapeles', 20) !!}</div>
                 <div class="stat-value">{{ $pendientesRevision }}</div>
                 <div class="stat-label">Pendientes de revisión</div>
                 <div class="stat-help">Esperando validación</div>
             </div>
 
             <div class="stat">
-                <div class="stat-icon blue">✓</div>
+                <div class="stat-icon blue">{!! \App\Filament\Apariencia\Iconos::svg('aprobado', 20) !!}</div>
                 <div class="stat-value">{{ $publicadasActivas }}</div>
                 <div class="stat-label">Publicadas / activas</div>
                 <div class="stat-help">Disponibles para usuarios</div>
             </div>
 
             <div class="stat">
-                <div class="stat-icon gray">—</div>
+                <div class="stat-icon gray">{!! \App\Filament\Apariencia\Iconos::svg('rechazado', 20) !!}</div>
                 <div class="stat-value">{{ $cerradasArchivadas }}</div>
                 <div class="stat-label">Cerradas / archivadas</div>
                 <div class="stat-help">Fuera de vigencia</div>
@@ -394,8 +394,8 @@
             </div>
 
             <div>
-                Abre una convocatoria pendiente con «Ver» para aprobarla o solicitar
-                correcciones; cada decisión queda registrada con sus observaciones.
+                La revisión y publicación de convocatorias pendientes la realiza
+                un directivo en «Convocatorias por revisar».
             </div>
 
         </div>

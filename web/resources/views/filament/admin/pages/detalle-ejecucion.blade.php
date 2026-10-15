@@ -2038,9 +2038,9 @@
 
 
                 <div class="visual-note">
-                    Todos los valores mostrados
-                    corresponden a registros reales
-                    de PostgreSQL.
+                    Todos los valores corresponden
+                    a lo que registró el extractor
+                    en esta ejecución.
                 </div>
 
             </aside>

@@ -471,6 +471,96 @@
         --hover-text: #fff;
     }
 
+
+    /* ---------------- Tarjetas de estadística (StatCard de Figma) ----------------
+       Las vistas usan .stat / .stat-card / .summary-card con el valor antes de la
+       etiqueta; aquí se reacomodan como en el diseño: ícono a la izquierda,
+       etiqueta, valor y ayuda. */
+
+    .fi-main :is(.stat, .stat-card, .summary-card):has(> :is(.stat-value, .summary-value)) {
+        display: grid !important;
+        grid-template-areas: "etiqueta" "valor" "ayuda" "accion";
+        grid-template-columns: minmax(0, 1fr);
+        align-content: start;
+        min-height: 0 !important;
+        padding: 20px !important;
+        border: 1px solid var(--itsva-borde) !important;
+        border-radius: 12px !important;
+        background: #fff;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, .04) !important;
+        color: inherit;
+        text-decoration: none;
+        transition: border-color .15s, box-shadow .15s, transform .15s;
+    }
+
+    .fi-main :is(.stat, .stat-card):has(> :is(.stat-icon, .stat-header)) {
+        grid-template-areas:
+            "icono etiqueta"
+            "icono valor"
+            "icono ayuda"
+            "accion accion";
+        grid-template-columns: 44px minmax(0, 1fr);
+        column-gap: 16px;
+    }
+
+    .fi-main a:is(.stat, .stat-card, .summary-card):hover {
+        border-color: var(--itsva-primario) !important;
+        box-shadow: 0 4px 12px rgba(26, 75, 140, .12) !important;
+        transform: translateY(-1px);
+    }
+
+    .fi-main :is(.stat, .stat-card) > :is(.stat-icon, .stat-header) {
+        grid-area: icono;
+        align-self: start;
+        margin: 0 !important;
+    }
+
+    .fi-main :is(.stat, .stat-card) .stat-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 44px !important;
+        height: 44px !important;
+        border-radius: 12px !important;
+    }
+
+    .fi-main :is(.stat, .stat-card) > .stat-label,
+    .fi-main .summary-card > .summary-label {
+        grid-area: etiqueta;
+        margin: 0 0 4px !important;
+        color: var(--itsva-texto-suave) !important;
+        font: 400 14px var(--itsva-display) !important;
+        text-transform: none !important;
+        letter-spacing: 0 !important;
+    }
+
+    .fi-main :is(.stat, .stat-card) > .stat-value,
+    .fi-main .summary-card > .summary-value {
+        grid-area: valor;
+        margin: 0 !important;
+        color: var(--itsva-texto) !important;
+        font: 700 24px/1.25 var(--itsva-display) !important;
+    }
+
+    .fi-main :is(.stat, .stat-card) > .stat-help,
+    .fi-main .summary-card > .summary-help {
+        grid-area: ayuda;
+        margin: 2px 0 0 !important;
+        color: #94A3B8 !important;
+        font: 400 12px var(--itsva-cuerpo) !important;
+    }
+
+    .fi-main :is(.stat, .stat-card) > .stat-action {
+        grid-area: accion;
+        margin-top: 12px !important;
+    }
+
+    /* El rol ya aparece en el sidebar y en el menú del usuario: el diseño no
+       repite la pastilla de rol junto al título de cada página. */
+    .fi-main .page-header > .role-badge {
+        display: none !important;
+    }
+
     /* ---------------- Paginación ---------------- */
 
     .itsva-paginacion {

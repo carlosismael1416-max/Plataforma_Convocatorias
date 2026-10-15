@@ -1464,7 +1464,7 @@
                 <div class="visual-note">
 
                     Los datos de esta pantalla
-                    provienen de PostgreSQL.
+                    son los registrados para la fuente.
 
                     <br>
 
