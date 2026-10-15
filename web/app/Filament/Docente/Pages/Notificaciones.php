@@ -40,6 +40,7 @@ class Notificaciones extends Page
     /** Preferencias que el docente puede cambiar y que la plataforma respeta. */
     public const PREFERENCIAS = [
         'fechas_proximas',
+        'convocatorias_revision',
         'nuevas_propuestas',
     ];
 

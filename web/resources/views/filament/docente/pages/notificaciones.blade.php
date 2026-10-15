@@ -937,6 +937,7 @@
 
             @foreach ([
                 'fechas_proximas' => ['Fechas de cierre', 'Aviso cuando una convocatoria guardada o tu propuesta en preparación cierra en los próximos 7 días.'],
+                'convocatorias_revision' => ['Cambios en convocatorias que sigo', 'Aviso si el sitio oficial cambia la fecha, agrega documentos o actualiza el texto de una convocatoria guardada o con propuesta.'],
                 'nuevas_propuestas' => ['Cambios en propuestas', 'Aviso cuando un directivo aprueba, devuelve o rechaza tu propuesta.'],
             ] as $campo => [$nombre, $descripcion])
                 <div class="preference">

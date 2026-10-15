@@ -63,6 +63,7 @@ class DetalleConvocatoria extends Page
                     'categoria',
                     'organismo',
                     'fuente',
+                'seguimiento',
                     'requisitos',
                     'archivos',
                 ])

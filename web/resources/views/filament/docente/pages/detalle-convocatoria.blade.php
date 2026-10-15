@@ -433,6 +433,23 @@
 
         </section>
 
+        @php($seguimiento = $convocatoria->seguimiento)
+        @if ($seguimiento?->revisado_en && $seguimiento->ultimo_resultado !== 'ERROR')
+            <div style="display:flex; flex-wrap:wrap; gap:6px 16px; margin:12px 0; padding:10px 14px; border:1px solid #DDE3EE; border-radius:10px; background:#F8FAFC; color:#64748B; font-size:12px;">
+                <span>
+                    Verificada en el sitio oficial:
+                    <strong style="color:#1A2C4E">{{ $seguimiento->revisado_en->setTimezone('America/Merida')->locale('es')->isoFormat('D MMM YYYY, HH:mm') }}</strong>
+                </span>
+                @if ($seguimiento->ultimo_cambio_en && $seguimiento->ultimo_resumen)
+                    <span>
+                        Último cambio ({{ $seguimiento->ultimo_cambio_en->setTimezone('America/Merida')->locale('es')->isoFormat('D MMM') }}):
+                        <strong style="color:#D97706">{{ $seguimiento->ultimo_resumen }}</strong>
+                    </span>
+                @endif
+            </div>
+        @endif
+
+
         <div class="detalle-tabs">
 
             <button
