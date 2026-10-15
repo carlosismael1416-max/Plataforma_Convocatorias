@@ -135,4 +135,23 @@ class AparienciaTest extends TestCase
 
         $this->get("/directivo/detalle-convocatoria/{$interna->id}")->assertNotFound();
     }
+
+    public function test_vigentes_iguales_para_docente_y_directivo(): void
+    {
+        $this->convocatoria(['titulo' => 'ZZ-VIGENTE', 'fecha_cierre' => today()->addDays(10)]);
+        $this->convocatoria(['titulo' => 'ZZ-VENCIDA-PUBLICADA', 'fecha_cierre' => today()->subDay()]);
+        $this->convocatoria(['titulo' => 'ZZ-CERRADA', 'estado' => 'CERRADA', 'fecha_cierre' => today()->subMonth()]);
+
+        foreach (['DOCENTE' => '/docente/buscar-convocatorias', 'DIRECTIVO' => '/directivo/buscar-convocatorias'] as $rol => $ruta) {
+            $this->actingAs($this->usuarioConRol($rol))
+                ->get($ruta)
+                ->assertOk()
+                ->assertSee('ZZ-VIGENTE')
+                ->assertDontSee('ZZ-VENCIDA-PUBLICADA')
+                ->assertDontSee('ZZ-CERRADA');
+        }
+
+        $this->assertSame(1, \App\Models\Convocatoria::query()->visibles()->count());
+        $this->assertSame(2, \App\Models\Convocatoria::query()->historial()->count());
+    }
 }

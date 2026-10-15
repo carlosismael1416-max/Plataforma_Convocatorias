@@ -696,15 +696,15 @@
                     wire:model.live="estado"
                 >
                     <option value="">
-                        Publicadas y cerradas
+                        Vigentes (las que ve el docente)
                     </option>
 
-                    <option value="PUBLICADA">
-                        Publicadas
+                    <option value="HISTORIAL">
+                        Cerradas (historial)
                     </option>
 
-                    <option value="CERRADA">
-                        Cerradas
+                    <option value="TODAS">
+                        Vigentes y cerradas
                     </option>
                 </select>
 
@@ -1188,7 +1188,7 @@
                 </div>
 
                 <div class="summary-item">
-                    <span>Total</span>
+                    <span>Vigentes y cerradas</span>
 
                     <strong>
                         {{ $total }}
@@ -1197,7 +1197,7 @@
 
                 <div class="summary-item">
                     <span>
-                        Publicadas / activas
+                        Vigentes (igual que el docente)
                     </span>
 
                     <strong

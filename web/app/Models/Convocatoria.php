@@ -48,6 +48,31 @@ class Convocatoria extends Model
      * Excluye las convocatorias cuya fecha de cierre ya pasó.
      * Las que no tienen fecha se conservan (filtro "sin fecha").
      */
+    /**
+     * Lo que ven todos los usuarios como convocatoria abierta (docente,
+     * directivo y admin usan el mismo criterio): publicada y no vencida.
+     */
+    public function scopeVisibles(Builder $query): Builder
+    {
+        return $query
+            ->whereIn('estado', ['PUBLICADA', 'ACTIVA'])
+            ->noVencidas();
+    }
+
+    /** Historial: cerradas o publicadas cuya fecha de cierre ya pasó. */
+    public function scopeHistorial(Builder $query): Builder
+    {
+        return $query->where(
+            fn (Builder $q) => $q
+                ->where('estado', 'CERRADA')
+                ->orWhere(
+                    fn (Builder $p) => $p
+                        ->whereIn('estado', ['PUBLICADA', 'ACTIVA'])
+                        ->whereDate('fecha_cierre', '<', today())
+                )
+        );
+    }
+
     public function scopeNoVencidas(Builder $query): Builder
     {
         return $query->where(

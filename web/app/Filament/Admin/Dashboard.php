@@ -60,7 +60,9 @@ class Dashboard extends BaseDashboard
         $ciclo = $this->ultimoCiclo();
         $apiDisponible = $this->apiDisponible();
 
-        $nuevasSemana = DB::table('convocatorias')
+        // Nuevas y visibles para todos (mismo criterio que el docente).
+        $nuevasSemana = \App\Models\Convocatoria::query()
+            ->visibles()
             ->where('created_at', '>=', now()->subWeek())
             ->count();
 
@@ -96,7 +98,7 @@ class Dashboard extends BaseDashboard
                 [
                     'etiqueta' => 'Convocatorias nuevas',
                     'valor' => $nuevasSemana,
-                    'sub' => 'Últimos 7 días',
+                    'sub' => 'Publicadas y vigentes, últimos 7 días',
                     'icono' => 'libro',
                     'color' => 'morado',
                     'url' => ConvocatoriaResource::getUrl('index'),
