@@ -86,7 +86,7 @@ if __name__ == "__main__":
     unittest.main()
 
 
-LISTADO_WORDPRESS = b"""
+LISTADO_WORDPRESS = """
 <html><body>
 <a href="https://ciencia.yucatan.gob.mx/convocatorias/">Convocatorias</a>
 <a href="https://ciencia.yucatan.gob.mx/convocatorias/fondo-investigacion-2026/">Fondo 2026</a>
@@ -98,7 +98,7 @@ LISTADO_WORDPRESS = b"""
 <a href="https://www.facebook.com/sharer/sharer.php?u=https://ciencia.yucatan.gob.mx/convocatorias/x">Compartir</a>
 <a href="https://ciencia.yucatan.gob.mx/contacto/">Contacto</a>
 </body></html>
-"""
+""".encode("utf-8")
 
 
 class ListadoGenericoTest(unittest.TestCase):
