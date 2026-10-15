@@ -13,6 +13,9 @@ use Livewire\WithPagination;
 
 class BuscarConvocatorias extends Page
 {
+    /** Estados visibles para todos (lo demás es interno del motor). */
+    public const ESTADOS_VISIBLES = ['PUBLICADA', 'ACTIVA', 'CERRADA'];
+
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-magnifying-glass';
 
     protected static ?string $navigationLabel = 'Buscar convocatorias';
@@ -132,8 +135,11 @@ class BuscarConvocatorias extends Page
                     'nombre',
                 ]);
 
+        // Solo lo que ven todos los usuarios: publicadas (y las cerradas como
+        // historial). Lo que el validador no aprobó es interno del motor.
         $query =
             Convocatoria::query()
+                ->whereIn('estado', self::ESTADOS_VISIBLES)
                 ->with([
                     'categoria',
                     'organismo',
@@ -239,8 +245,7 @@ class BuscarConvocatorias extends Page
         }
 
         if (
-            $this->estado
-            !== ''
+            in_array($this->estado, self::ESTADOS_VISIBLES, true)
         ) {
             $query->where(
                 'estado',
@@ -308,6 +313,7 @@ class BuscarConvocatorias extends Page
 
         $total =
             Convocatoria::query()
+                ->whereIn('estado', self::ESTADOS_VISIBLES)
                 ->count();
 
         $abiertas =
@@ -323,10 +329,7 @@ class BuscarConvocatorias extends Page
 
         $enRevision =
             Convocatoria::query()
-                ->where(
-                    'estado',
-                    'PENDIENTE_REVISION'
-                )
+                ->where('estado', 'CERRADA')
                 ->count();
 
         $proximasCerrar =

@@ -67,6 +67,8 @@ class DetalleConvocatoria extends Page
                     'requisitos',
                     'archivos',
                 ])
+                // Solo lo que ven todos; lo no publicado es interno del motor.
+                ->whereIn('estado', BuscarConvocatorias::ESTADOS_VISIBLES)
                 ->findOrFail(
                     $record
                 );

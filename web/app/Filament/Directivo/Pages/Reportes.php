@@ -103,7 +103,6 @@ class Reportes extends Page
                 $seccion,
                 [
                     'convocatorias',
-                    'revisiones',
                     'propuestas',
                     'financiamiento',
                 ],
@@ -128,7 +127,6 @@ class Reportes extends Page
                 $tipo,
                 [
                     'convocatorias',
-                    'revisiones',
                     'propuestas',
                     'financiamiento',
                 ],
@@ -278,8 +276,6 @@ class Reportes extends Page
         return match (
             $this->tipoReporte
         ) {
-            'revisiones' =>
-                $this->reporteRevisiones(),
 
             'propuestas' =>
                 $this->reportePropuestas(),
@@ -546,275 +542,6 @@ class Reportes extends Page
         return $this->armarResultado(
             'Reporte de Convocatorias',
             'Convocatorias registradas durante el periodo seleccionado.',
-            $columnas,
-            $filas,
-            $metricas
-        );
-    }
-
-    private function reporteRevisiones(): array
-    {
-        [
-            $inicio,
-            $fin,
-        ] = $this->limites();
-
-        $query =
-            DB::table(
-                'convocatoria_revisiones_administrativas AS r'
-            )
-                ->join(
-                    'convocatorias AS c',
-                    'c.id',
-                    '=',
-                    'r.convocatoria_id'
-                )
-                ->leftJoin(
-                    'users AS u',
-                    'u.id',
-                    '=',
-                    'r.revisor_id'
-                )
-                ->leftJoin(
-                    'organismos AS o',
-                    'o.id',
-                    '=',
-                    'c.organismo_id'
-                )
-                ->leftJoin(
-                    'categorias AS cat',
-                    'cat.id',
-                    '=',
-                    'c.categoria_id'
-                )
-                ->whereBetween(
-                    'r.fecha_decision',
-                    [
-                        $inicio,
-                        $fin,
-                    ]
-                );
-
-        if (
-            $this->organismo
-            !== ''
-        ) {
-            $query->where(
-                'c.organismo_id',
-                (int)
-                $this->organismo
-            );
-        }
-
-        if (
-            $this->categoria
-            !== ''
-        ) {
-            $query->where(
-                'c.categoria_id',
-                (int)
-                $this->categoria
-            );
-        }
-
-        if (
-            $this->estado
-            !== ''
-        ) {
-            $query->where(
-                'r.accion',
-                $this->estado
-            );
-        }
-
-        $items =
-            $query
-                ->select([
-                    'r.id',
-                    'r.convocatoria_id',
-                    'r.revisor_id',
-                    'r.accion',
-                    'r.estado_anterior',
-                    'r.estado_nuevo',
-                    'r.observaciones',
-                    'r.fecha_decision',
-                    'c.titulo AS convocatoria',
-                    'o.nombre AS organismo',
-                    'cat.nombre AS categoria',
-                    'u.name AS revisor_nombre',
-                    'u.apellidos AS revisor_apellidos',
-                ])
-                ->orderByDesc(
-                    'r.fecha_decision'
-                )
-                ->get();
-
-        $columnas = [
-            [
-                'key' => 'id',
-                'label' => 'ID',
-                'grupo' => 'base',
-            ],
-            [
-                'key' => 'convocatoria',
-                'label' => 'Convocatoria',
-                'grupo' => 'general',
-            ],
-            [
-                'key' => 'accion',
-                'label' => 'Acción',
-                'grupo' => 'general',
-            ],
-            [
-                'key' => 'estado_anterior',
-                'label' => 'Estado anterior',
-                'grupo' => 'general',
-            ],
-            [
-                'key' => 'estado_nuevo',
-                'label' => 'Estado nuevo',
-                'grupo' => 'general',
-            ],
-            [
-                'key' => 'revisor',
-                'label' => 'Revisor',
-                'grupo' => 'general',
-            ],
-            [
-                'key' => 'organismo',
-                'label' => 'Organismo',
-                'grupo' => 'organismos',
-            ],
-            [
-                'key' => 'categoria',
-                'label' => 'Categoría',
-                'grupo' => 'organismos',
-            ],
-            [
-                'key' => 'fecha',
-                'label' => 'Fecha de decisión',
-                'grupo' => 'fechas',
-            ],
-            [
-                'key' => 'observaciones',
-                'label' => 'Observaciones',
-                'grupo' => 'general',
-            ],
-        ];
-
-        $filas =
-            $items->map(
-                function (
-                    object $item
-                ): array {
-                    $revisor =
-                        trim(
-                            (
-                                $item->revisor_nombre
-                                ?? ''
-                            )
-                            . ' '
-                            . (
-                                $item->revisor_apellidos
-                                ?? ''
-                            )
-                        );
-
-                    return [
-                        'id' =>
-                            $item->id,
-
-                        'convocatoria' =>
-                            $item->convocatoria,
-
-                        'accion' =>
-                            $this->accionRevisionLabel(
-                                $item->accion
-                            ),
-
-                        'estado_anterior' =>
-                            $this->estadoConvocatoriaLabel(
-                                $item->estado_anterior
-                            ),
-
-                        'estado_nuevo' =>
-                            $this->estadoConvocatoriaLabel(
-                                $item->estado_nuevo
-                            ),
-
-                        'revisor' =>
-                            $revisor !== ''
-                                ? $revisor
-                                : 'Sin revisor',
-
-                        'organismo' =>
-                            $item->organismo
-                            ?? 'Sin organismo',
-
-                        'categoria' =>
-                            $item->categoria
-                            ?? 'Sin categoría',
-
-                        'fecha' =>
-                            Carbon::parse(
-                                $item->fecha_decision
-                            )->format(
-                                'd/m/Y H:i'
-                            ),
-
-                        'observaciones' =>
-                            $item->observaciones
-                            ?? 'Sin observaciones',
-                    ];
-                }
-            );
-
-        $metricas = [
-            [
-                'label' =>
-                    'Revisiones',
-                'valor' =>
-                    $items->count(),
-            ],
-            [
-                'label' =>
-                    'Aprobaciones',
-                'valor' =>
-                    $items
-                        ->where(
-                            'accion',
-                            'APROBAR'
-                        )
-                        ->count(),
-            ],
-            [
-                'label' =>
-                    'Correcciones',
-                'valor' =>
-                    $items
-                        ->where(
-                            'accion',
-                            'SOLICITAR_CORRECCIONES'
-                        )
-                        ->count(),
-            ],
-            [
-                'label' =>
-                    'Revisores',
-                'valor' =>
-                    $items
-                        ->pluck(
-                            'revisor_id'
-                        )
-                        ->filter()
-                        ->unique()
-                        ->count(),
-            ],
-        ];
-
-        return $this->armarResultado(
-            'Reporte de Revisiones',
-            'Historial de decisiones administrativas registradas.',
             $columnas,
             $filas,
             $metricas
@@ -1478,16 +1205,6 @@ class Reportes extends Page
         return match (
             $this->tipoReporte
         ) {
-            'revisiones' => [
-                'APROBAR' =>
-                    'Aprobada',
-
-                'SOLICITAR_CORRECCIONES' =>
-                    'Solicitar correcciones',
-
-                'REENVIAR_REVISION' =>
-                    'Reenviada a revisión',
-            ],
 
             'propuestas' => [
                 'BORRADOR' =>
@@ -1545,8 +1262,6 @@ class Reportes extends Page
         return match (
             $this->tipoReporte
         ) {
-            'revisiones' =>
-                'Revisiones',
 
             'propuestas' =>
                 'Propuestas',

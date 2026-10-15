@@ -42,25 +42,6 @@ class ConvocatoriaInfolist
                     ->label('Fecha de registro')
                     ->dateTime('d/m/Y H:i'),
 
-                TextEntry::make('ultima_observacion')
-                    ->label('Correcciones solicitadas por el administrador')
-                    ->state(
-                        fn (Convocatoria $record): ?string =>
-                            $record->revisionesAdministrativas()
-                                ->where(
-                                    'accion',
-                                    'SOLICITAR_CORRECCIONES'
-                                )
-                                ->orderByDesc('fecha_decision')
-                                ->orderByDesc('id')
-                                ->value('observaciones')
-                    )
-                    ->visible(
-                        fn (Convocatoria $record): bool =>
-                            $record->estado === 'REQUIERE_CORRECCIONES'
-                    )
-                    ->placeholder('Sin observaciones')
-                    ->columnSpanFull(),
 
                 TextEntry::make('descripcion')
                     ->label('Descripción')
