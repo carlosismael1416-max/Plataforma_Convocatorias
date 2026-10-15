@@ -109,7 +109,7 @@
             border-radius: 999px;
             background: var(--primary-soft);
             color: var(--primary-dark);
-            font-size: 10px;
+            font-size: 12px;
             font-weight: 850;
         }
 
@@ -135,7 +135,7 @@
         .info-label {
             display: block;
             color: #94A3B8;
-            font-size: 9px;
+            font-size: 12px;
             text-transform: uppercase;
             font-weight: 800;
         }
@@ -201,7 +201,7 @@
             border-radius: 9px;
             background: white;
             color: var(--primary);
-            font-size: 10px;
+            font-size: 12px;
             font-weight: 850;
             cursor: pointer;
         }
@@ -220,7 +220,7 @@
             display: block;
             margin-bottom: 6px;
             color: #64748B;
-            font-size: 10px;
+            font-size: 12px;
             font-weight: 800;
         }
 
@@ -268,7 +268,7 @@
             justify-content: center;
             background: #D1FAE5;
             color: #047857;
-            font-size: 10px;
+            font-size: 12px;
             font-weight: 900;
         }
 
@@ -281,7 +281,7 @@
         .permission-description {
             margin-top: 3px;
             color: #94A3B8;
-            font-size: 9px;
+            font-size: 12px;
             line-height: 1.45;
         }
 
@@ -312,7 +312,7 @@
         .security-help {
             margin-top: 3px;
             color: #94A3B8;
-            font-size: 9px;
+            font-size: 12px;
         }
 
         .security-btn {
@@ -322,7 +322,7 @@
             border-radius: 8px;
             background: white;
             color: #475569;
-            font-size: 9px;
+            font-size: 12px;
             font-weight: 850;
             cursor: pointer;
             white-space: nowrap;
@@ -355,25 +355,25 @@
             justify-content: center;
             background: var(--primary-soft);
             color: var(--primary);
-            font-size: 10px;
+            font-size: 12px;
             font-weight: 900;
         }
 
         .activity-title {
             color: #334155;
-            font-size: 10px;
+            font-size: 12px;
             font-weight: 800;
         }
 
         .activity-help {
             margin-top: 3px;
             color: #94A3B8;
-            font-size: 9px;
+            font-size: 12px;
         }
 
         .activity-date {
             color: #94A3B8;
-            font-size: 9px;
+            font-size: 12px;
             white-space: nowrap;
         }
 
@@ -383,7 +383,7 @@
             border-radius: 10px;
             background: #F5F3FF;
             color: #5B21B6;
-            font-size: 10px;
+            font-size: 12px;
             line-height: 1.5;
         }
 
@@ -468,7 +468,7 @@
             min-height: 38px;
             padding: 0 14px;
             border-radius: 9px;
-            font-size: 10px;
+            font-size: 12px;
             font-weight: 850;
             cursor: pointer;
         }
@@ -488,7 +488,7 @@
         .field-error {
             margin-top: 5px;
             color: #DC2626;
-            font-size: 9px;
+            font-size: 12px;
         }
 
         .protected-box {
@@ -497,7 +497,7 @@
             border-radius: 10px;
             background: #F8FAFC;
             color: #64748B;
-            font-size: 9px;
+            font-size: 12px;
             line-height: 1.5;
         }
 
@@ -522,7 +522,7 @@
             border-radius: 10px;
             background: #F8FAFC;
             color: #94A3B8;
-            font-size: 10px;
+            font-size: 12px;
             line-height: 1.5;
         }
 
@@ -1363,7 +1363,7 @@
 
                         <strong
                             style="
-                                font-size:10px;
+                                font-size:12px;
                                 color:#475569;
                             "
                         >

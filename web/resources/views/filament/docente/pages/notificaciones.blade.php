@@ -93,7 +93,7 @@
     .summary-label {
         margin-bottom: 7px;
         color: var(--muted);
-        font-size: 10px;
+        font-size: 12px;
     }
 
     .summary-value {
@@ -105,7 +105,7 @@
     .summary-help {
         margin-top: 4px;
         color: #94A3B8;
-        font-size: 9px;
+        font-size: 12px;
     }
 
     .notifications-layout {
@@ -147,7 +147,7 @@
         border-radius: 999px;
         background: #E8EEF8;
         color: var(--primary);
-        font-size: 9px;
+        font-size: 12px;
         font-weight: 800;
     }
 
@@ -168,7 +168,7 @@
         background: white;
         color: #475569;
         cursor: pointer;
-        font-size: 10px;
+        font-size: 12px;
         font-weight: 700;
     }
 
@@ -255,7 +255,7 @@
         border-radius: 999px;
         background: #DBEAFE;
         color: #1D4ED8;
-        font-size: 8px;
+        font-size: 11px;
         font-weight: 900;
         text-transform: uppercase;
     }
@@ -263,21 +263,21 @@
     .notification-type {
         margin-top: 4px;
         color: #94A3B8;
-        font-size: 8px;
+        font-size: 11px;
         font-weight: 700;
     }
 
     .notification-text {
         margin-top: 5px;
         color: var(--muted);
-        font-size: 10px;
+        font-size: 12px;
         line-height: 1.55;
     }
 
     .notification-time {
         margin-top: 7px;
         color: #94A3B8;
-        font-size: 9px;
+        font-size: 12px;
     }
 
     .notification-side {
@@ -292,7 +292,7 @@
         min-height: 28px;
         padding: 0 8px;
         border-radius: 7px;
-        font-size: 8px;
+        font-size: 11px;
     }
 
     .item-btn.primary {
@@ -330,7 +330,7 @@
         max-width: 420px;
         margin: 6px auto 0;
         color: var(--muted);
-        font-size: 10px;
+        font-size: 12px;
         line-height: 1.5;
     }
 
@@ -410,7 +410,7 @@
         border-radius: 9px;
         background: #EFF6FF;
         color: #1E40AF;
-        font-size: 9px;
+        font-size: 12px;
         line-height: 1.5;
     }
 

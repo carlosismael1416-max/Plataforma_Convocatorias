@@ -114,7 +114,7 @@
         border-radius: 999px;
         background: #E8EEF8;
         color: var(--primary);
-        font-size: 10px;
+        font-size: 12px;
         font-weight: 800;
     }
 
@@ -171,14 +171,14 @@
     .requirement-type {
         margin-top: 7px;
         color: #64748B;
-        font-size: 9px;
+        font-size: 12px;
         text-transform: uppercase;
     }
 
     .tag {
         padding: 5px 8px;
         border-radius: 999px;
-        font-size: 9px;
+        font-size: 12px;
         font-weight: 800;
         white-space: nowrap;
     }
@@ -202,7 +202,7 @@
         display: block;
         margin-bottom: 6px;
         color: #475569;
-        font-size: 10px;
+        font-size: 12px;
         font-weight: 800;
     }
 
@@ -260,7 +260,7 @@
     }
 
     .evidence-name {
-        font-size: 10px;
+        font-size: 12px;
         font-weight: 700;
         color: #334155;
     }
@@ -268,7 +268,7 @@
     .evidence-description {
         margin-top: 2px;
         color: #94A3B8;
-        font-size: 9px;
+        font-size: 12px;
     }
 
     .evidence-actions {
@@ -285,7 +285,7 @@
         background: white;
         color: #1A4B8C;
         cursor: pointer;
-        font-size: 9px;
+        font-size: 12px;
         font-weight: 700;
         text-decoration: none;
     }
@@ -352,7 +352,7 @@
         border-radius: 9px;
         background: #FFFBEB;
         color: #92400E;
-        font-size: 10px;
+        font-size: 12px;
     }
 
     .sidebar {
@@ -369,7 +369,7 @@
         justify-content: space-between;
         gap: 10px;
         margin-bottom: 10px;
-        font-size: 10px;
+        font-size: 12px;
     }
 
     .sidebar-row span {
@@ -402,7 +402,7 @@
         border-radius: 8px;
         text-decoration: none;
         color: #475569;
-        font-size: 10px;
+        font-size: 12px;
         font-weight: 700;
     }
 
@@ -419,7 +419,7 @@
         justify-content: center;
         border: 1px solid #CBD5E1;
         border-radius: 50%;
-        font-size: 9px;
+        font-size: 12px;
     }
 
     .step.complete .step-number {
@@ -461,7 +461,7 @@
     .modal-card p {
         margin: 0 0 17px;
         color: var(--muted);
-        font-size: 10px;
+        font-size: 12px;
     }
 
     .modal-field {
@@ -472,14 +472,14 @@
         display: block;
         margin-bottom: 5px;
         color: #475569;
-        font-size: 10px;
+        font-size: 12px;
         font-weight: 700;
     }
 
     .field-error {
         margin-top: 4px;
         color: #DC2626;
-        font-size: 9px;
+        font-size: 12px;
     }
 
     .modal-actions {
@@ -1292,7 +1292,7 @@
                         "
                         style="
                             margin-top:5px;
-                            font-size:9px;
+                            font-size:12px;
                             color:#64748B;
                         "
                     >

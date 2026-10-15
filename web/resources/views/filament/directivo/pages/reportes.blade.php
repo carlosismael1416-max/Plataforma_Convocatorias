@@ -141,7 +141,7 @@
         .report-description {
             margin-top: 5px;
             color: var(--muted);
-            font-size: 10px;
+            font-size: 12px;
             line-height: 1.5;
         }
 
@@ -152,7 +152,7 @@
             border-radius: 999px;
             background: #EDE9FE;
             color: #6D28D9;
-            font-size: 9px;
+            font-size: 12px;
             font-weight: 850;
         }
 
@@ -209,7 +209,7 @@
             border-radius: 10px;
             background: #FBFCFE;
             color: #475569;
-            font-size: 10px;
+            font-size: 12px;
             font-weight: 700;
         }
 
@@ -245,7 +245,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 10px;
+            font-size: 12px;
             font-weight: 900;
         }
 
@@ -286,7 +286,7 @@
         .preview-text {
             margin-top: 5px;
             color: #7C3AED;
-            font-size: 10px;
+            font-size: 12px;
             line-height: 1.5;
         }
 
@@ -307,7 +307,7 @@
         .preview-stat span {
             display: block;
             color: #A78BFA;
-            font-size: 8px;
+            font-size: 11px;
             text-transform: uppercase;
         }
 
@@ -331,7 +331,7 @@
         .generate-help {
             max-width: 520px;
             color: var(--muted);
-            font-size: 10px;
+            font-size: 12px;
             line-height: 1.5;
         }
 
@@ -385,7 +385,7 @@
 
         .history-title {
             color: #334155;
-            font-size: 10px;
+            font-size: 12px;
             font-weight: 800;
             line-height: 1.4;
         }
@@ -396,7 +396,7 @@
             gap: 8px;
             margin-top: 5px;
             color: #94A3B8;
-            font-size: 8px;
+            font-size: 11px;
         }
 
         .download {
@@ -411,7 +411,7 @@
             gap: 12px;
             padding: 8px 0;
             border-bottom: 1px solid #EEF2F7;
-            font-size: 10px;
+            font-size: 12px;
         }
 
         .summary-row:last-child {
@@ -432,7 +432,7 @@
             background: #F5F3FF;
             border: 1px solid #DDD6FE;
             color: #5B21B6;
-            font-size: 10px;
+            font-size: 12px;
             line-height: 1.5;
         }
 
@@ -542,7 +542,7 @@
             background: #F8FAFC;
             border-bottom: 1px solid #E7ECF3;
             color: #64748B;
-            font-size: 9px;
+            font-size: 12px;
             text-align: left;
             white-space: nowrap;
         }
@@ -551,7 +551,7 @@
             padding: 9px 10px;
             border-bottom: 1px solid #EEF2F7;
             color: #475569;
-            font-size: 9px;
+            font-size: 12px;
             vertical-align: top;
         }
 
@@ -565,7 +565,7 @@
             border-radius: 10px;
             background: #F8FAFC;
             color: #94A3B8;
-            font-size: 10px;
+            font-size: 12px;
             line-height: 1.5;
         }
 
@@ -575,7 +575,7 @@
             border-bottom: 1px solid #EEF2F7;
             color: #475569;
             text-decoration: none;
-            font-size: 10px;
+            font-size: 12px;
             font-weight: 800;
         }
 
@@ -590,7 +590,7 @@
         .filter-note {
             margin-top: 10px;
             color: #94A3B8;
-            font-size: 9px;
+            font-size: 12px;
         }
 
 </style>

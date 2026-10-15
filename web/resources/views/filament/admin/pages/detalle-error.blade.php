@@ -43,7 +43,7 @@
 
         .eyebrow {
             color: var(--danger);
-            font-size: 10px;
+            font-size: 12px;
             font-weight: 900;
             text-transform: uppercase;
             letter-spacing: .06em;
@@ -66,7 +66,7 @@
             border-radius: 999px;
             background: #FEE2E2;
             color: #B91C1C;
-            font-size: 10px;
+            font-size: 12px;
             font-weight: 850;
             white-space: nowrap;
         }
@@ -89,7 +89,7 @@
             display: block;
             margin-bottom: 5px;
             color: #94A3B8;
-            font-size: 9px;
+            font-size: 12px;
             text-transform: uppercase;
         }
 
@@ -134,7 +134,7 @@
             margin-top: 4px;
             margin-bottom: 17px;
             color: var(--muted);
-            font-size: 10px;
+            font-size: 12px;
         }
 
         .info-grid {
@@ -158,14 +158,14 @@
             display: block;
             margin-bottom: 5px;
             color: #94A3B8;
-            font-size: 9px;
+            font-size: 12px;
             font-weight: 800;
             text-transform: uppercase;
         }
 
         .info-value {
             color: #334155;
-            font-size: 10px;
+            font-size: 12px;
             font-weight: 800;
             word-break: break-word;
         }
@@ -177,7 +177,7 @@
             background: #0F172A;
             color: #E2E8F0;
             font-family: monospace;
-            font-size: 10px;
+            font-size: 12px;
             line-height: 1.6;
             white-space: pre-wrap;
             overflow-x: auto;
@@ -204,20 +204,20 @@
             justify-content: center;
             background: #FEE2E2;
             color: #B91C1C;
-            font-size: 9px;
+            font-size: 12px;
             font-weight: 900;
         }
 
         .event-title {
             color: #334155;
-            font-size: 10px;
+            font-size: 12px;
             font-weight: 850;
         }
 
         .event-text {
             margin-top: 3px;
             color: #94A3B8;
-            font-size: 9px;
+            font-size: 12px;
             line-height: 1.45;
         }
 
@@ -227,7 +227,7 @@
             gap: 12px;
             padding: 10px 0;
             border-bottom: 1px solid #EEF2F7;
-            font-size: 10px;
+            font-size: 12px;
         }
 
         .side-row:last-child {
@@ -259,7 +259,7 @@
         .warning-text {
             margin-top: 5px;
             color: #DC2626;
-            font-size: 9px;
+            font-size: 12px;
             line-height: 1.5;
         }
 
@@ -276,7 +276,7 @@
             border-radius: 9px;
             background: white;
             color: #475569;
-            font-size: 10px;
+            font-size: 12px;
             font-weight: 850;
             cursor: pointer;
         }
@@ -299,7 +299,7 @@
             border-radius: 10px;
             background: #ECFDF5;
             color: #047857;
-            font-size: 9px;
+            font-size: 12px;
             line-height: 1.5;
             text-align: center;
         }
@@ -354,7 +354,7 @@
         .resolved-text {
             margin-top: 5px;
             color: #059669;
-            font-size: 9px;
+            font-size: 12px;
             line-height: 1.5;
         }
 
@@ -385,7 +385,7 @@
             border-radius: 10px;
             background: #F8FAFC;
             color: #64748B;
-            font-size: 10px;
+            font-size: 12px;
             line-height: 1.6;
         }
 

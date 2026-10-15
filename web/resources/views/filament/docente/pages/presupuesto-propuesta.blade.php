@@ -113,7 +113,7 @@
         border-radius: 999px;
         background: #E8EEF8;
         color: var(--primary);
-        font-size: 10px;
+        font-size: 12px;
         font-weight: 800;
         white-space: nowrap;
     }
@@ -147,7 +147,7 @@
         color: #475569;
         border-bottom: 1px solid var(--border);
         text-align: left;
-        font-size: 10px;
+        font-size: 12px;
         font-weight: 800;
     }
 
@@ -171,7 +171,7 @@
     .concept-desc {
         margin-top: 3px;
         color: var(--muted);
-        font-size: 9px;
+        font-size: 12px;
         line-height: 1.45;
     }
 
@@ -181,7 +181,7 @@
         border-radius: 999px;
         background: #E8EEF8;
         color: var(--primary);
-        font-size: 9px;
+        font-size: 12px;
         font-weight: 800;
     }
 
@@ -209,7 +209,7 @@
         background: white;
         color: #1A4B8C;
         cursor: pointer;
-        font-size: 9px;
+        font-size: 12px;
         font-weight: 700;
     }
 
@@ -222,7 +222,7 @@
     .quote-count {
         margin-top: 5px;
         color: #64748B;
-        font-size: 8px;
+        font-size: 11px;
     }
 
     .empty {
@@ -261,7 +261,7 @@
         display: block;
         margin-bottom: 5px;
         color: #475569;
-        font-size: 9px;
+        font-size: 12px;
         font-weight: 800;
     }
 
@@ -303,7 +303,7 @@
     .field-error {
         margin-top: 4px;
         color: #DC2626;
-        font-size: 9px;
+        font-size: 12px;
     }
 
     .form-actions {
@@ -363,7 +363,7 @@
         margin-top: 13px;
         padding: 11px;
         border-radius: 9px;
-        font-size: 10px;
+        font-size: 12px;
         line-height: 1.5;
     }
 
@@ -408,7 +408,7 @@
         border-radius: 9px;
         background: #FFFBEB;
         color: #92400E;
-        font-size: 10px;
+        font-size: 12px;
     }
 
     .sidebar {
@@ -425,7 +425,7 @@
         justify-content: space-between;
         gap: 10px;
         margin-bottom: 9px;
-        font-size: 10px;
+        font-size: 12px;
     }
 
     .sidebar-row span {
@@ -448,7 +448,7 @@
         display: flex;
         justify-content: space-between;
         margin-bottom: 7px;
-        font-size: 10px;
+        font-size: 12px;
         font-weight: 800;
     }
 
@@ -479,7 +479,7 @@
         border-radius: 8px;
         color: #475569;
         text-decoration: none;
-        font-size: 10px;
+        font-size: 12px;
         font-weight: 700;
     }
 
@@ -492,7 +492,7 @@
         flex: 0 0 auto;
         border: 1px solid #CBD5E1;
         border-radius: 50%;
-        font-size: 9px;
+        font-size: 12px;
     }
 
     .step.complete .step-number {

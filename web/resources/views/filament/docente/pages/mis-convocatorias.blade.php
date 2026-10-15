@@ -48,7 +48,7 @@
         .mis-stat-label {
             margin-top: 4px;
             color: #64748B;
-            font-size: 10px;
+            font-size: 12px;
         }
 
         .mis-toolbar {
@@ -73,7 +73,7 @@
             display: block;
             margin-bottom: 5px;
             color: #64748B;
-            font-size: 9px;
+            font-size: 12px;
             font-weight: 700;
             text-transform: uppercase;
         }
@@ -104,7 +104,7 @@
             background: white;
             color: #475569;
             cursor: pointer;
-            font-size: 10px;
+            font-size: 12px;
             font-weight: 700;
             white-space: nowrap;
         }
@@ -160,7 +160,7 @@
             border-radius: 20px;
             background: #DBEAFE;
             color: #2563EB;
-            font-size: 9px;
+            font-size: 12px;
             font-weight: 700;
         }
 
@@ -194,7 +194,7 @@
             display: block;
             margin-bottom: 6px;
             color: #64748B;
-            font-size: 9px;
+            font-size: 12px;
             font-weight: 700;
             text-transform: uppercase;
         }
@@ -207,7 +207,7 @@
             padding: 0 10px;
             background: white;
             color: #1A2C4E;
-            font-size: 10px;
+            font-size: 12px;
         }
 
         .notes-textarea {
@@ -219,7 +219,7 @@
             border-radius: 8px;
             background: white;
             color: #1A2C4E;
-            font-size: 10px;
+            font-size: 12px;
             line-height: 1.5;
         }
 
@@ -244,7 +244,7 @@
             padding: 0 12px;
             text-decoration: none;
             cursor: pointer;
-            font-size: 10px;
+            font-size: 12px;
             font-weight: 700;
         }
 
@@ -288,7 +288,7 @@
             background: white;
             color: #1A4B8C;
             cursor: pointer;
-            font-size: 9px;
+            font-size: 12px;
             font-weight: 700;
         }
 
@@ -299,7 +299,7 @@
             border-radius: 9px;
             background: #FFFBEB;
             color: #92400E;
-            font-size: 10px;
+            font-size: 12px;
             line-height: 1.5;
         }
 

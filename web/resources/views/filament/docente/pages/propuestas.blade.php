@@ -93,7 +93,7 @@
     .prop-header {
         background: #F8FAFC;
         color: #64748B;
-        font-size: 10px;
+        font-size: 12px;
         font-weight: 700;
         text-transform: uppercase;
     }
@@ -106,7 +106,7 @@
 
     .prop-version {
         color: #64748B;
-        font-size: 10px;
+        font-size: 12px;
         margin-top: 4px;
     }
 
@@ -125,7 +125,7 @@
         width: fit-content;
         padding: 5px 9px;
         border-radius: 20px;
-        font-size: 10px;
+        font-size: 12px;
         font-weight: 700;
     }
 
@@ -176,7 +176,7 @@
         background: white;
         color: #1A4B8C;
         padding: 6px 8px;
-        font-size: 10px;
+        font-size: 12px;
         font-weight: 600;
         cursor: pointer;
     }

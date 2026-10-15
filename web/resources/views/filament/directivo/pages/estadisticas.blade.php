@@ -107,7 +107,7 @@
             padding-top: 11px;
             border-top: 1px solid #EEF2F7;
             color: var(--primary);
-            font-size: 10px;
+            font-size: 12px;
             font-weight: 850;
         }
 
@@ -161,7 +161,7 @@
         .trend {
             padding: 4px 7px;
             border-radius: 999px;
-            font-size: 9px;
+            font-size: 12px;
             font-weight: 850;
         }
 
@@ -191,7 +191,7 @@
         .stat-help {
             margin-top: 5px;
             color: #94A3B8;
-            font-size: 10px;
+            font-size: 12px;
         }
 
         .layout {
@@ -294,7 +294,7 @@
 
         .month-label {
             color: #94A3B8;
-            font-size: 9px;
+            font-size: 12px;
             font-weight: 700;
         }
 
@@ -310,7 +310,7 @@
             align-items: center;
             gap: 7px;
             color: #64748B;
-            font-size: 10px;
+            font-size: 12px;
         }
 
         .legend-dot {
@@ -367,7 +367,7 @@
             background: #F8FAFC;
             border-bottom: 1px solid var(--border);
             color: #64748B;
-            font-size: 10px;
+            font-size: 12px;
             font-weight: 850;
         }
 
@@ -430,7 +430,7 @@
         .summary-help {
             margin-top: 2px;
             color: #94A3B8;
-            font-size: 9px;
+            font-size: 12px;
         }
 
         .summary-number {
@@ -448,7 +448,7 @@
 
         .amount-label {
             color: #8B5CF6;
-            font-size: 10px;
+            font-size: 12px;
             font-weight: 800;
             text-transform: uppercase;
         }
@@ -463,7 +463,7 @@
         .amount-help {
             margin-top: 5px;
             color: #7C3AED;
-            font-size: 10px;
+            font-size: 12px;
             line-height: 1.45;
         }
 
@@ -484,7 +484,7 @@
         .small-stat span {
             display: block;
             color: #94A3B8;
-            font-size: 9px;
+            font-size: 12px;
         }
 
         .small-stat strong {
@@ -536,14 +536,14 @@
             border: 1px solid #E7ECF3;
             background: #F8FAFC;
             color: #94A3B8;
-            font-size: 10px;
+            font-size: 12px;
             line-height: 1.5;
         }
 
         .period-info {
             margin-top: 5px;
             color: #94A3B8;
-            font-size: 9px;
+            font-size: 12px;
         }
 
         .proposal-state-list {
@@ -561,7 +561,7 @@
             border: 1px solid #E7ECF3;
             border-radius: 10px;
             background: #FBFCFE;
-            font-size: 10px;
+            font-size: 12px;
         }
 
         .proposal-state span {
@@ -580,7 +580,7 @@
 
         .bar-value {
             color: #64748B;
-            font-size: 7px;
+            font-size: 11px;
             font-weight: 800;
         }
 

@@ -15,6 +15,9 @@ class MotorExtraccion extends Page
     protected string $view =
         'filament.admin.pages.motor-extraccion';
 
+    // La vista ya trae su encabezado.
+    protected ?string $heading = '';
+
     protected static ?string $slug =
         'motor-extraccion';
 
@@ -471,7 +474,18 @@ class MotorExtraccion extends Page
                 );
         }
 
+        // Estado real de la API del extractor (FastAPI en 127.0.0.1:8001).
+        try {
+            $apiDisponible = Http::timeout(2)
+                ->get(rtrim((string) config('services.extractor.url', 'http://127.0.0.1:8001'), '/') . '/health')
+                ->json('status') === 'ok';
+        } catch (\Throwable) {
+            $apiDisponible = false;
+        }
+
         return [
+            'apiDisponible' => $apiDisponible,
+
             'fuenteContexto' =>
                 $fuenteContexto,
 

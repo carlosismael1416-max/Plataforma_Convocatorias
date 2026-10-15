@@ -458,6 +458,11 @@
         color: var(--itsva-texto-suave);
     }
 
+    /* Sin título (lo pone la vista), las acciones del encabezado van a la derecha. */
+    .fi-header-actions-ctn {
+        margin-inline-start: auto;
+    }
+
     /* Botón primario del diseño (Filament elegía un tono claro por contraste). */
     .fi-btn:not(.fi-outlined).fi-color.fi-color-primary:not(label) {
         --bg: #1A4B8C;

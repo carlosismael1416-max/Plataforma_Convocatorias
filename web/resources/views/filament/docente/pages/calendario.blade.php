@@ -28,7 +28,7 @@
     .summary-label {
         margin-top: 3px;
         color: #64748B;
-        font-size: 10px;
+        font-size: 12px;
     }
 
     .cal-layout {
@@ -172,7 +172,7 @@
         padding: 5px 6px;
         border: 0;
         border-radius: 6px;
-        font-size: 9px;
+        font-size: 12px;
         line-height: 1.25;
         text-align: left;
         text-decoration: none;
@@ -236,7 +236,7 @@
 
     .next-date {
         color: #2563EB;
-        font-size: 10px;
+        font-size: 12px;
         font-weight: 700;
     }
 
@@ -251,7 +251,7 @@
     .next-type {
         margin-top: 4px;
         color: #64748B;
-        font-size: 10px;
+        font-size: 12px;
     }
 
     .next-actions {
@@ -267,7 +267,7 @@
         color: #1A4B8C;
         padding: 5px 7px;
         cursor: pointer;
-        font-size: 9px;
+        font-size: 12px;
         text-decoration: none;
     }
 
@@ -413,7 +413,7 @@
     .field-error {
         margin-top: 5px;
         color: #DC2626;
-        font-size: 9px;
+        font-size: 12px;
     }
 
     .modal-footer {
@@ -458,7 +458,7 @@
         }
 
         .cal-event {
-            font-size: 7px;
+            font-size: 11px;
             padding: 4px;
         }
 

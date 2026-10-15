@@ -199,7 +199,7 @@
             border-radius: 999px;
             background: #F0F4FB;
             color: #1A4B8C;
-            font-size: 9px;
+            font-size: 12px;
             font-weight: 650;
         }
 
@@ -248,7 +248,7 @@
         .finance-detail {
             margin-top: 7px;
             color: #64748B;
-            font-size: 10px;
+            font-size: 12px;
             line-height: 1.55;
         }
 

@@ -17,6 +17,9 @@ class BitacoraErrores extends Page
     protected string $view =
         'filament.admin.pages.bitacora-errores';
 
+    // La vista ya trae su encabezado.
+    protected ?string $heading = '';
+
     protected static ?string $navigationLabel =
         'Bitácora de Errores';
 

@@ -21,6 +21,8 @@ class AparienciaItsva
     {
         return $panel
             ->topbar(false)
+            // El título de cada página ya aparece en el header propio.
+            ->breadcrumbs(false)
             // El header propio ya tiene búsqueda y menú de usuario; sin
             // barra superior Filament los movería a la sidebar.
             ->globalSearch(false)

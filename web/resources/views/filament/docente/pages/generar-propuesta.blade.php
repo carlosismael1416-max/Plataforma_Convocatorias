@@ -63,7 +63,7 @@
     .gp-card-header p {
         margin: 5px 0 0;
         color: #64748B;
-        font-size: 10px;
+        font-size: 12px;
     }
 
     .gp-card-body {
@@ -82,7 +82,7 @@
         display: block;
         margin-bottom: 6px;
         color: #475569;
-        font-size: 10px;
+        font-size: 12px;
         font-weight: 700;
         text-transform: uppercase;
     }
@@ -111,7 +111,7 @@
     .field-error {
         margin-top: 5px;
         color: #DC2626;
-        font-size: 10px;
+        font-size: 12px;
     }
 
     .gp-summary {
@@ -129,7 +129,7 @@
     }
 
     .gp-info-label {
-        font-size: 9px;
+        font-size: 12px;
         color: #64748B;
         font-weight: 700;
         text-transform: uppercase;
@@ -282,7 +282,7 @@
     .requirement-row {
         padding: 8px 0;
         border-bottom: 1px solid #EEF2F7;
-        font-size: 10px;
+        font-size: 12px;
         color: #475569;
     }
 

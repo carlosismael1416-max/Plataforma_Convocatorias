@@ -55,7 +55,7 @@
 
         .stats {
             display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
             gap: 14px;
             margin-bottom: 22px;
         }
@@ -96,7 +96,7 @@
         .stat-help {
             margin-top: 4px;
             color: #94A3B8;
-            font-size: 9px;
+            font-size: 12px;
         }
 
         .section-title {
@@ -157,7 +157,7 @@
             border-radius: 999px;
             background: #D1FAE5;
             color: #047857;
-            font-size: 9px;
+            font-size: 12px;
             font-weight: 850;
         }
 
@@ -172,7 +172,7 @@
             min-height: 45px;
             margin-top: 5px;
             color: var(--muted);
-            font-size: 10px;
+            font-size: 12px;
             line-height: 1.5;
         }
 
@@ -181,7 +181,7 @@
             padding-top: 15px;
             border-top: 1px solid #EEF2F7;
             color: #64748B;
-            font-size: 9px;
+            font-size: 12px;
             font-weight: 850;
             text-transform: uppercase;
         }
@@ -198,7 +198,7 @@
             gap: 8px;
             align-items: flex-start;
             color: #475569;
-            font-size: 10px;
+            font-size: 12px;
         }
 
         .check {
@@ -211,15 +211,21 @@
             align-items: center;
             background: #D1FAE5;
             color: #047857;
-            font-size: 8px;
+            font-size: 11px;
             font-weight: 900;
         }
 
         .more {
+            display: inline-block;
             margin-top: 11px;
             color: var(--primary);
-            font-size: 9px;
-            font-weight: 850;
+            font-size: 12px;
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .more:hover {
+            text-decoration: underline;
         }
 
         .notice {
@@ -231,7 +237,7 @@
             border-radius: 11px;
             background: #ECFDF5;
             color: #047857;
-            font-size: 10px;
+            font-size: 12px;
             line-height: 1.55;
         }
 
@@ -309,233 +315,74 @@
         </div>
 
         <div class="stats">
-
             <div class="stat">
                 <div class="stat-icon">R</div>
-
-                <div class="stat-value">3</div>
-
-                <div class="stat-label">
-                    Roles principales
-                </div>
-
-                <div class="stat-help">
-                    Docente, Directivo y Administrador
-                </div>
+                <div class="stat-value">{{ $totalRoles }}</div>
+                <div class="stat-label">Roles registrados</div>
+                <div class="stat-help">{{ $rolesActivos }} activo(s)</div>
             </div>
 
             <div class="stat">
                 <div class="stat-icon">U</div>
-
-                <div class="stat-value">32</div>
-
-                <div class="stat-label">
-                    Usuarios asignados
-                </div>
-
-                <div class="stat-help">
-                    Cuentas asociadas a roles
-                </div>
+                <div class="stat-value">{{ $usuariosConRol }}</div>
+                <div class="stat-label">Usuarios asignados</div>
+                <div class="stat-help">Cuentas con un rol asignado</div>
             </div>
 
             <div class="stat">
                 <div class="stat-icon">P</div>
-
-                <div class="stat-value">18</div>
-
-                <div class="stat-label">
-                    Permisos definidos
-                </div>
-
-                <div class="stat-help">
-                    Funciones consideradas en la plataforma
-                </div>
+                <div class="stat-value">{{ $totalPermisos }}</div>
+                <div class="stat-label">Permisos definidos</div>
+                <div class="stat-help">Registrados en el catálogo de permisos</div>
             </div>
-
         </div>
 
         <div class="section-title">
-            Permisos principales por rol
+            Permisos por rol
         </div>
 
         <div class="role-grid">
+            @foreach ($roles as $rol)
+                @php
+                    $clase = ['DOCENTE' => 'docente', 'DIRECTIVO' => 'directivo', 'ADMINISTRADOR' => 'admin'][$rol->nombre] ?? 'admin';
+                    $inicial = ['DOCENTE' => 'D', 'DIRECTIVO' => 'DI', 'ADMINISTRADOR' => 'A', 'SISTEMA' => 'S'][$rol->nombre] ?? mb_substr($rol->nombre, 0, 1);
+                @endphp
 
-            <article class="role-card">
-
-                <div class="role-card-top">
-                    <div class="role-icon docente">D</div>
-                    <span class="status">Activo</span>
-                </div>
-
-                <div class="role-name">
-                    Docente
-                </div>
-
-                <div class="role-description">
-                    Consulta oportunidades de financiamiento y desarrolla propuestas relacionadas con convocatorias.
-                </div>
-
-                <div class="permissions-title">
-                    Accesos principales
-                </div>
-
-                <div class="permissions">
-
-                    <div class="permission">
-                        <span class="check">✓</span>
-                        Buscar convocatorias
+                <article class="role-card">
+                    <div class="role-card-top">
+                        <div class="role-icon {{ $clase }}">{{ $inicial }}</div>
+                        <span class="status">{{ $rol->estado ? 'Activo' : 'Inactivo' }}</span>
                     </div>
 
-                    <div class="permission">
-                        <span class="check">✓</span>
-                        Administrar Mis Convocatorias
+                    <div class="role-name">
+                        {{ \Illuminate\Support\Str::ucfirst(mb_strtolower($rol->nombre)) }}
                     </div>
 
-                    <div class="permission">
-                        <span class="check">✓</span>
-                        Consultar calendario
+                    <div class="role-description">
+                        {{ $rol->descripcion ?: 'Sin descripción.' }}
+                        · {{ $rol->users_count }} usuario(s)
                     </div>
 
-                    <div class="permission">
-                        <span class="check">✓</span>
-                        Generar y editar propuestas
+                    <div class="permissions-title">
+                        Permisos ({{ $rol->permisos->count() }})
                     </div>
 
-                    <div class="permission">
-                        <span class="check">✓</span>
-                        Exportar propuestas
+                    <div class="permissions">
+                        @forelse ($rol->permisos as $permiso)
+                            <div class="permission" title="{{ $permiso->descripcion }}">
+                                <span class="check">✓</span>
+                                {{ \Illuminate\Support\Str::ucfirst(str_replace('_', ' ', $permiso->nombre)) }}
+                            </div>
+                        @empty
+                            <div class="permission">Sin permisos asignados.</div>
+                        @endforelse
                     </div>
 
-                </div>
-
-                <div class="more">
-                    Permisos del rol Docente
-                </div>
-
-            </article>
-
-            <article class="role-card">
-
-                <div class="role-card-top">
-                    <div class="role-icon directivo">DI</div>
-                    <span class="status">Activo</span>
-                </div>
-
-                <div class="role-name">
-                    Directivo
-                </div>
-
-                <div class="role-description">
-                    Consulta convocatorias y supervisa el proceso institucional de revisión.
-                </div>
-
-                <div class="permissions-title">
-                    Accesos principales
-                </div>
-
-                <div class="permissions">
-
-                    <div class="permission">
-                        <span class="check">✓</span>
-                        Buscar convocatorias
-                    </div>
-
-                    <div class="permission">
-                        <span class="check">✓</span>
-                        Revisar convocatorias
-                    </div>
-
-                    <div class="permission">
-                        <span class="check">✓</span>
-                        Aprobar o rechazar registros
-                    </div>
-
-                    <div class="permission">
-                        <span class="check">✓</span>
-                        Consultar estadísticas
-                    </div>
-
-                    <div class="permission">
-                        <span class="check">✓</span>
-                        Generar reportes
-                    </div>
-
-                </div>
-
-                <div class="more">
-                    Permisos del rol Directivo
-                </div>
-
-            </article>
-
-            <article class="role-card">
-
-                <div class="role-card-top">
-                    <div class="role-icon admin">A</div>
-                    <span class="status">Activo</span>
-                </div>
-
-                <div class="role-name">
-                    Administrador
-                </div>
-
-                <div class="role-description">
-                    Administra usuarios, configuración, fuentes web y funcionamiento general de la plataforma.
-                </div>
-
-                <div class="permissions-title">
-                    Accesos principales
-                </div>
-
-                <div class="permissions">
-
-                    <div class="permission">
-                        <span class="check">✓</span>
-                        Gestionar usuarios
-                    </div>
-
-                    <div class="permission">
-                        <span class="check">✓</span>
-                        Gestionar roles y permisos
-                    </div>
-
-                    <div class="permission">
-                        <span class="check">✓</span>
-                        Gestionar fuentes web
-                    </div>
-
-                    <div class="permission">
-                        <span class="check">✓</span>
-                        Supervisar motor de extracción
-                    </div>
-
-                    <div class="permission">
-                        <span class="check">✓</span>
-                        Gestionar convocatorias
-                    </div>
-
-                </div>
-
-                <div class="more">
-                    Permisos del rol Administrador
-                </div>
-
-            </article>
-
-        </div>
-
-        <div class="notice">
-
-            <div class="notice-icon">
-                i
-            </div>
-
-            <div>
-                Los permisos mostrados arriba corresponden al diseño visual de los tres
-                perfiles principales. La asignación real de permisos mediante
-                <strong>rol_permisos</strong> se conectará en la fase de funcionalidad.
-            </div>
-
+                    <a class="more" href="{{ \App\Filament\Resources\Roles\RoleResource::getUrl('edit', ['record' => $rol]) }}">
+                        Editar permisos del rol →
+                    </a>
+                </article>
+            @endforeach
         </div>
 
         <section class="table-card">

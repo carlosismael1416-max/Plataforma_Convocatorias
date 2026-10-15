@@ -13,6 +13,9 @@ class Perfil extends Page
     protected string $view =
         'filament.admin.pages.perfil';
 
+    // La vista ya trae su encabezado.
+    protected ?string $heading = '';
+
     protected static ?string $navigationLabel =
         'Perfil';
 

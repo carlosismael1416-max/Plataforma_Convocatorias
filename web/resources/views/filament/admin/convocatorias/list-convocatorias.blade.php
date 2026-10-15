@@ -79,7 +79,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 10px;
+            font-size: 12px;
             font-weight: 900;
         }
 
@@ -118,7 +118,7 @@
         .stat-help {
             margin-top: 4px;
             color: #94A3B8;
-            font-size: 9px;
+            font-size: 12px;
         }
 
         .workflow {
@@ -155,20 +155,20 @@
             justify-content: center;
             background: var(--primary-soft);
             color: var(--primary-dark);
-            font-size: 9px;
+            font-size: 12px;
             font-weight: 900;
         }
 
         .workflow-title {
             color: #334155;
-            font-size: 10px;
+            font-size: 12px;
             font-weight: 850;
         }
 
         .workflow-text {
             margin-top: 4px;
             color: #94A3B8;
-            font-size: 9px;
+            font-size: 12px;
             line-height: 1.45;
         }
 
@@ -187,7 +187,7 @@
             border-radius: 11px;
             background: #ECFDF5;
             color: #047857;
-            font-size: 9px;
+            font-size: 12px;
             line-height: 1.5;
         }
 
@@ -394,9 +394,8 @@
             </div>
 
             <div>
-                Los indicadores y la tabla utilizan directamente los registros actuales
-                de PostgreSQL. Las acciones de aprobación y correcciones permanecen reservadas
-                para la fase de integración de flujos.
+                Abre una convocatoria pendiente con «Ver» para aprobarla o solicitar
+                correcciones; cada decisión queda registrada con sus observaciones.
             </div>
 
         </div>

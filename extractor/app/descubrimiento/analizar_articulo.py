@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from app.descubrimiento.codificacion import decodificar_html
 from app.seguridad_red import SesionSegura
 
 
@@ -560,11 +561,6 @@ def descargar_articulo(
                 partes
             )
 
-            encoding = (
-                respuesta.encoding
-                or "utf-8"
-            )
-
             return {
                 "estado":
                     "COMPLETADO",
@@ -573,9 +569,9 @@ def descargar_articulo(
                     respuesta.url,
 
                 "html":
-                    contenido.decode(
-                        encoding,
-                        errors="replace",
+                    decodificar_html(
+                        contenido,
+                        respuesta,
                     ),
 
                 "error":

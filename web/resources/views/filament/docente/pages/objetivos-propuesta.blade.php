@@ -172,13 +172,13 @@
         margin-top: 6px;
         text-align: right;
         color: #94A3B8;
-        font-size: 10px;
+        font-size: 12px;
     }
 
     .field-error {
         margin-top: 6px;
         color: #DC2626;
-        font-size: 10px;
+        font-size: 12px;
     }
 
     .objective-item {
@@ -230,7 +230,7 @@
         padding: 0 9px;
         border-radius: 7px;
         cursor: pointer;
-        font-size: 10px;
+        font-size: 12px;
         font-weight: 700;
     }
 
@@ -337,7 +337,7 @@
         padding: 6px 10px;
         background: #FEF3C7;
         color: #92400E;
-        font-size: 10px;
+        font-size: 12px;
         font-weight: 800;
     }
 
@@ -407,7 +407,7 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 10px;
+        font-size: 12px;
         font-weight: 800;
     }
 
@@ -450,7 +450,7 @@
         display: block;
         margin-bottom: 2px;
         color: #94A3B8;
-        font-size: 10px;
+        font-size: 12px;
     }
 
     .summary-item strong {

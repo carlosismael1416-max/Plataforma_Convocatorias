@@ -46,7 +46,7 @@
         border-radius: 999px;
         background: var(--primary-soft);
         color: var(--primary-dark);
-        font-size: 10px;
+        font-size: 12px;
         font-weight: 850;
     }
 
@@ -181,12 +181,12 @@
     .card-subtitle {
         margin-top: 3px;
         color: var(--muted);
-        font-size: 9px;
+        font-size: 12px;
     }
 
     .link {
         color: var(--primary);
-        font-size: 9px;
+        font-size: 12px;
         font-weight: 850;
         text-decoration: none;
     }
@@ -236,7 +236,7 @@
     .quick-description {
         margin-top: 4px;
         color: var(--muted);
-        font-size: 8px;
+        font-size: 11px;
         line-height: 1.45;
     }
 
@@ -265,7 +265,7 @@
     .review-organization {
         margin-top: 4px;
         color: var(--muted);
-        font-size: 9px;
+        font-size: 12px;
     }
 
     .review-badge {
@@ -273,7 +273,7 @@
         border-radius: 999px;
         background: #FEF3C7;
         color: #92400E;
-        font-size: 8px;
+        font-size: 11px;
         font-weight: 850;
         white-space: nowrap;
     }
@@ -287,7 +287,7 @@
 
     .review-info-item {
         color: #94A3B8;
-        font-size: 8px;
+        font-size: 11px;
     }
 
     .review-info-item strong {
@@ -309,7 +309,7 @@
         border-radius: 7px;
         background: var(--primary);
         color: white;
-        font-size: 8px;
+        font-size: 11px;
         font-weight: 800;
         text-decoration: none;
     }
@@ -346,21 +346,21 @@
 
     .deadline-month {
         margin-top: 3px;
-        font-size: 7px;
+        font-size: 11px;
         font-weight: 850;
         text-transform: uppercase;
     }
 
     .deadline-title {
         color: #334155;
-        font-size: 10px;
+        font-size: 12px;
         font-weight: 800;
     }
 
     .deadline-text {
         margin-top: 4px;
         color: var(--muted);
-        font-size: 8px;
+        font-size: 11px;
         line-height: 1.4;
     }
 
@@ -386,20 +386,20 @@
 
     .activity-title {
         color: #334155;
-        font-size: 9px;
+        font-size: 12px;
         font-weight: 750;
     }
 
     .activity-time {
         margin-top: 4px;
         color: #94A3B8;
-        font-size: 8px;
+        font-size: 11px;
     }
 
     .empty {
         padding: 28px 18px;
         color: var(--muted);
-        font-size: 9px;
+        font-size: 12px;
         text-align: center;
     }
 

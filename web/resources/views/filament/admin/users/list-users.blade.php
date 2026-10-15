@@ -116,7 +116,7 @@
         .stat-help {
             margin-top: 4px;
             color: #94A3B8;
-            font-size: 9px;
+            font-size: 12px;
         }
 
         .table-card {
@@ -151,7 +151,7 @@
             border-radius: 11px;
             background: #ECFDF5;
             color: #047857;
-            font-size: 10px;
+            font-size: 12px;
             line-height: 1.5;
         }
 
