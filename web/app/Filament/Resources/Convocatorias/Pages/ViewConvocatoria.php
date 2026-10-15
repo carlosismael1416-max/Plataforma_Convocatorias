@@ -7,7 +7,7 @@ use Filament\Actions\EditAction;
 use Filament\Resources\Pages\ViewRecord;
 
 // El administrador ya no aprueba ni solicita correcciones de convocatorias;
-// la revisión la hace el directivo en «Convocatorias por revisar».
+// se publican solas (motor validado o subida del personal).
 class ViewConvocatoria extends ViewRecord
 {
     protected static string $resource = ConvocatoriaResource::class;
