@@ -10,6 +10,7 @@ use App\Models\PresupuestoItem;
 use App\Models\Propuesta;
 use App\Models\PropuestaEntregable;
 use App\Models\PropuestaObjetivo;
+use App\Models\PropuestaRevision;
 use App\Models\User;
 use App\Services\RevisionPropuesta;
 use Filament\Facades\Filament;
@@ -179,5 +180,58 @@ class RevisionPropuestaTest extends TestCase
         $this->actingAs($docente)
             ->get('/directivo/revisar-propuesta?propuesta=' . $borrador->id)
             ->assertForbidden();
+    }
+
+    public function test_el_historial_guarda_envio_y_dictamen_con_observaciones(): void
+    {
+        $docente = $this->usuarioConRol('DOCENTE');
+        $directivo = $this->usuarioConRol('DIRECTIVO');
+        $propuesta = $this->propuesta($docente);
+
+        RevisionPropuesta::enviar($propuesta, $docente);
+        RevisionPropuesta::dictaminar($propuesta, $directivo, 'DEVOLVER', 'Ajusta el cronograma.');
+
+        $historial = PropuestaRevision::query()
+            ->where('propuesta_id', $propuesta->id)
+            ->orderBy('id')
+            ->get(['user_id', 'accion', 'estado_anterior', 'estado_nuevo', 'observaciones'])
+            ->toArray();
+
+        $this->assertSame([
+            ['user_id' => $docente->id, 'accion' => 'ENVIAR', 'estado_anterior' => 'EDITANDO', 'estado_nuevo' => 'ENVIADA', 'observaciones' => null],
+            ['user_id' => $directivo->id, 'accion' => 'DEVOLVER', 'estado_anterior' => 'ENVIADA', 'estado_nuevo' => 'EDITANDO', 'observaciones' => 'Ajusta el cronograma.'],
+        ], $historial);
+
+        // El autor ve las observaciones al abrir el editor.
+        $this->actingAs($docente)
+            ->get('/docente/editor-propuesta?propuesta=' . $propuesta->id)
+            ->assertOk()
+            ->assertSee('Propuesta devuelta con observaciones')
+            ->assertSee('Ajusta el cronograma.');
+    }
+
+    public function test_un_dictamen_fallido_no_deja_historial(): void
+    {
+        $directivo = $this->usuarioConRol('DIRECTIVO');
+        $propuesta = $this->propuesta($this->usuarioConRol('DOCENTE'), estado: 'ENVIADA');
+
+        try {
+            RevisionPropuesta::dictaminar($propuesta, $directivo, 'RECHAZAR', '');
+        } catch (ValidationException) {
+        }
+
+        $this->assertSame(0, PropuestaRevision::query()->count());
+        $this->assertSame('ENVIADA', $propuesta->fresh()->estado);
+    }
+
+    public function test_las_estadisticas_del_dashboard_directivo_son_enlaces(): void
+    {
+        $respuesta = $this->actingAs($this->usuarioConRol('DIRECTIVO'))
+            ->get('/directivo')
+            ->assertOk();
+
+        foreach (['convocatorias-por-revisar', 'estadisticas', 'reportes', 'propuestas-por-revisar'] as $seccion) {
+            $respuesta->assertSee('<a class="stat-card" href="' . url("/directivo/{$seccion}") . '"', false);
+        }
     }
 }

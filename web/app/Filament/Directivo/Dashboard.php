@@ -2,6 +2,7 @@
 
 namespace App\Filament\Directivo;
 
+use App\Filament\Directivo\Pages;
 use App\Models\Convocatoria;
 use App\Models\Propuesta;
 use App\Models\User;
@@ -262,6 +263,18 @@ class Dashboard extends BaseDashboard
 
             'propuestasDocentes' =>
                 $propuestasDocentes,
+
+            'propuestasPorRevisar' =>
+                Propuesta::query()
+                    ->where('estado', 'ENVIADA')
+                    ->count(),
+
+            'urls' => [
+                'porRevisar' => Pages\ConvocatoriasPorRevisar::getUrl(),
+                'convocatorias' => Pages\Estadisticas::getUrl(),
+                'revisadas' => Pages\Reportes::getUrl(),
+                'propuestas' => Pages\PropuestasPorRevisar::getUrl(),
+            ],
 
             'pendientes' =>
                 $pendientes,

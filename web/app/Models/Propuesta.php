@@ -74,6 +74,13 @@ class Propuesta extends Model
             ->orderBy('orden');
     }
 
+    public function revisiones(): HasMany
+    {
+        return $this->hasMany(PropuestaRevision::class)
+            ->latest()
+            ->latest('id');
+    }
+
     public function entregables(): HasMany
     {
         return $this->hasMany(PropuestaEntregable::class);

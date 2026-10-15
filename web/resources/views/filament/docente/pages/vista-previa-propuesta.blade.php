@@ -555,6 +555,29 @@
     .dictamen .btn { justify-content: center; width: 100%; }
     .dictamen .dictamen-rechazar { border-color: #FECACA; color: #B91C1C; }
 
+    .historial {
+        margin-top: 16px;
+        padding-top: 16px;
+        border-top: 1px solid #F0F4FB;
+    }
+
+    .historial-item {
+        padding: 10px 0;
+        border-bottom: 1px dashed #E2E8F0;
+        font-size: 12px;
+    }
+
+    .historial-item:last-child { border-bottom: 0; }
+    .historial-cabecera { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .historial-accion { padding: 2px 8px; border-radius: 999px; font-weight: 700; font-size: 11px; }
+    .historial-enviar { background: #DBEAFE; color: #1D4ED8; }
+    .historial-aprobar { background: #D1FAE5; color: #047857; }
+    .historial-devolver { background: #FEF3C7; color: #B45309; }
+    .historial-rechazar { background: #FEE2E2; color: #B91C1C; }
+    .historial-fecha { color: #94A3B8; }
+    .historial-autor { margin-top: 4px; color: #475569; font-weight: 600; }
+    .historial-obs { margin-top: 4px; color: #334155; line-height: 1.45; white-space: pre-line; }
+
     .estado-envio {
         margin-top: 12px;
         padding: 12px 14px;
@@ -1961,6 +1984,52 @@
                     <div class="estado-envio rechazada">Propuesta rechazada. Revisa las observaciones en tus notificaciones.</div>
                     @break
             @endswitch
+
+            @php
+                $ultimaDevolucion = $propuesta->estado === 'EDITANDO'
+                    ? $revisiones->firstWhere('accion', 'DEVOLVER')
+                    : null;
+            @endphp
+
+            @if ($ultimaDevolucion && $revisiones->first()?->is($ultimaDevolucion))
+                <div class="estado-envio rechazada">
+                    <strong>Devuelta con observaciones.</strong>
+                    {{ $ultimaDevolucion->observaciones }}
+                    Corrígela y vuelve a enviarla.
+                </div>
+            @endif
+
+            @if ($revisiones->isNotEmpty())
+                <div class="historial">
+                    <div class="summary-title">Historial de revisión</div>
+
+                    @foreach ($revisiones as $revision)
+                        <div class="historial-item">
+                            <div class="historial-cabecera">
+                                <span class="historial-accion historial-{{ strtolower($revision->accion) }}">
+                                    {{ [
+                                        'ENVIAR' => 'Enviada',
+                                        'APROBAR' => 'Aprobada',
+                                        'DEVOLVER' => 'Devuelta',
+                                        'RECHAZAR' => 'Rechazada',
+                                    ][$revision->accion] ?? $revision->accion }}
+                                </span>
+                                <span class="historial-fecha">
+                                    {{ $revision->created_at?->locale('es')->isoFormat('D MMM YYYY, HH:mm') }}
+                                </span>
+                            </div>
+
+                            <div class="historial-autor">
+                                {{ trim(($revision->usuario?->name ?? '') . ' ' . ($revision->usuario?->apellidos ?? '')) }}
+                            </div>
+
+                            @if (filled($revision->observaciones))
+                                <div class="historial-obs">{{ $revision->observaciones }}</div>
+                            @endif
+                        </div>
+                    @endforeach
+                </div>
+            @endif
 
             @if ($modoRevision && $propuesta->estado === 'ENVIADA')
                 <div class="dictamen">
