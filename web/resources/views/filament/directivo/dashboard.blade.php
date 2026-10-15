@@ -1,1051 +1,225 @@
 <x-filament-panels::page>
-
-<style>
-    .directivo-dashboard {
-        --text: #0F1827;
-        --muted: #64748B;
-        --primary: #7C3AED;
-        --primary-dark: #6D28D9;
-        --primary-soft: #F3E8FF;
-        --border: #DDE3EE;
-        --success: #059669;
-        --warning: #D97706;
-
-        color: var(--text);
-    }
-
-    .directivo-dashboard * {
-        box-sizing: border-box;
-    }
-
-    .dashboard-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-        gap: 22px;
-        margin-bottom: 22px;
-    }
-
-    .dashboard-title {
-        margin: 0;
-        font-size: 25px;
-        font-weight: 850;
-    }
-
-    .dashboard-subtitle {
-        margin-top: 6px;
-        color: var(--muted);
-        font-size: 12px;
-    }
-
-    .role-badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        padding: 6px 10px;
-        border-radius: 999px;
-        background: var(--primary-soft);
-        color: var(--primary-dark);
-        font-size: 12px;
-        font-weight: 850;
-    }
-
-    .role-dot {
-        width: 7px;
-        height: 7px;
-        border-radius: 50%;
-        background: var(--primary);
-    }
-
-    .stats-grid {
-        display: grid;
-        grid-template-columns:
-            repeat(4, minmax(0, 1fr));
-        gap: 12px;
-        margin-bottom: 20px;
-    }
-
-    .stat-card,
-    .card {
-        background: white;
-        border: 1px solid var(--border);
-        box-shadow:
-            0 1px 2px
-            rgba(15, 24, 39, .03);
-    }
-
-    .stat-card {
-        display: block;
-        padding: 20px;
-        border-radius: 12px;
-        color: inherit;
-        text-decoration: none;
-        transition: border-color .15s, box-shadow .15s, transform .15s;
-    }
-
-    .stat-card:hover {
-        border-color: #7C3AED;
-        box-shadow: 0 4px 12px rgba(124, 58, 237, .12);
-        transform: translateY(-1px);
-    }
-
-    .stat-card:focus-visible {
-        outline: 2px solid #7C3AED;
-        outline-offset: 2px;
-    }
-
-    .stat-icon {
-        width: 37px;
-        height: 37px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 10px;
-        font-size: 12px;
-        font-weight: 900;
-    }
-
-    .icon-purple {
-        background: #F3E8FF;
-        color: #7C3AED;
-    }
-
-    .icon-blue {
-        background: #DBEAFE;
-        color: #2563EB;
-    }
-
-    .icon-green {
-        background: #D1FAE5;
-        color: #047857;
-    }
-
-    .icon-yellow {
-        background: #FEF3C7;
-        color: #B45309;
-    }
-
-    .stat-value {
-        margin-top: 13px;
-        font: 700 24px 'DM Sans', sans-serif;
-    }
-
-    .stat-label {
-        margin-top: 3px;
-        color: #475569;
-        font: 600 14px 'DM Sans', sans-serif;
-    }
-
-    .stat-help {
-        margin-top: 4px;
-        color: #94A3B8;
-        font-size: 12px;
-        line-height: 1.4;
-    }
-
-    .dashboard-layout {
-        display: grid;
-        grid-template-columns:
-            minmax(0, 1.4fr)
-            minmax(280px, .6fr);
-        gap: 20px;
-        align-items: start;
-    }
-
-    .column {
-        display: flex;
-        flex-direction: column;
-        gap: 16px;
-    }
-
-    .card {
-        overflow: hidden;
-        border-radius: 14px;
-    }
-
-    .card-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 12px;
-        padding: 17px 19px;
-        border-bottom:
-            1px solid var(--border);
-    }
-
-    .card-title {
-        font-size: 13px;
-        font-weight: 850;
-    }
-
-    .card-subtitle {
-        margin-top: 3px;
-        color: var(--muted);
-        font-size: 12px;
-    }
-
-    .link {
-        color: var(--primary);
-        font-size: 12px;
-        font-weight: 850;
-        text-decoration: none;
-    }
-
-    .quick-actions {
-        display: grid;
-        grid-template-columns:
-            repeat(2, minmax(0, 1fr));
-        gap: 10px;
-        padding: 18px;
-    }
-
-    .quick-action {
-        min-height: 100px;
-        padding: 14px;
-        border: 1px solid var(--border);
-        border-radius: 11px;
-        background: #FBFCFE;
-        color: var(--text);
-        text-decoration: none;
-    }
-
-    .quick-action:hover {
-        border-color: #C4B5FD;
-        background: #FCFAFF;
-    }
-
-    .quick-icon {
-        width: 33px;
-        height: 33px;
-        margin-bottom: 9px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 9px;
-        background: var(--primary-soft);
-        color: var(--primary);
-        font-size: 11px;
-        font-weight: 900;
-    }
-
-    .quick-title {
-        font-size: 11px;
-        font-weight: 850;
-    }
-
-    .quick-description {
-        margin-top: 4px;
-        color: var(--muted);
-        font-size: 11px;
-        line-height: 1.45;
-    }
-
-    .review-item {
-        padding: 16px 19px;
-        border-bottom: 1px solid #EEF2F7;
-    }
-
-    .review-item:last-child {
-        border-bottom: 0;
-    }
-
-    .review-top {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-        gap: 12px;
-    }
-
-    .review-title {
-        color: #1E293B;
-        font-size: 11px;
-        font-weight: 850;
-    }
-
-    .review-organization {
-        margin-top: 4px;
-        color: var(--muted);
-        font-size: 12px;
-    }
-
-    .review-badge {
-        padding: 4px 8px;
-        border-radius: 999px;
-        background: #FEF3C7;
-        color: #92400E;
-        font-size: 11px;
-        font-weight: 850;
-        white-space: nowrap;
-    }
-
-    .review-info {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 14px;
-        margin-top: 11px;
-    }
-
-    .review-info-item {
-        color: #94A3B8;
-        font-size: 11px;
-    }
-
-    .review-info-item strong {
-        color: #475569;
-        font-weight: 800;
-    }
-
-    .review-actions {
-        margin-top: 12px;
-    }
-
-    .small-btn {
-        min-height: 31px;
-        padding: 0 10px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        border: 1px solid var(--primary);
-        border-radius: 7px;
-        background: var(--primary);
-        color: white;
-        font-size: 11px;
-        font-weight: 800;
-        text-decoration: none;
-    }
-
-    .deadline {
-        display: flex;
-        gap: 10px;
-        padding: 13px 18px;
-        border-bottom: 1px solid #EEF2F7;
-    }
-
-    .deadline:last-child {
-        border-bottom: 0;
-    }
-
-    .deadline-date {
-        width: 42px;
-        height: 46px;
-        flex: 0 0 42px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        border-radius: 9px;
-        background: var(--primary-soft);
-        color: var(--primary-dark);
-    }
-
-    .deadline-day {
-        font-size: 14px;
-        font-weight: 900;
-        line-height: 1;
-    }
-
-    .deadline-month {
-        margin-top: 3px;
-        font-size: 11px;
-        font-weight: 850;
-        text-transform: uppercase;
-    }
-
-    .deadline-title {
-        color: #334155;
-        font-size: 12px;
-        font-weight: 800;
-    }
-
-    .deadline-text {
-        margin-top: 4px;
-        color: var(--muted);
-        font-size: 11px;
-        line-height: 1.4;
-    }
-
-    .activity {
-        display: flex;
-        gap: 10px;
-        padding: 12px 18px;
-        border-bottom: 1px solid #EEF2F7;
-    }
-
-    .activity:last-child {
-        border-bottom: 0;
-    }
-
-    .activity-dot {
-        width: 8px;
-        height: 8px;
-        flex: 0 0 8px;
-        margin-top: 4px;
-        border-radius: 50%;
-        background: var(--primary);
-    }
-
-    .activity-title {
-        color: #334155;
-        font-size: 12px;
-        font-weight: 750;
-    }
-
-    .activity-time {
-        margin-top: 4px;
-        color: #94A3B8;
-        font-size: 11px;
-    }
-
-    .empty {
-        padding: 28px 18px;
-        color: var(--muted);
-        font-size: 12px;
-        text-align: center;
-    }
-
-    @media (max-width: 1100px) {
-        .stats-grid {
-            grid-template-columns:
-                repeat(2, 1fr);
-        }
-
-        .dashboard-layout {
-            grid-template-columns: 1fr;
-        }
-    }
-
-    @media (max-width: 650px) {
-        .dashboard-header {
-            flex-direction: column;
-        }
-
-        .stats-grid,
-        .quick-actions {
-            grid-template-columns: 1fr;
-        }
-    }
-</style>
-
-<div class="directivo-dashboard">
-
-    <div class="dashboard-header">
-
-        <div>
-
-            <h1 class="dashboard-title">
-                Dashboard Directivo
-            </h1>
-
-            <div class="dashboard-subtitle">
-                Bienvenido,
-                {{ $usuario->name }}.
-                Consulta convocatorias y supervisa
-                la información registrada en la
-                plataforma.
+    @php
+        $svg = fn (string $nombre, int $tam = 18): string => \App\Filament\Apariencia\Iconos::svg($nombre, $tam);
+    @endphp
+
+    @include('filament.itsva.dashboard-estilos')
+
+    <div class="dd dd-directivo">
+        {{-- Banner --}}
+        <section class="dd-hero">
+            <span class="dd-hero-deco">{!! $svg('portapapeles', 120) !!}</span>
+
+            <div>
+                <p class="dd-hero-pre">Bienvenido de vuelta</p>
+                <h1>{{ $nombre }}</h1>
+                <p class="dd-hero-sub">
+                    Directivo
+                    @if ($departamento)
+                        — {{ $departamento }}
+                    @endif
+                    — {{ $fecha }}
+                </p>
+
+                <div class="dd-hero-acciones">
+                    <a class="dd-hero-btn dd-hero-btn-primario" href="{{ $urls['porRevisar'] }}">
+                        {!! $svg('portapapeles', 15) !!} Revisar convocatorias
+                    </a>
+                    <a class="dd-hero-btn" href="{{ $urls['propuestas'] }}">
+                        {!! $svg('aprobado', 15) !!} Revisar propuestas
+                    </a>
+                    <a class="dd-hero-btn" href="{{ $urls['subir'] }}">
+                        {!! $svg('subir', 15) !!} Subir convocatoria
+                    </a>
+                    <a class="dd-hero-btn" href="{{ $urls['reportes'] }}">
+                        {!! $svg('reporte', 15) !!} Reportes
+                    </a>
+                </div>
             </div>
+        </section>
 
-        </div>
-
-        <span class="role-badge">
-            <span class="role-dot"></span>
-            Directivo
-        </span>
-
-    </div>
-
-    <div class="stats-grid">
-
-        <a class="stat-card" href="{{ $urls['porRevisar'] }}">
-
-            <div class="stat-icon icon-purple">
-                R
-            </div>
-
-            <div class="stat-value">
-                {{ $porRevisar }}
-            </div>
-
-            <div class="stat-label">
-                Por revisar
-            </div>
-
-            <div class="stat-help">
-                Convocatorias pendientes de revisión
-            </div>
-
-        </a>
-
-        <a class="stat-card" href="{{ $urls['convocatorias'] }}">
-
-            <div class="stat-icon icon-blue">
-                C
-            </div>
-
-            <div class="stat-value">
-                {{ $totalConvocatorias }}
-            </div>
-
-            <div class="stat-label">
-                Convocatorias
-            </div>
-
-            <div class="stat-help">
-                Total registradas en la plataforma
-            </div>
-
-        </a>
-
-        <a class="stat-card" href="{{ $urls['revisadas'] }}">
-
-            <div class="stat-icon icon-green">
-                ✓
-            </div>
-
-            <div class="stat-value">
-                {{ $revisadas }}
-            </div>
-
-            <div class="stat-label">
-                Revisadas
-            </div>
-
-            <div class="stat-help">
-                Ya no están pendientes de revisión
-            </div>
-
-        </a>
-
-        <a class="stat-card" href="{{ $urls['propuestas'] }}">
-
-            <div class="stat-icon icon-yellow">
-                P
-            </div>
-
-            <div class="stat-value">
-                {{ $propuestasPorRevisar }}
-            </div>
-
-            <div class="stat-label">
-                Propuestas por revisar
-            </div>
-
-            <div class="stat-help">
-                {{ $propuestasDocentes }} propuesta(s) de docentes en total
-            </div>
-
-        </a>
-
-    </div>
-
-    <div class="dashboard-layout">
-
-        <div class="column">
-
-            <section class="card">
-
-                <div class="card-header">
-
+        {{-- Estadísticas --}}
+        <section class="dd-stats">
+            @foreach ($estadisticas as $estadistica)
+                <a href="{{ $estadistica['url'] }}" class="dd-card dd-stat">
+                    <div class="dd-stat-icono dd-{{ $estadistica['color'] }}">{!! $svg($estadistica['icono'], 20) !!}</div>
                     <div>
+                        <p class="dd-stat-etiqueta">{{ $estadistica['etiqueta'] }}</p>
+                        <p class="dd-stat-valor">{{ $estadistica['valor'] }}</p>
+                        <p class="dd-stat-sub">{{ $estadistica['sub'] }}</p>
+                    </div>
+                </a>
+            @endforeach
+        </section>
 
-                        <div class="card-title">
-                            Accesos rápidos
+        <div class="dd-grid">
+            <div class="dd-columna">
+                {{-- Convocatorias pendientes --}}
+                <section>
+                    <div class="dd-seccion">
+                        <div>
+                            <h2>Pendientes de revisión</h2>
+                            <p>Convocatorias detectadas o subidas que requieren tu aprobación</p>
                         </div>
-
-                        <div class="card-subtitle">
-                            Funciones principales
-                            del panel Directivo
-                        </div>
-
+                        <a class="dd-enlace" href="{{ $urls['porRevisar'] }}">Ver todas →</a>
                     </div>
 
-                </div>
+                    <div class="dd-card">
+                        @if ($pendientes === [])
+                            <div class="dd-vacio">No hay convocatorias pendientes de revisión.</div>
+                        @else
+                            <div class="dd-tabla-ctn">
+                                <table class="dd-tabla">
+                                    <thead>
+                                        <tr>
+                                            <th>Título</th>
+                                            <th>Organismo</th>
+                                            <th>Fuente</th>
+                                            <th>Encontrada</th>
+                                            <th>Cierre</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach ($pendientes as $p)
+                                            <tr>
+                                                <td>
+                                                    <p class="dd-tabla-titulo">{{ $p['titulo'] }}</p>
+                                                    @if ($p['categoria'])
+                                                        <span class="dd-categoria">{{ $p['categoria'] }}</span>
+                                                    @endif
+                                                </td>
+                                                <td class="dd-suave">{{ $p['organismo'] }}</td>
+                                                <td class="{{ $p['manual'] ? 'dd-manual' : 'dd-auto' }}">{{ $p['manual'] ? 'Manual' : 'Automático' }}</td>
+                                                <td class="dd-mono dd-suave">{{ $p['encontrada'] }}</td>
+                                                <td class="dd-mono">{{ $p['cierre'] }}</td>
+                                                <td>
+                                                    <a class="dd-btn dd-btn-chico dd-btn-morado" href="{{ $p['url'] }}">
+                                                        {!! $svg('ojo', 13) !!}&nbsp;Revisar
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        @endif
+                    </div>
+                </section>
 
-                <div class="quick-actions">
-
-                    <a
-                        href="{{
-                            url(
-                                '/directivo/buscar-convocatorias'
-                            )
-                        }}"
-                        class="quick-action"
-                    >
-
-                        <div class="quick-icon">
-                            ⌕
+                {{-- Propuestas pendientes --}}
+                <section>
+                    <div class="dd-seccion">
+                        <div>
+                            <h2>Propuestas por revisar</h2>
+                            <p>Enviadas por docentes y directivos, incluidas las tuyas</p>
                         </div>
-
-                        <div class="quick-title">
-                            Buscar convocatorias
-                        </div>
-
-                        <div class="quick-description">
-                            Consulta convocatorias
-                            mediante filtros y
-                            palabras clave.
-                        </div>
-
-                    </a>
-
-                    <a
-                        href="{{
-                            url(
-                                '/directivo/convocatorias-por-revisar'
-                            )
-                        }}"
-                        class="quick-action"
-                    >
-
-                        <div class="quick-icon">
-                            ✓
-                        </div>
-
-                        <div class="quick-title">
-                            Convocatorias por revisar
-                        </div>
-
-                        <div class="quick-description">
-                            Consulta los registros
-                            pendientes de revisión.
-                        </div>
-
-                    </a>
-
-                    <a
-                        href="{{
-                            url(
-                                '/directivo/estadisticas'
-                            )
-                        }}"
-                        class="quick-action"
-                    >
-
-                        <div class="quick-icon">
-                            %
-                        </div>
-
-                        <div class="quick-title">
-                            Estadísticas
-                        </div>
-
-                        <div class="quick-description">
-                            Visualiza indicadores
-                            generales del sistema.
-                        </div>
-
-                    </a>
-
-                    <a
-                        href="{{
-                            url(
-                                '/directivo/reportes'
-                            )
-                        }}"
-                        class="quick-action"
-                    >
-
-                        <div class="quick-icon">
-                            R
-                        </div>
-
-                        <div class="quick-title">
-                            Reportes
-                        </div>
-
-                        <div class="quick-description">
-                            Consulta los reportes
-                            institucionales.
-                        </div>
-
-                    </a>
-
-                </div>
-
-            </section>
-
-            <section class="card">
-
-                <div class="card-header">
-
-                    <div>
-
-                        <div class="card-title">
-                            Convocatorias pendientes
-                            de revisión
-                        </div>
-
-                        <div class="card-subtitle">
-                            Últimos registros que
-                            requieren revisión
-                        </div>
-
+                        <a class="dd-enlace" href="{{ $urls['propuestas'] }}">Ver todas →</a>
                     </div>
 
-                    <a
-                        href="{{
-                            url(
-                                '/directivo/convocatorias-por-revisar'
-                            )
-                        }}"
-                        class="link"
-                    >
-                        Ver todas
-                    </a>
+                    <div class="dd-card">
+                        @if ($propuestasPendientes === [])
+                            <div class="dd-vacio">No hay propuestas pendientes de revisión.</div>
+                        @else
+                            <div class="dd-tabla-ctn">
+                                <table class="dd-tabla">
+                                    <thead>
+                                        <tr>
+                                            <th>Propuesta</th>
+                                            <th>Autor</th>
+                                            <th>Enviada</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach ($propuestasPendientes as $p)
+                                            <tr>
+                                                <td>
+                                                    <p class="dd-tabla-titulo">{{ $p['titulo'] }}</p>
+                                                    <p class="dd-tabla-sub">{{ \Illuminate\Support\Str::limit($p['convocatoria'], 60) }}</p>
+                                                </td>
+                                                <td>
+                                                    {{ $p['autor'] }}
+                                                    @if ($p['propia'])
+                                                        <span class="dd-badge dd-badge-porcerrar">TUYA</span>
+                                                    @endif
+                                                </td>
+                                                <td class="dd-mono dd-suave">{{ $p['enviada'] }}</td>
+                                                <td>
+                                                    <a class="dd-btn dd-btn-chico dd-btn-morado" href="{{ $p['url'] }}">
+                                                        {!! $svg('ojo', 13) !!}&nbsp;Revisar
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        @endif
+                    </div>
+                </section>
+            </div>
 
-                </div>
-
-                @forelse (
-                    $pendientes
-                    as $convocatoria
-                )
-
-                    <div class="review-item">
-
-                        <div class="review-top">
-
+            <div class="dd-columna">
+                {{-- Resumen del mes --}}
+                <section class="dd-card dd-panel">
+                    <h3>Resumen del mes</h3>
+                    <div class="dd-barras">
+                        @foreach ($resumen as $r)
                             <div>
-
-                                <div class="review-title">
-                                    {{
-                                        $convocatoria
-                                            ->titulo
-                                    }}
+                                <div class="dd-barra-fila">
+                                    <span>{{ $r['etiqueta'] }}</span>
+                                    <strong style="color: {{ $r['color'] }}">{{ $r['valor'] }}</strong>
                                 </div>
-
-                                <div
-                                    class="
-                                        review-organization
-                                    "
-                                >
-                                    {{
-                                        $convocatoria
-                                            ->organismo
-                                            ?->nombre
-                                        ?? 'Sin organismo'
-                                    }}
+                                <div class="dd-barra-gruesa">
+                                    <div style="width: {{ min(100, round($r['valor'] / $r['max'] * 100)) }}%; background: {{ $r['color'] }}"></div>
                                 </div>
-
                             </div>
+                        @endforeach
+                    </div>
+                </section>
 
-                            <span class="review-badge">
-                                Pendiente
-                            </span>
+                {{-- Próximos cierres --}}
+                <section>
+                    <div class="dd-seccion">
+                        <h2>Próximos cierres</h2>
+                        <a class="dd-enlace" href="{{ $urls['calendario'] }}">Calendario →</a>
+                    </div>
 
-                        </div>
-
-                        <div class="review-info">
-
-                            <div
-                                class="
-                                    review-info-item
-                                "
-                            >
-                                Cierre:
-
-                                <strong>
-                                    {{
-                                        $convocatoria
-                                            ->fecha_cierre
-                                            ?->format(
-                                                'd/m/Y'
-                                            )
-                                        ?? 'Sin fecha'
-                                    }}
-                                </strong>
-                            </div>
-
-                            <div
-                                class="
-                                    review-info-item
-                                "
-                            >
-                                Monto:
-
-                                <strong>
-                                    @if (
-                                        $convocatoria
-                                            ->monto_maximo
-                                        !== null
-                                    )
-
-                                        $
-                                        {{
-                                            number_format(
-                                                (float)
-                                                $convocatoria
-                                                    ->monto_maximo,
-                                                2
-                                            )
-                                        }}
-
-                                        {{
-                                            $convocatoria
-                                                ->moneda
-                                            ?: 'MXN'
-                                        }}
-
-                                    @else
-
-                                        No especificado
-
-                                    @endif
-                                </strong>
-                            </div>
-
-                            <div
-                                class="
-                                    review-info-item
-                                "
-                            >
-                                Origen:
-
-                                <strong>
-                                    {{
-                                        match (
-                                            $convocatoria
-                                                ->origen
-                                        ) {
-                                            'SCRAPING' =>
-                                                'Automática',
-
-                                            'MANUAL' =>
-                                                'Manual',
-
-                                            'ADMINISTRADOR' =>
-                                                'Administrador',
-
-                                            'API' =>
-                                                'API',
-
-                                            default =>
-                                                $convocatoria
-                                                    ->origen
-                                                ?: 'Sin origen',
-                                        }
-                                    }}
-                                </strong>
-                            </div>
-
-                        </div>
-
-                        <div class="review-actions">
-
-                            <a
-                                href="{{
-                                    url(
-                                        '/directivo/convocatorias-por-revisar'
-                                    )
-                                }}"
-                                class="small-btn"
-                            >
-                                Consultar pendientes
+                    <div class="dd-card dd-lista">
+                        @forelse ($proximosCierres as $c)
+                            <a class="dd-venc" href="{{ $c['url'] }}">
+                                <div class="dd-venc-dias">
+                                    <div @class(['dd-venc-num', 'dd-venc-num-pronto' => $c['dias'] <= 14])>{{ $c['dias'] }}</div>
+                                    <div class="dd-venc-txt">días</div>
+                                </div>
+                                <div class="dd-venc-info">
+                                    <p class="dd-venc-titulo">{{ $c['titulo'] }}</p>
+                                    <p class="dd-venc-fecha">{{ $c['cierre'] }}</p>
+                                </div>
                             </a>
-
-                        </div>
-
+                        @empty
+                            <div class="dd-vacio">Sin cierres próximos.</div>
+                        @endforelse
                     </div>
+                </section>
 
-                @empty
-
-                    <div class="empty">
-                        No hay convocatorias
-                        pendientes de revisión.
+                {{-- Acceso rápido --}}
+                <section class="dd-card dd-panel">
+                    <h3>Acceso rápido</h3>
+                    <div class="dd-accesos">
+                        <a class="dd-acceso" style="background: #EDE9FE" href="{{ $urls['estadisticas'] }}">
+                            <span style="color: #7C3AED">{!! $svg('grafica', 16) !!}</span> Ver estadísticas
+                        </a>
+                        <a class="dd-acceso" style="background: #D1FAE5" href="{{ $urls['reportes'] }}">
+                            <span style="color: #059669">{!! $svg('reporte', 16) !!}</span> Generar reporte
+                        </a>
+                        <a class="dd-acceso" style="background: #FEF3C7" href="{{ $urls['buscar'] }}">
+                            <span style="color: #D97706">{!! $svg('buscar', 16) !!}</span> Buscar convocatorias
+                        </a>
                     </div>
-
-                @endforelse
-
-            </section>
-
+                </section>
+            </div>
         </div>
-
-        <div class="column">
-
-            <section class="card">
-
-                <div class="card-header">
-
-                    <div>
-
-                        <div class="card-title">
-                            Próximos cierres
-                        </div>
-
-                        <div class="card-subtitle">
-                            Fechas reales registradas
-                            en convocatorias
-                        </div>
-
-                    </div>
-
-                </div>
-
-                @forelse (
-                    $proximosCierres
-                    as $convocatoria
-                )
-
-                    @php
-                        $dias =
-                            (int)
-                            now()
-                                ->startOfDay()
-                                ->diffInDays(
-                                    $convocatoria
-                                        ->fecha_cierre
-                                        ->copy()
-                                        ->startOfDay()
-                                );
-                    @endphp
-
-                    <div class="deadline">
-
-                        <div class="deadline-date">
-
-                            <span class="deadline-day">
-                                {{
-                                    $convocatoria
-                                        ->fecha_cierre
-                                        ->format('d')
-                                }}
-                            </span>
-
-                            <span class="deadline-month">
-                                {{
-                                    $convocatoria
-                                        ->fecha_cierre
-                                        ->locale('es')
-                                        ->translatedFormat(
-                                            'M'
-                                        )
-                                }}
-                            </span>
-
-                        </div>
-
-                        <div>
-
-                            <div class="deadline-title">
-                                {{
-                                    $convocatoria
-                                        ->titulo
-                                }}
-                            </div>
-
-                            <div class="deadline-text">
-
-                                @if ($dias === 0)
-
-                                    Cierra hoy
-
-                                @elseif ($dias === 1)
-
-                                    Cierra en 1 día
-
-                                @else
-
-                                    Cierra en
-                                    {{ $dias }}
-                                    días
-
-                                @endif
-
-                                @if (
-                                    $convocatoria
-                                        ->organismo
-                                )
-                                    ·
-                                    {{
-                                        $convocatoria
-                                            ->organismo
-                                            ->nombre
-                                    }}
-                                @endif
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                @empty
-
-                    <div class="empty">
-                        No existen cierres futuros
-                        registrados.
-                    </div>
-
-                @endforelse
-
-            </section>
-
-            <section class="card">
-
-                <div class="card-header">
-
-                    <div>
-
-                        <div class="card-title">
-                            Registros recientes
-                        </div>
-
-                        <div class="card-subtitle">
-                            Información real registrada
-                            en la plataforma
-                        </div>
-
-                    </div>
-
-                </div>
-
-                @forelse (
-                    $actividadReciente
-                    as $actividad
-                )
-
-                    <div class="activity">
-
-                        <span
-                            class="activity-dot"
-                        ></span>
-
-                        <div>
-
-                            <div class="activity-title">
-                                {{
-                                    $actividad[
-                                        'titulo'
-                                    ]
-                                }}
-                            </div>
-
-                            <div class="activity-time">
-                                {{
-                                    $actividad[
-                                        'fecha'
-                                    ]
-                                        ->locale('es')
-                                        ->diffForHumans()
-                                }}
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                @empty
-
-                    <div class="empty">
-                        No hay registros recientes.
-                    </div>
-
-                @endforelse
-
-            </section>
-
-        </div>
-
     </div>
-
-</div>
-
 </x-filament-panels::page>

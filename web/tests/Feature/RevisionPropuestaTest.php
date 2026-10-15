@@ -230,8 +230,8 @@ class RevisionPropuestaTest extends TestCase
             ->get('/directivo')
             ->assertOk();
 
-        foreach (['convocatorias-por-revisar', 'estadisticas', 'reportes', 'propuestas-por-revisar'] as $seccion) {
-            $respuesta->assertSee('<a class="stat-card" href="' . url("/directivo/{$seccion}") . '"', false);
+        foreach (['convocatorias-por-revisar', 'propuestas-por-revisar', 'buscar-convocatorias'] as $seccion) {
+            $respuesta->assertSee('href="' . url("/directivo/{$seccion}") . '" class="dd-card dd-stat"', false);
         }
     }
 }
