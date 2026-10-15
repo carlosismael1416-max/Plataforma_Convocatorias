@@ -102,21 +102,12 @@ class Estadisticas extends Page
         |--------------------------------------------------------------------------
         */
 
+        // Ya no hay revisión humana: «publicadas» son las que el motor o el
+        // personal dejaron visibles para todos en el periodo.
         $revisadas =
-            DB::table(
-                'convocatoria_revisiones_administrativas'
-            )
-                ->whereBetween(
-                    'fecha_decision',
-                    [
-                        $inicio,
-                        $fin,
-                    ]
-                )
-                ->distinct()
-                ->count(
-                    'convocatoria_id'
-                );
+            (clone $baseConvocatorias)
+                ->whereIn('estado', ['PUBLICADA', 'ACTIVA', 'CERRADA'])
+                ->count();
 
         /*
         |--------------------------------------------------------------------------
@@ -193,6 +184,13 @@ class Estadisticas extends Page
                     'estado',
                     'DESCARTADA'
                 )
+                ->count();
+
+        // El validador no las aprobó (datos incompletos, vencidas, no
+        // elegibles...); el motor las revalida solo.
+        $noPublicadas =
+            (clone $baseConvocatorias)
+                ->where('estado', 'PENDIENTE_REVISION')
                 ->count();
 
         /*
@@ -322,16 +320,14 @@ class Estadisticas extends Page
                     ): object {
                         $revisionQuery =
                             DB::table(
-                                'convocatoria_revisiones_administrativas AS r'
+                                'convocatorias AS c'
                             )
-                                ->join(
-                                    'convocatorias AS c',
-                                    'c.id',
-                                    '=',
-                                    'r.convocatoria_id'
+                                ->whereIn(
+                                    'c.estado',
+                                    ['PUBLICADA', 'ACTIVA', 'CERRADA']
                                 )
                                 ->whereBetween(
-                                    'r.fecha_decision',
+                                    'c.created_at',
                                     [
                                         $inicio,
                                         $fin,
@@ -458,10 +454,14 @@ class Estadisticas extends Page
 
         $revisadasPorMes =
             DB::table(
-                'convocatoria_revisiones_administrativas'
+                'convocatorias'
             )
+                ->whereIn(
+                    'estado',
+                    ['PUBLICADA', 'ACTIVA', 'CERRADA']
+                )
                 ->whereBetween(
-                    'fecha_decision',
+                    'created_at',
                     [
                         $inicio,
                         $fin,
@@ -471,22 +471,20 @@ class Estadisticas extends Page
                     "
                     DATE_TRUNC(
                         'month',
-                        fecha_decision
+                        created_at
                     ) AS mes
                     "
                 )
                 ->selectRaw(
                     "
-                    COUNT(
-                        DISTINCT convocatoria_id
-                    ) AS total
+                    COUNT(*) AS total
                     "
                 )
                 ->groupByRaw(
                     "
                     DATE_TRUNC(
                         'month',
-                        fecha_decision
+                        created_at
                     )
                     "
                 )
@@ -581,6 +579,7 @@ class Estadisticas extends Page
             'aprobadas',
             'correcciones',
             'rechazadas',
+            'noPublicadas',
             'propuestasPorEstado',
             'financiamientos',
         );

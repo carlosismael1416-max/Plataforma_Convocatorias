@@ -691,49 +691,6 @@
 
                         </button>
 
-                        <button
-                            type="button"
-                            class="
-                                report-type
-                                {{
-                                    $tipoReporte
-                                    === 'revisiones'
-                                        ? 'active'
-                                        : ''
-                                }}
-                            "
-                            wire:click="seleccionarTipo('revisiones')"
-                        >
-
-                            <div class="report-icon">
-                                ✓
-                            </div>
-
-                            <div class="report-name">
-                                Revisiones
-                            </div>
-
-                            <div class="report-description">
-                                Historial real de
-                                decisiones administrativas.
-                            </div>
-
-                            @if (
-                                $tipoReporte
-                                === 'revisiones'
-                            )
-
-                                <span
-                                    class="
-                                        selected-indicator
-                                    "
-                                >
-                                    Seleccionado
-                                </span>
-
-                            @endif
-
-                        </button>
 
                         <button
                             type="button"

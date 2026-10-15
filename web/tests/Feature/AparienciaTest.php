@@ -121,4 +121,18 @@ class AparienciaTest extends TestCase
             ->assertDontSee('Probar interacción')
             ->assertDontSee('PostgreSQL');
     }
+
+    public function test_el_directivo_solo_ve_convocatorias_publicadas_o_cerradas(): void
+    {
+        $this->convocatoria(['titulo' => 'ZZ-VISIBLE', 'fecha_cierre' => today()->addDays(10)]);
+        $interna = $this->convocatoria(['titulo' => 'ZZ-INTERNA', 'estado' => 'PENDIENTE_REVISION']);
+
+        $this->actingAs($this->usuarioConRol('DIRECTIVO'))
+            ->get('/directivo/buscar-convocatorias')
+            ->assertOk()
+            ->assertSee('ZZ-VISIBLE')
+            ->assertDontSee('ZZ-INTERNA');
+
+        $this->get("/directivo/detalle-convocatoria/{$interna->id}")->assertNotFound();
+    }
 }

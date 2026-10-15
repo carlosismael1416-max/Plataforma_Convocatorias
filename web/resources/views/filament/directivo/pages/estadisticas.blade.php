@@ -598,7 +598,7 @@
 
                 <div class="page-subtitle">
                     Consulta indicadores reales sobre
-                    convocatorias, revisiones y propuestas
+                    convocatorias publicadas y propuestas
                     registradas en la plataforma.
                 </div>
 
@@ -705,15 +705,11 @@
             <a
                 href="{{
                     route(
-                        'filament.directivo.pages.reportes',
-                        [
-                            'seccion' =>
-                                'revisiones',
-                        ]
+                        'filament.directivo.pages.buscar-convocatorias'
                     )
                 }}"
                 class="stat-card"
-                title="Consultar revisiones"
+                title="Ver convocatorias publicadas"
             >
 
                 <div class="stat-header">
@@ -725,16 +721,16 @@
                 </div>
 
                 <div class="stat-label">
-                    Convocatorias revisadas
+                    Convocatorias publicadas
                 </div>
 
                 <div class="stat-help">
-                    Con decisión administrativa registrada
+                    Visibles para todos los usuarios
                 </div>
 
                 <div class="stat-action">
                     <span>
-                        Ver revisiones
+                        Ver convocatorias
                     </span>
 
                     <span class="stat-arrow">
@@ -842,7 +838,7 @@
 
                             <div class="card-description">
                                 Comparación entre convocatorias
-                                detectadas y revisadas.
+                                detectadas y publicadas.
                             </div>
 
                         </div>
@@ -893,7 +889,7 @@
                                             reviewed
                                         "
                                         title="
-                                            Revisadas:
+                                            Publicadas:
                                             {{ $mes['revisadas'] }}
                                         "
                                         style="
@@ -955,7 +951,7 @@
                                     background:#7C3AED;
                                 "
                             ></span>
-                            Revisadas
+                            Publicadas
                         </div>
 
                     </div>
@@ -1002,7 +998,7 @@
                                             Detectadas
                                         </th>
                                         <th>
-                                            Revisadas
+                                            Publicadas
                                         </th>
                                         <th>
                                             Propuestas
@@ -1192,7 +1188,7 @@
                         <div>
 
                             <div class="card-title">
-                                Estado de las revisiones
+                                Estado de las convocatorias
                             </div>
 
                             <div class="card-description">
@@ -1219,7 +1215,7 @@
 
                             <div>
                                 <div class="summary-name">
-                                    Aprobadas
+                                    Publicadas
                                 </div>
                                 <div class="summary-help">
                                     Publicadas, activas
@@ -1246,41 +1242,15 @@
 
                             <div>
                                 <div class="summary-name">
-                                    Pendientes
+                                    No publicadas
                                 </div>
                                 <div class="summary-help">
-                                    Esperando revisión
+                                    El validador no las aprobó; se revalidan solas
                                 </div>
                             </div>
 
                             <div class="summary-number">
-                                {{ $pendientes }}
-                            </div>
-
-                        </div>
-
-                        <div class="summary-row">
-
-                            <div
-                                class="
-                                    summary-icon
-                                    purple
-                                "
-                            >
-                                C
-                            </div>
-
-                            <div>
-                                <div class="summary-name">
-                                    Corrección
-                                </div>
-                                <div class="summary-help">
-                                    Requieren ajustes
-                                </div>
-                            </div>
-
-                            <div class="summary-number">
-                                {{ $correcciones }}
+                                {{ $noPublicadas }}
                             </div>
 
                         </div>

@@ -696,45 +696,16 @@
                     wire:model.live="estado"
                 >
                     <option value="">
-                        Todos
-                    </option>
-
-                    <option value="BORRADOR">
-                        Borrador
-                    </option>
-
-                    <option
-                        value="PENDIENTE_REVISION"
-                    >
-                        Pendiente de revisión
-                    </option>
-
-                    <option
-                        value="REQUIERE_CORRECCIONES"
-                    >
-                        Requiere correcciones
+                        Publicadas y cerradas
                     </option>
 
                     <option value="PUBLICADA">
-                        Publicada
-                    </option>
-
-                    <option value="ACTIVA">
-                        Activa
+                        Publicadas
                     </option>
 
                     <option value="CERRADA">
-                        Cerrada
+                        Cerradas
                     </option>
-
-                    <option value="DESCARTADA">
-                        Descartada
-                    </option>
-
-                    <option value="ARCHIVADA">
-                        Archivada
-                    </option>
-
                 </select>
 
             </div>
@@ -1240,12 +1211,12 @@
 
                 <div class="summary-item">
                     <span>
-                        Pendientes de revisión
+                        Cerradas (historial)
                     </span>
 
                     <strong
                         style="
-                            color:#D97706;
+                            color:#64748B;
                         "
                     >
                         {{ $enRevision }}
