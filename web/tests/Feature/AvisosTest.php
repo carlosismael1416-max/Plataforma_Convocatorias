@@ -178,4 +178,17 @@ class AvisosTest extends TestCase
             ->assertOk()
             ->assertSee('Cambios en convocatorias que sigo');
     }
+
+    public function test_financiamiento_muestra_el_monto_de_la_convocatoria(): void
+    {
+        $this->actingAs($this->usuarioConRol('DOCENTE'));
+        Filament::setCurrentPanel(Filament::getPanel('docente'));
+        $c = $this->convocatoria(['fecha_cierre' => today()->addDays(10), 'monto_maximo' => 700000, 'moneda' => 'MXN']);
+
+        Livewire::test(\App\Filament\Docente\Pages\DetalleConvocatoria::class, ['record' => $c->id])
+            ->set('tab', 'financiamiento')
+            ->assertSee('Monto máximo por propuesta')
+            ->assertSee('700,000.00 MXN')
+            ->assertDontSee('No hay información adicional');
+    }
 }

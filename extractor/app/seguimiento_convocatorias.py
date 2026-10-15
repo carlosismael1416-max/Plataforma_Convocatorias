@@ -49,7 +49,13 @@ def convocatorias_a_revisar(conexion, limite: int = MAX_POR_CICLO) -> list[dict]
                         NULLIF(BTRIM(COALESCE(c.descripcion, '')), '') IS NULL
                         OR NULLIF(BTRIM(COALESCE(c.objetivo, '')), '') IS NULL
                         OR c.organismo_id IS NULL
+                        OR c.categoria_id IS NULL
                         OR c.monto_maximo IS NULL
+                        OR c.fecha_inicio IS NULL
+                        OR NOT EXISTS (
+                            SELECT 1 FROM convocatoria_requisitos r
+                            WHERE r.convocatoria_id = c.id
+                        )
                     )
                 ) AS incompleta
             FROM convocatorias c

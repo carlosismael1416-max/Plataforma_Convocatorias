@@ -4,6 +4,7 @@ from decimal import Decimal
 
 from app.enriquecer_convocatoria import fechas_en_linea
 from app.enriquecer_datos_extra import (
+    extraer_requisitos,
     descripcion_de_pagina,
     extraer_fechas_publicacion_inicio,
     extraer_montos,
@@ -62,6 +63,63 @@ class FechasTest(unittest.TestCase):
         ]
         r = extraer_fechas_publicacion_inicio(lineas, fechas_en_linea)
         self.assertEqual(r["fecha_inicio"], date(2026, 10, 5))
+
+
+class FechaEnOtraLineaTest(unittest.TestCase):
+    def test_apertura_con_fecha_en_la_linea_siguiente(self):
+        lineas = ["Apertura del sistema para captura", "5 de octubre de 2026", "Cierre 23 de octubre de 2026"]
+        r = extraer_fechas_publicacion_inicio(lineas, fechas_en_linea)
+        self.assertEqual(r["fecha_inicio"], date(2026, 10, 5))
+
+
+class RequisitosTest(unittest.TestCase):
+    def test_extrae_los_incisos_hasta_la_siguiente_seccion(self):
+        lineas = [
+            "IV. Requisitos",
+            "Las instituciones interesadas deberán cumplir con lo siguiente para participar en la convocatoria vigente:",
+            "a) Estar registradas en Rizoma con su registro actualizado al momento del cierre.",
+            "b) Presentar la propuesta mediante el sistema en línea en tiempo y forma,",
+            "con la carta institucional firmada.",
+            "c) Contar con una persona responsable técnica adscrita a la institución.",
+            "V. Calendario",
+            "a) Publicación de resultados en enero.",
+        ]
+        r = extraer_requisitos(lineas)
+        self.assertEqual(len(r), 3)
+        self.assertIn("carta institucional firmada", r[1]["descripcion"])
+        self.assertEqual(r[2]["orden"], 3)
+
+    def test_sublista_y_pie_de_pagina(self):
+        lineas = [
+            "Requisitos",
+            "a) Declarar tener la nacionalidad de alguno de los Estados Miembros de la OEA.",
+            "b) Haber obtenido una Beca Nacional en alguna de las siguientes convocatorias: Página 4 de 10",
+            "• Becas Nacionales para Estudios de Posgrado 2025",
+            "• Becas Nacionales en Humanidades 2025",
+            "c) Contar con carta de aceptación del programa de posgrado.",
+        ]
+        r = extraer_requisitos(lineas)
+        self.assertEqual(len(r), 3)
+        self.assertNotIn("Página", r[1]["descripcion"])
+        self.assertIn("Humanidades 2025", r[1]["descripcion"])
+
+    def test_poblacion_objetivo_y_restricciones(self):
+        lineas = [
+            "II. Población objetivo",
+            "Instituciones de educación superior públicas y centros de investigación que editen revistas científicas nacionales.",
+            "III. Modalidades",
+            "a) Individual.",
+            "V. Restricciones de participación",
+            "a) No serán elegibles las instituciones con adeudos con la Secretaría.",
+            "b) No podrán participar revistas con fines de lucro.",
+            "VI. Calendario",
+        ]
+        r = extraer_requisitos(lineas)
+        self.assertEqual([q["tipo_requisito"] for q in r], ["requisito", "restriccion", "restriccion"])
+        self.assertIn("educación superior", r[0]["descripcion"])
+
+    def test_sin_seccion_no_inventa(self):
+        self.assertEqual(extraer_requisitos(["Bases", "a) algo largo de prueba para ver."]), [])
 
 
 class DescripcionTest(unittest.TestCase):
