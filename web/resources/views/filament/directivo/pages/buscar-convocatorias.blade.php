@@ -1276,10 +1276,9 @@
             </section>
 
             <div class="info-box">
-                Esta pantalla es de consulta.
-                La revisión y cambio de estado se
-                gestionará desde
-                “Convocatorias por revisar”.
+                Las convocatorias se publican solas cuando
+                el motor las valida o cuando el personal
+                las sube. Aquí ves las mismas que el docente.
             </div>
 
         </aside>
