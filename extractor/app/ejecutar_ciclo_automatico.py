@@ -381,6 +381,110 @@ def ejecutar_descubridor(
         timeout_segundos=900,
     )
 
+
+# Tiempo mínimo que debe quedar del ciclo para empezar una fuente.
+SEGUNDOS_MIN_FUENTE = 420
+
+
+def fuentes_pendientes(conexion) -> list[dict]:
+    """
+    Fuentes oficiales activas que ya cumplieron su frecuencia
+    (frecuencia_scraping en minutos; 1440 si no tiene). Las que
+    requieren JavaScript se omiten (bajo consumo, sin navegador).
+    """
+
+    with conexion.cursor() as cursor:
+        cursor.execute(
+            """
+            SELECT id, nombre
+            FROM fuentes
+            WHERE activa = TRUE
+              AND COALESCE(requiere_javascript, FALSE) = FALSE
+              AND (
+                  ultima_ejecucion IS NULL
+                  OR ultima_ejecucion
+                      < NOW() - make_interval(mins => COALESCE(frecuencia_scraping, 1440))
+              )
+            ORDER BY ultima_ejecucion NULLS FIRST, id
+            """
+        )
+
+        return [
+            {"id": fila[0], "nombre": fila[1]}
+            for fila in cursor.fetchall()
+        ]
+
+
+def ejecutar_fuentes_oficiales(
+    *,
+    terminar_antes_de: float,
+    limite: int = 10,
+) -> dict:
+    """
+    Extrae las convocatorias de las fuentes oficiales configuradas.
+    Lo nuevo entra como PENDIENTE_REVISION (sin duplicados por
+    url_hash) y la fase de revalidación decide si se publica.
+    """
+
+    conexion = conectar()
+
+    try:
+        fuentes = fuentes_pendientes(conexion)
+    finally:
+        conexion.close()
+
+    resultado = {
+        "consultadas": 0,
+        "errores": 0,
+        "pospuestas": 0,
+        "omitidas_por_frecuencia": 0,
+        "resultados": [],
+    }
+
+    if not fuentes:
+        print("Ninguna fuente cumple su frecuencia todavía.")
+
+    for fuente in fuentes:
+        restante = terminar_antes_de - time.monotonic()
+
+        if restante < SEGUNDOS_MIN_FUENTE:
+            resultado["pospuestas"] += 1
+            print("Pospuesta por tiempo:", fuente["nombre"])
+            continue
+
+        print()
+        print("Fuente:", fuente["nombre"], f"(id {fuente['id']})")
+
+        ejecucion = ejecutar_proceso_stream(
+            [
+                sys.executable,
+                "-m",
+                "app.ejecutar_fuente",
+                "--fuente-id",
+                str(fuente["id"]),
+                "--limite",
+                str(limite),
+                "--guardar",
+            ],
+            timeout_segundos=int(min(600, restante - 60)),
+        )
+
+        resultado["consultadas"] += 1
+
+        if not ejecucion["ok"]:
+            resultado["errores"] += 1
+
+        resultado["resultados"].append({
+            "fuente_id": fuente["id"],
+            "nombre": fuente["nombre"],
+            "ok": ejecucion["ok"],
+            "error": ejecucion["error"],
+            "duracion_segundos": ejecucion["duracion_segundos"],
+        })
+
+    return resultado
+
+
 def ejecutar_ciclo(
     *,
     cantidad_google: int,
@@ -431,7 +535,7 @@ def ejecutar_ciclo(
 
         print()
         print(
-            "FASE 1/4: DESCUBRIMIENTO"
+            "FASE 1/5: DESCUBRIMIENTO"
         )
 
         descubrimiento = (
@@ -458,7 +562,7 @@ def ejecutar_ciclo(
 
         print()
         print(
-            "FASE 2/4: "
+            "FASE 2/5: "
             "EVALUACIÓN AUTOMÁTICA"
         )
 
@@ -502,7 +606,7 @@ def ejecutar_ciclo(
 
         print()
         print(
-            "FASE 3/4: "
+            "FASE 3/5: "
             "EXTRACCIÓN Y PUBLICACIÓN"
         )
 
@@ -553,12 +657,31 @@ def ejecutar_ciclo(
         )
 
         # =====================================================
-        # 4. REVALIDAR CONVOCATORIAS PENDIENTES
+        # 4. FUENTES OFICIALES CONFIGURADAS
         # =====================================================
 
         print()
         print(
-            "FASE 4/4: "
+            "FASE 4/5: "
+            "FUENTES OFICIALES"
+        )
+
+        fuentes = ejecutar_fuentes_oficiales(
+            terminar_antes_de=
+                terminar_antes_de,
+        )
+
+        print("Fuentes consultadas:", fuentes["consultadas"])
+        print("Errores:", fuentes["errores"])
+        print("Pospuestas por tiempo:", fuentes["pospuestas"])
+
+        # =====================================================
+        # 5. REVALIDAR CONVOCATORIAS PENDIENTES
+        # =====================================================
+
+        print()
+        print(
+            "FASE 5/5: "
             "REVALIDACIÓN DE PENDIENTES"
         )
 
@@ -594,6 +717,7 @@ def ejecutar_ciclo(
             or revalidacion[
                 "errores"
             ] > 0
+            or fuentes["errores"] > 0
         )
 
         resultado = {
@@ -618,6 +742,9 @@ def ejecutar_ciclo(
 
             "publicacion":
                 publicacion,
+
+            "fuentes":
+                fuentes,
 
             "revalidacion":
                 revalidacion,

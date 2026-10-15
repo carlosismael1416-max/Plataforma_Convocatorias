@@ -164,11 +164,13 @@ class Dashboard extends BaseDashboard
             return null;
         }
 
-        $inicio = Carbon::parse($datos['inicio'])->setTimezone(config('app.timezone'));
+        // La app guarda en UTC; el ciclo se muestra en hora local (Yucatán).
+        $inicio = Carbon::parse($datos['inicio'])->setTimezone('America/Merida');
         $fin = ! empty($datos['fin']) ? Carbon::parse($datos['fin']) : null;
 
         $errores = (int) ($datos['publicacion']['errores'] ?? 0)
             + (int) ($datos['revalidacion']['errores'] ?? 0)
+            + (int) ($datos['fuentes']['errores'] ?? 0)
             + (($datos['descubrimiento']['ok'] ?? true) ? 0 : 1);
 
         return [
@@ -182,7 +184,7 @@ class Dashboard extends BaseDashboard
                 ['etiqueta' => 'Aprobados', 'valor' => (int) ($datos['evaluacion']['aprobados'] ?? 0), 'color' => '#334155'],
                 ['etiqueta' => 'A revisión', 'valor' => (int) ($datos['evaluacion']['revision'] ?? 0), 'color' => '#D97706'],
                 ['etiqueta' => 'Publicadas', 'valor' => (int) ($datos['publicacion']['publicados'] ?? 0) + (int) ($datos['revalidacion']['publicadas'] ?? 0), 'color' => '#059669'],
-                ['etiqueta' => 'Cerradas', 'valor' => (int) ($datos['revalidacion']['cerradas_vencidas'] ?? 0), 'color' => '#64748B'],
+                ['etiqueta' => 'Fuentes oficiales', 'valor' => (int) ($datos['fuentes']['consultadas'] ?? 0), 'color' => '#64748B'],
                 ['etiqueta' => 'Errores', 'valor' => $errores, 'color' => '#DC2626'],
             ],
         ];

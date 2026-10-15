@@ -10,6 +10,18 @@ from app.procesar_revision_resultado import (
 from app.analizar_pdf import analizar_pdf_bytes
 from app.resolver_fecha_cierre import resolver_fecha_cierre
 
+# Rutas de SECIHTI que nunca son elegibles para ITSVA (becas individuales,
+# plazas y nombramientos). Se omiten para no descargarlas; el validador las
+# bloquea de todos modos.
+RUTAS_NO_ELEGIBLES = (
+    "/convocatoria/becas-al-extranjero/",
+    "/convocatoria/becas-nacionales/",
+    "/convocatoria/centros-publicos-de-investigacion/",
+    "/convocatoria/investigadoras-e-investigadores-por-mexico/",
+    "/convocatoria/catedras-conacyt/",
+)
+
+
 class ConvocatoriasSpider(scrapy.Spider):
     name = "convocatorias_itsva"
 
@@ -71,6 +83,11 @@ class ConvocatoriasSpider(scrapy.Spider):
             return
 
         if ruta_actual == "/convocatorias":
+            # La portada lista primero las convocatorias más recientes
+            # (donde están las vigentes). Se procesan antes que las
+            # categorías para que el límite no se gaste en las antiguas.
+            yield from self.convocatorias_de_portada(response)
+
 
             categorias_objetivo = {
                 "/convocatoria_categoria/ciencias-y-humanidades/proyectos-de-investigacion",
@@ -279,6 +296,50 @@ class ConvocatoriasSpider(scrapy.Spider):
                 cb_kwargs={
                     "titulo_enlace": titulo,
                 },
+            )
+
+    def convocatorias_de_portada(self, response):
+        for enlace in response.css("a[href]"):
+            if (
+                self.limite > 0
+                and len(self.enlaces_encontrados) >= self.limite
+            ):
+                return
+
+            url, _ = urldefrag(
+                response.urljoin(
+                    enlace.attrib.get("href", "").strip()
+                )
+            )
+            parsed = urlparse(url)
+
+            if (
+                parsed.scheme not in ("http", "https")
+                or (parsed.hostname or "").removeprefix("www.") != self.dominio
+                or not parsed.path.startswith("/convocatoria/")
+                or parsed.path.startswith(RUTAS_NO_ELEGIBLES)
+            ):
+                continue
+
+            clave = (self.dominio, parsed.path.rstrip("/"))
+
+            if clave in self.enlaces_encontrados:
+                continue
+
+            titulo = " ".join(
+                (enlace.xpath("normalize-space(.)").get() or "").split()
+            )
+
+            if not titulo:
+                continue
+
+            self.enlaces_encontrados.add(clave)
+
+            yield scrapy.Request(
+                url=url,
+                callback=self.parse_detalle,
+                cb_kwargs={"titulo_enlace": titulo},
+                priority=10,
             )
 
     def parse_detalle(self, response, titulo_enlace):
