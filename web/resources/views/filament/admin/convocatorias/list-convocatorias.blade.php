@@ -361,11 +361,11 @@
                 <div class="workflow-number">2</div>
 
                 <div class="workflow-title">
-                    Revisión administrativa
+                    Validación automática
                 </div>
 
                 <div class="workflow-text">
-                    Se verifican datos, documentos, fechas, requisitos y consistencia del registro.
+                    El validador revisa vigencia, elegibilidad y datos mínimos; las subidas a mano se publican directamente.
                 </div>
             </div>
 
@@ -381,7 +381,7 @@
                 </div>
 
                 <div class="workflow-text">
-                    Una convocatoria validada puede quedar disponible para Docentes y Directivos.
+                    Queda visible para docentes y directivos, y el motor le da seguimiento por si cambia.
                 </div>
             </div>
 
@@ -394,8 +394,8 @@
             </div>
 
             <div>
-                La revisión y publicación de convocatorias pendientes la realiza
-                un directivo en «Convocatorias por revisar».
+                Las convocatorias se publican solas; el directivo revisa las
+                propuestas que se preparan para participar en ellas.
             </div>
 
         </div>
