@@ -17,8 +17,12 @@ import requests
 
 from selectolax.parser import HTMLParser
 
+from app.descubrimiento.clasificar_objetivo import (
+    clasificar_objetivo_convocatoria,
+)
 from app.enriquecer_datos_extra import (
     descripcion_de_pagina,
+    extraer_requisitos,
     extraer_fechas_publicacion_inicio,
     extraer_montos,
 )
@@ -1862,10 +1866,23 @@ def construir_enriquecimiento(
             evidencia_pdf
         )
 
+    categoria_objetivo = contexto.get("categoria_objetivo")
+
+    # Lo que entra por una fuente oficial no tiene descubrimiento: la
+    # categoría se deduce del título, la URL y el texto de la convocatoria.
+    if not categoria_objetivo:
+        categoria_objetivo = clasificar_objetivo_convocatoria(
+            titulo=contexto.get("titulo") or "",
+            url=contexto.get("url_original") or "",
+            contexto=(objetivo or descripcion or texto_total)[:3000],
+        ).get("categoria_objetivo")
+
     categoria_id = buscar_categoria(
-        contexto.get(
-            "categoria_objetivo"
-        )
+        categoria_objetivo
+    )
+
+    requisitos = extraer_requisitos(
+        lineas
     )
 
     organismo_id = (
@@ -1926,6 +1943,9 @@ def construir_enriquecimiento(
         "fecha_inicio":
             fechas_extra["fecha_inicio"],
 
+        "requisitos":
+            requisitos,
+
         "documentos_procesados":
             documentos_procesados,
 
@@ -1937,6 +1957,53 @@ def construir_enriquecimiento(
                 lineas
             ),
     }
+
+
+def guardar_requisitos(
+    convocatoria_id: int,
+    requisitos: list[dict],
+) -> int:
+    """Inserta los requisitos extraídos solo si la convocatoria no tiene."""
+
+    if not requisitos:
+        return 0
+
+    conexion = conectar()
+
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute(
+                "SELECT COUNT(*) FROM convocatoria_requisitos WHERE convocatoria_id = %s",
+                (convocatoria_id,),
+            )
+
+            if cursor.fetchone()[0] > 0:
+                conexion.rollback()
+                return 0
+
+            for requisito in requisitos:
+                cursor.execute(
+                    """
+                    INSERT INTO convocatoria_requisitos (
+                        convocatoria_id, titulo, descripcion, obligatorio,
+                        tipo_requisito, orden, created_at, updated_at
+                    )
+                    VALUES (%s, %s, %s, %s, %s, %s, NOW(), NOW())
+                    """,
+                    (
+                        convocatoria_id,
+                        requisito["titulo"],
+                        requisito["descripcion"],
+                        requisito["obligatorio"],
+                        requisito["tipo_requisito"],
+                        requisito["orden"],
+                    ),
+                )
+
+        conexion.commit()
+        return len(requisitos)
+    finally:
+        conexion.close()
 
 
 def campos_extra(
@@ -2088,6 +2155,14 @@ def aplicar_enriquecimiento(
     campos.update(
         campos_extra(contexto, resultado, campos)
     )
+
+    requisitos_insertados = guardar_requisitos(
+        contexto["convocatoria_id"],
+        resultado.get("requisitos") or [],
+    )
+
+    if requisitos_insertados and not campos:
+        return ["requisitos"]
 
     if not campos:
         return []

@@ -788,8 +788,33 @@
 
                 <div class="detalle-card-body">
 
+                    @if ($convocatoria->monto_maximo !== null || $convocatoria->monto_minimo !== null)
+                        @php($moneda = $convocatoria->moneda ?: 'MXN')
+                        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:12px; margin-bottom:16px;">
+                            @if ($convocatoria->monto_minimo !== null)
+                                <div style="padding:12px 14px; border-radius:10px; background:#F8FAFC;">
+                                    <div style="color:#94A3B8; font-size:12px;">Monto mínimo</div>
+                                    <div style="color:#1A2C4E; font:700 18px 'DM Sans', sans-serif;">${{ number_format((float) $convocatoria->monto_minimo, 2) }} {{ $moneda }}</div>
+                                </div>
+                            @endif
+                            @if ($convocatoria->monto_maximo !== null)
+                                <div style="padding:12px 14px; border-radius:10px; background:#E8EEF8;">
+                                    <div style="color:#64748B; font-size:12px;">Monto máximo por propuesta</div>
+                                    <div style="color:#1A4B8C; font:700 18px 'DM Sans', sans-serif;">${{ number_format((float) $convocatoria->monto_maximo, 2) }} {{ $moneda }}</div>
+                                </div>
+                            @endif
+                            @if (filled($convocatoria->modalidad))
+                                <div style="padding:12px 14px; border-radius:10px; background:#F8FAFC;">
+                                    <div style="color:#94A3B8; font-size:12px;">Modalidad</div>
+                                    <div style="color:#1A2C4E; font:700 15px 'DM Sans', sans-serif;">{{ $convocatoria->modalidad }}</div>
+                                </div>
+                            @endif
+                        </div>
+                    @endif
+
                     @if (
-                        $convocatoria->financiamientos->isEmpty()
+                        ($convocatoria->monto_maximo === null && $convocatoria->monto_minimo === null)
+                        && $convocatoria->financiamientos->isEmpty()
                         && $convocatoria
                             ->modalidadesFinanciamiento
                             ->isEmpty()

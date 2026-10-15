@@ -145,15 +145,18 @@ def extraer_fechas_publicacion_inicio(
     publicacion = None
     inicio = None
 
-    for linea in lineas:
+    for posicion, linea in enumerate(lineas):
         normal = normalizar(linea)
+        # En los PDF la etiqueta y la fecha suelen quedar en líneas
+        # distintas (tablas de calendario): se mira también la siguiente.
+        cercanas = " ".join(lineas[posicion:posicion + 2])
 
         if publicacion is None and _ETIQUETAS_PUBLICACION.search(normal):
-            fechas = fechas_en_linea(linea)
+            fechas = fechas_en_linea(linea) or fechas_en_linea(cercanas)
             publicacion = fechas[0] if fechas else None
 
         if inicio is None and _ETIQUETAS_INICIO.search(normal):
-            fechas = fechas_en_linea(linea)
+            fechas = fechas_en_linea(linea) or fechas_en_linea(cercanas)
             inicio = fechas[0] if fechas else None
 
         if publicacion and inicio:
@@ -190,3 +193,102 @@ def descripcion_de_pagina(texto_pagina: str, titulo: str | None, maximo: int = 9
         corte = corte[:ultimo_punto + 1]
 
     return corte.strip()
+
+
+# Secciones que describen quién puede participar (requisito) y quién no
+# (restriccion), con los nombres que usan SECIHTI y otras dependencias.
+_SECCIONES_REQUISITOS = (
+    (
+        re.compile(
+            r"^\W*(?:[ivxlc]+[.)]|\d+[.)])?\s*(requisitos(?: (?:de|para) (?:participacion|participar|elegibilidad))?|"
+            r"poblacion objetivo|participantes|quienes pueden participar|elegibilidad|"
+            r"bases de participacion|condiciones de participacion)\s*:?$"
+        ),
+        "requisito",
+    ),
+    (
+        re.compile(r"^\W*(?:[ivxlc]+[.)]|\d+[.)])?\s*(restricciones(?: de participacion)?|causas de no elegibilidad)\s*:?$"),
+        "restriccion",
+    ),
+)
+# Secciones en romanos con mayúscula («V. Calendario»); los incisos van en
+# minúscula («a)», «b.») o numerados/viñetas.
+_CABECERA_SECCION = re.compile(r"^\W*[IVXLC]+[.)]\s+[A-ZÁÉÍÓÚÑ]")
+_INCISO = re.compile(r"^\s*(?:([a-z])[.)]|(\d{1,2})[.)]|[•·\-–▪])\s+(.*)$")
+
+
+def _textos_de_seccion(lineas: list[str], inicio: int, maximo: int) -> list[str]:
+    incisos: list[list[str]] = []
+    parrafo: list[str] = []
+    tipo_principal = None
+
+    for linea in lineas[inicio:]:
+        # Pies de página del PDF («Página 4 de 10»).
+        texto = re.sub(r"\bP[áa]gina \d+ de \d+\b", "", linea).strip()
+
+        if not texto:
+            continue
+
+        # Siguiente sección numerada (p. ej. «VI. Calendario»): termina.
+        if _CABECERA_SECCION.match(texto) and len(texto) <= 90:
+            break
+
+        coincide = _INCISO.match(texto)
+
+        if coincide:
+            tipo = "letra" if coincide.group(1) else "numero" if coincide.group(2) else "vineta"
+            tipo_principal = tipo_principal or tipo
+
+            # Una sublista (otro tipo de viñeta) pertenece al inciso que la
+            # introduce, p. ej. «b) Haber obtenido una beca en: • …».
+            if tipo != tipo_principal and incisos:
+                incisos[-1].append("; " + coincide.group(3).strip())
+            else:
+                incisos.append([coincide.group(3).strip()])
+        elif incisos:
+            incisos[-1].append(texto)
+        else:
+            parrafo.append(texto)
+
+        if len(incisos) > maximo:
+            break
+
+    if incisos:
+        return [" ".join(p) for p in incisos[:maximo]]
+
+    # Sección sin incisos: el párrafo completo es un solo requisito.
+    texto = " ".join(parrafo)[:800]
+    return [texto] if len(texto) >= 60 else []
+
+
+def extraer_requisitos(lineas: list[str], maximo: int = 25) -> list[dict]:
+    """Requisitos y restricciones de participación de la convocatoria."""
+
+    requisitos = []
+    usadas = set()
+
+    for posicion, linea in enumerate(lineas):
+        normal = normalizar(linea)
+
+        if len(normal) > 70:
+            continue
+
+        for patron, tipo in _SECCIONES_REQUISITOS:
+            if tipo in usadas or not patron.match(normal):
+                continue
+
+            usadas.add(tipo)
+
+            for texto in _textos_de_seccion(lineas, posicion + 1, maximo):
+                descripcion = " ".join(texto.split()).replace(" ;", ";").replace(":;", ":")
+
+                if 15 <= len(descripcion) <= 1200:
+                    requisitos.append({
+                        "titulo": ("Restricción " if tipo == "restriccion" else "Requisito ") + str(len(requisitos) + 1),
+                        "descripcion": descripcion,
+                        "obligatorio": True,
+                        "tipo_requisito": tipo,
+                        "orden": len(requisitos) + 1,
+                    })
+
+    return requisitos[:maximo * 2]
