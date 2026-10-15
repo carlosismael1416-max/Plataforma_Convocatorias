@@ -13,9 +13,9 @@ use Filament\Pages\Dashboard as BaseDashboard;
 use Illuminate\Support\Carbon;
 
 /**
- * Dashboard directivo según el diseño de Figma (DashboardDirectivo): banner,
- * estadísticas, pendientes de revisión, resumen del mes y accesos rápidos.
- * Todo con datos reales.
+ * Dashboard directivo según el diseño de Figma (DashboardDirectivo). El
+ * directivo revisa las propuestas para participar; las convocatorias se
+ * publican solas. Todo con datos reales.
  */
 class Dashboard extends BaseDashboard
 {
@@ -58,17 +58,17 @@ class Dashboard extends BaseDashboard
             ->where('created_at', '>=', $inicioMes)
             ->whereIn('accion', ['APROBAR', 'DEVOLVER', 'RECHAZAR']);
 
-        $porRevisar = Convocatoria::query()->where('estado', 'PENDIENTE_REVISION')->count();
         $propuestasPorRevisar = Propuesta::query()->where('estado', 'ENVIADA')->count();
 
-        $detectadasMes = Convocatoria::query()->where('created_at', '>=', $inicioMes)->count();
-        $publicadasMes = Convocatoria::query()
+        $enviadasMes = PropuestaRevision::query()
             ->where('created_at', '>=', $inicioMes)
-            ->whereIn('estado', ['PUBLICADA', 'ACTIVA', 'CERRADA'])
+            ->where('accion', 'ENVIAR')
             ->count();
-        $pendientesMes = Convocatoria::query()
+        $aprobadasMes = (clone $dictamenesMes)->where('accion', 'APROBAR')->count();
+        $devueltasMes = (clone $dictamenesMes)->whereIn('accion', ['DEVOLVER', 'RECHAZAR'])->count();
+        $publicadasMes = Convocatoria::query()
+            ->whereIn('estado', ['PUBLICADA', 'ACTIVA', 'CERRADA'])
             ->where('created_at', '>=', $inicioMes)
-            ->where('estado', 'PENDIENTE_REVISION')
             ->count();
 
         return [
@@ -77,36 +77,35 @@ class Dashboard extends BaseDashboard
             'fecha' => $hoy->copy()->locale('es')->isoFormat('D [de] MMMM [de] YYYY'),
 
             'urls' => [
-                'porRevisar' => Pages\ConvocatoriasPorRevisar::getUrl(),
                 'propuestas' => Pages\PropuestasPorRevisar::getUrl(),
+                'buscar' => Pages\BuscarConvocatorias::getUrl(),
                 'subir' => ConvocatoriaResource::getUrl('create'),
                 'reportes' => Pages\Reportes::getUrl(),
                 'estadisticas' => Pages\Estadisticas::getUrl(),
                 'calendario' => Pages\Calendario::getUrl(),
-                'buscar' => Pages\BuscarConvocatorias::getUrl(),
             ],
 
             'estadisticas' => [
                 [
-                    'etiqueta' => 'Convocatorias por revisar',
-                    'valor' => $porRevisar,
-                    'sub' => $porRevisar > 0 ? 'Acción requerida' : 'Sin pendientes',
-                    'icono' => 'portapapeles',
-                    'color' => 'ambar',
-                    'url' => Pages\ConvocatoriasPorRevisar::getUrl(),
-                ],
-                [
                     'etiqueta' => 'Propuestas por revisar',
                     'valor' => $propuestasPorRevisar,
-                    'sub' => (clone $dictamenesMes)->where('accion', 'APROBAR')->count() . ' aprobada(s) este mes',
+                    'sub' => $propuestasPorRevisar > 0 ? 'Acción requerida' : 'Sin pendientes',
+                    'icono' => 'portapapeles',
+                    'color' => 'ambar',
+                    'url' => Pages\PropuestasPorRevisar::getUrl(),
+                ],
+                [
+                    'etiqueta' => 'Aprobadas este mes',
+                    'valor' => $aprobadasMes,
+                    'sub' => 'Propuestas dictaminadas',
                     'icono' => 'aprobado',
                     'color' => 'verde',
                     'url' => Pages\PropuestasPorRevisar::getUrl(),
                 ],
                 [
-                    'etiqueta' => 'Propuestas rechazadas',
-                    'valor' => Propuesta::query()->where('estado', 'RECHAZADA')->count(),
-                    'sub' => 'Con observaciones',
+                    'etiqueta' => 'Devueltas o rechazadas',
+                    'valor' => $devueltasMes,
+                    'sub' => 'Este mes, con observaciones',
                     'icono' => 'rechazado',
                     'color' => 'rojo',
                     'url' => Pages\PropuestasPorRevisar::getUrl(),
@@ -121,28 +120,11 @@ class Dashboard extends BaseDashboard
                 ],
             ],
 
-            'pendientes' => Convocatoria::query()
-                ->with(['organismo:id,nombre', 'categoria:id,nombre'])
-                ->where('estado', 'PENDIENTE_REVISION')
-                ->latest()
-                ->limit(5)
-                ->get()
-                ->map(fn (Convocatoria $c): array => [
-                    'titulo' => $c->titulo,
-                    'organismo' => $c->organismo?->nombre ?? 'Sin organismo',
-                    'categoria' => $c->categoria?->nombre,
-                    'manual' => $c->origen === 'MANUAL',
-                    'encontrada' => $c->created_at?->locale('es')->isoFormat('D MMM YYYY'),
-                    'cierre' => $c->fecha_cierre?->locale('es')->isoFormat('D MMM YYYY') ?? 'Sin fecha',
-                    'url' => Pages\RevisarConvocatoria::getUrl(['record' => $c->id]),
-                ])
-                ->all(),
-
             'propuestasPendientes' => Propuesta::query()
                 ->with(['usuario:id,name,apellidos', 'convocatoria:id,titulo'])
                 ->where('estado', 'ENVIADA')
                 ->orderBy('fecha_envio')
-                ->limit(5)
+                ->limit(6)
                 ->get()
                 ->map(fn (Propuesta $p): array => [
                     'titulo' => $p->titulo,
@@ -154,11 +136,26 @@ class Dashboard extends BaseDashboard
                 ])
                 ->all(),
 
+            'recientes' => $disponibles()
+                ->with(['organismo:id,nombre'])
+                ->latest()
+                ->limit(5)
+                ->get()
+                ->map(fn (Convocatoria $c): array => [
+                    'titulo' => $c->titulo,
+                    'organismo' => $c->organismo?->nombre ?? 'Sin organismo',
+                    'manual' => $c->origen === 'MANUAL',
+                    'publicada' => $c->created_at?->locale('es')->isoFormat('D MMM YYYY'),
+                    'cierre' => $c->fecha_cierre?->locale('es')->isoFormat('D MMM YYYY') ?? 'Sin fecha',
+                    'url' => Pages\DetalleConvocatoria::getUrl(['record' => $c->id]),
+                ])
+                ->all(),
+
             'resumen' => [
-                ['etiqueta' => 'Detectadas este mes', 'valor' => $detectadasMes, 'max' => max($detectadasMes, 1), 'color' => '#1A4B8C'],
-                ['etiqueta' => 'Ya revisadas', 'valor' => $publicadasMes, 'max' => max($detectadasMes, 1), 'color' => '#059669'],
-                ['etiqueta' => 'Siguen pendientes', 'valor' => $pendientesMes, 'max' => max($detectadasMes, 1), 'color' => '#D97706'],
-                ['etiqueta' => 'Dictámenes de propuestas', 'valor' => (clone $dictamenesMes)->count(), 'max' => max((clone $dictamenesMes)->count(), 1), 'color' => '#7C3AED'],
+                ['etiqueta' => 'Convocatorias publicadas', 'valor' => $publicadasMes, 'max' => max($publicadasMes, 1), 'color' => '#1A4B8C'],
+                ['etiqueta' => 'Propuestas enviadas', 'valor' => $enviadasMes, 'max' => max($enviadasMes, 1), 'color' => '#7C3AED'],
+                ['etiqueta' => 'Aprobadas', 'valor' => $aprobadasMes, 'max' => max($enviadasMes, $aprobadasMes, 1), 'color' => '#059669'],
+                ['etiqueta' => 'Devueltas o rechazadas', 'valor' => $devueltasMes, 'max' => max($enviadasMes, $devueltasMes, 1), 'color' => '#DC2626'],
             ],
 
             'proximosCierres' => $disponibles()

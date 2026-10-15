@@ -747,11 +747,11 @@
             <a
                 href="{{
                     route(
-                        'filament.directivo.pages.convocatorias-por-revisar'
+                        'filament.directivo.pages.propuestas-por-revisar'
                     )
                 }}"
                 class="stat-card"
-                title="Ver convocatorias pendientes"
+                title="Ver propuestas por revisar"
             >
 
                 <div class="stat-header">
@@ -763,16 +763,16 @@
                 </div>
 
                 <div class="stat-label">
-                    Pendientes de revisión
+                    Propuestas por revisar
                 </div>
 
                 <div class="stat-help">
-                    Dentro del periodo seleccionado
+                    Enviadas por docentes y directivos
                 </div>
 
                 <div class="stat-action">
                     <span>
-                        Revisar pendientes
+                        Revisar propuestas
                     </span>
 
                     <span class="stat-arrow">

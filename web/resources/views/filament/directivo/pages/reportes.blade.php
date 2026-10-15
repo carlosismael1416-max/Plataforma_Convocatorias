@@ -1521,12 +1521,12 @@
                     <a
                         href="{{
                             route(
-                                'filament.directivo.pages.convocatorias-por-revisar'
+                                'filament.directivo.pages.propuestas-por-revisar'
                             )
                         }}"
                         class="quick-link"
                     >
-                        Convocatorias por revisar →
+                        Propuestas por revisar →
                     </a>
 
                     <a

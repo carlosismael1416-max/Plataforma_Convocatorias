@@ -121,13 +121,13 @@ class ConvocatoriaForm
                             Text::make('• Usa un título claro, con el programa y el año.'),
                             Text::make('• Agrega el enlace oficial para que se pueda verificar la fuente.'),
                             Text::make('• La fecha de cierre alimenta el calendario y los avisos de vencimiento.'),
-                            Text::make('• Sin fecha de cierre, el directivo decide si se publica.'),
+                            Text::make('• Si aún no conoces la fecha de cierre, agrégala después editando la convocatoria.'),
                         ]),
 
-                    Section::make('¿Qué pasa al enviarla?')
+                    Section::make('¿Qué pasa al publicarla?')
                         ->icon(Heroicon::OutlinedShieldCheck)
                         ->schema([
-                            Text::make('Queda como pendiente de revisión. Un directivo la revisa y decide si se publica para todos los docentes.'),
+                            Text::make('Se publica al momento para todos los docentes y directivos. Puedes corregirla después desde «Subir convocatoria».'),
                         ]),
                 ])->columnSpan(1),
             ]);
