@@ -15,7 +15,7 @@ class ConvocatoriasPorRevisar extends Page
 
     protected static ?string $navigationLabel = 'Convocatorias por revisar';
 
-    protected static ?int $navigationSort = 4;
+    protected static ?int $navigationSort = 2;
 
 
     use WithPagination;

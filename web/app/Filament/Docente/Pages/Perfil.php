@@ -14,6 +14,9 @@ class Perfil extends Page
 {
     protected static ?int $navigationSort = 6;
 
+    // Se abre desde el menú del avatar, no desde la barra lateral.
+    protected static bool $shouldRegisterNavigation = false;
+
     protected string $view =
         'filament.docente.pages.perfil';
 

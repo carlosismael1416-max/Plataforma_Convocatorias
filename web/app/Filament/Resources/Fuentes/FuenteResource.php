@@ -24,7 +24,7 @@ class FuenteResource extends Resource
         Fuente::class;
 
     protected static string|BackedEnum|null $navigationIcon =
-        Heroicon::OutlinedRectangleStack;
+        Heroicon::OutlinedGlobeAlt;
 
     protected static ?string $navigationLabel =
         'Fuentes web';

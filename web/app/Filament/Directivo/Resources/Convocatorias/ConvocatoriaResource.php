@@ -21,14 +21,20 @@ use Illuminate\Database\Eloquent\Model;
 
 class ConvocatoriaResource extends Resource
 {
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-folder-open';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-arrow-up-tray';
 
-    protected static ?string $navigationLabel = 'Mis convocatorias';
+    protected static ?string $navigationLabel = 'Subir convocatoria';
 
-    protected static ?int $navigationSort = 3;
+    protected static ?int $navigationSort = 4;
 
 
-    protected static bool $shouldRegisterNavigation = false;
+    protected static bool $shouldRegisterNavigation = true;
+
+    // El menú lleva directo al formulario, como en el panel docente.
+    public static function getNavigationUrl(): string
+    {
+        return static::getUrl('create');
+    }
 
     protected static ?string $model = Convocatoria::class;
 

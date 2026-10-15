@@ -21,6 +21,8 @@ class MotorExtraccion extends Page
     protected static ?string $navigationLabel =
         'Motor de Extracción';
 
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-cpu-chip';
+
     protected static ?int $navigationSort =
         5;
 

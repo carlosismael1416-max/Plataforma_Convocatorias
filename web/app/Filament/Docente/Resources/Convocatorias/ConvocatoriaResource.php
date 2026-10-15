@@ -21,7 +21,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class ConvocatoriaResource extends Resource
 {
-    protected static bool $shouldRegisterNavigation = false;
+    protected static bool $shouldRegisterNavigation = true;
 
     protected static ?string $model = Convocatoria::class;
 
@@ -37,7 +37,7 @@ class ConvocatoriaResource extends Resource
     protected static ?int $navigationSort = 3;
 
     protected static string|BackedEnum|null $navigationIcon =
-        Heroicon::OutlinedRectangleStack;
+        Heroicon::OutlinedArrowUpTray;
 
     protected static ?string $recordTitleAttribute = 'titulo';
 

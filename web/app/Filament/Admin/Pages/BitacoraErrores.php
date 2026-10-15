@@ -23,8 +23,10 @@ class BitacoraErrores extends Page
     protected static ?string $slug =
         'bitacora-errores';
 
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-exclamation-triangle';
+
     protected static ?int $navigationSort =
-        6;
+        7;
 
     #[Url(as: 'q', except: '')]
     public string $buscar = '';
