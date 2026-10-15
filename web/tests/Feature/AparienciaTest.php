@@ -99,4 +99,27 @@ class AparienciaTest extends TestCase
             ->assertSee('Enviar a revisión')
             ->assertSee('Queda como pendiente de revisión');
     }
+
+    public function test_la_paginacion_esta_en_espanol_y_con_el_estilo_propio(): void
+    {
+        foreach (range(1, 12) as $i) {
+            $this->convocatoria(['titulo' => "ZZ-PAGINA-{$i}", 'fecha_cierre' => today()->addDays(10)]);
+        }
+
+        $this->actingAs($this->usuarioConRol('DIRECTIVO'))
+            ->get('/directivo/buscar-convocatorias')
+            ->assertOk()
+            ->assertSee('itsva-paginacion', false)
+            ->assertSee('Siguiente ›')
+            ->assertDontSee('Showing');
+    }
+
+    public function test_reportes_no_muestra_el_boton_de_prueba(): void
+    {
+        $this->actingAs($this->usuarioConRol('DIRECTIVO'))
+            ->get('/directivo/reportes')
+            ->assertOk()
+            ->assertDontSee('Probar interacción')
+            ->assertDontSee('PostgreSQL');
+    }
 }

@@ -807,9 +807,7 @@
                                     type="text"
                                     maxlength="255"
                                     wire:model="concepto"
-                                    placeholder="
-                                        Nombre del concepto
-                                    "
+                                    placeholder="Nombre del concepto"
                                 >
 
                                 @error('concepto')
@@ -955,9 +953,7 @@
                                 class="textarea"
                                 maxlength="5000"
                                 wire:model="descripcion"
-                                placeholder="
-                                    Descripción del concepto...
-                                "
+                                placeholder="Descripción del concepto..."
                             ></textarea>
 
                             @error('descripcion')

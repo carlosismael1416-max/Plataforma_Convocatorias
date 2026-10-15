@@ -992,9 +992,7 @@
                                     class="input"
                                     maxlength="255"
                                     wire:model="nombre"
-                                    placeholder="
-                                        Nombre del entregable
-                                    "
+                                    placeholder="Nombre del entregable"
                                 >
 
                                 @error('nombre')
@@ -1149,9 +1147,7 @@
                                 wire:model="
                                     descripcion
                                 "
-                                placeholder="
-                                    Descripción del entregable...
-                                "
+                                placeholder="Descripción del entregable..."
                             ></textarea>
 
                             @error('descripcion')

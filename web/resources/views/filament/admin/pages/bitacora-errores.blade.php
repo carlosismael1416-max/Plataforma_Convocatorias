@@ -1017,7 +1017,7 @@
             @if ($errores->hasPages())
 
                 <div class="pagination-wrap">
-                    {{ $errores->links() }}
+                    {{ $errores->links('pagination.itsva') }}
                 </div>
 
             @endif

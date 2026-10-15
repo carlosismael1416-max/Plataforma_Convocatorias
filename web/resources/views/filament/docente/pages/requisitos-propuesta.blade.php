@@ -757,10 +757,7 @@
                                         $requisitoPropuesta->id
                                     }}
                                 "
-                                placeholder="
-                                    Añade comentarios sobre
-                                    el cumplimiento del requisito...
-                                "
+                                placeholder="Añade comentarios sobre el cumplimiento del requisito..."
                                 @disabled(! $editable)
                             ></textarea>
 
@@ -1322,9 +1319,7 @@
                         wire:model="
                             evidenciaUrl
                         "
-                        placeholder="
-                            https://...
-                        "
+                        placeholder="https://..."
                     >
 
                     @error('evidenciaUrl')

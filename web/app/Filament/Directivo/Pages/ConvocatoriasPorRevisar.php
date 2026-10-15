@@ -23,6 +23,9 @@ class ConvocatoriasPorRevisar extends Page
     protected string $view =
         'filament.directivo.pages.convocatorias-por-revisar';
 
+    // La vista ya trae su encabezado.
+    protected ?string $heading = '';
+
     protected static ?string $slug =
         'convocatorias-por-revisar';
 

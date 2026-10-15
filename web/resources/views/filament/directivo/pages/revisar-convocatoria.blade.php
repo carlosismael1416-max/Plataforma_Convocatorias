@@ -780,8 +780,8 @@
                             </div>
 
                             <div class="card-description">
-                                Datos actualmente almacenados
-                                en PostgreSQL.
+                                Datos registrados actualmente
+                                en la plataforma.
                             </div>
 
                         </div>
@@ -1627,10 +1627,7 @@
 
                     <textarea
                         class="textarea"
-                        placeholder="
-                            Se habilitará durante
-                            el flujo de decisión.
-                        "
+                        placeholder="Se habilitará durante el flujo de decisión."
                         disabled
                     ></textarea>
 

@@ -30,6 +30,9 @@ class Reportes extends Page
     protected string $view =
         'filament.directivo.pages.reportes';
 
+    // La vista ya trae su encabezado.
+    protected ?string $heading = '';
+
     protected static ?string $slug =
         'reportes';
 
@@ -115,15 +118,6 @@ class Reportes extends Page
     public function getTitle(): string
     {
         return 'Reportes';
-    }
-
-    public function probarBoton(): void
-    {
-        Notification::make()
-            ->title('Livewire funcionando')
-            ->body('El botón llegó correctamente al componente Reportes.')
-            ->success()
-            ->send();
     }
 
     public function seleccionarTipo(

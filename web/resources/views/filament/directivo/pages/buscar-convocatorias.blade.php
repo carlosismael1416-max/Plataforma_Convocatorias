@@ -572,10 +572,7 @@
             <input
                 type="text"
                 class="search-input"
-                placeholder="
-                    Buscar por título, organismo,
-                    palabra clave, modalidad o área...
-                "
+                placeholder="Buscar por título, organismo, palabra clave, modalidad o área..."
                 wire:model="buscar"
                 wire:keydown.enter="
                     aplicarBusqueda
@@ -1203,7 +1200,7 @@
                 <div class="pagination">
                     {{
                         $convocatorias
-                            ->links()
+                            ->links('pagination.itsva')
                     }}
                 </div>
 

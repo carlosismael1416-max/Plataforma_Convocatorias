@@ -866,7 +866,7 @@
 
             <div class="pagination-wrapper">
 
-                {{ $convocatorias->links() }}
+                {{ $convocatorias->links('pagination.itsva') }}
 
             </div>
 

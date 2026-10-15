@@ -8,10 +8,13 @@ use App\Models\NotificacionPreferencia;
 use App\Models\User;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
+use Livewire\WithPagination;
 use Illuminate\Database\Eloquent\Builder;
 
 class Notificaciones extends Page
 {
+    use WithPagination;
+
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-bell';
 
     protected static ?string $navigationLabel = 'Notificaciones';
@@ -21,6 +24,9 @@ class Notificaciones extends Page
 
     protected string $view =
         'filament.directivo.pages.notificaciones';
+
+    // La vista ya trae su encabezado.
+    protected ?string $heading = '';
 
     protected static ?string $slug =
         'notificaciones';
@@ -91,6 +97,8 @@ class Notificaciones extends Page
 
         $this->filtro =
             $filtro;
+
+        $this->resetPage();
     }
 
     public function alternarConfiguracion(): void

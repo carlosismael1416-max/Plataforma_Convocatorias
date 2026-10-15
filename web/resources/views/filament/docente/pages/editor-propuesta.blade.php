@@ -756,10 +756,7 @@
                         wire:model.live.debounce.700ms="
                             metodologia
                         "
-                        placeholder="
-                            Describe etapas, actividades,
-                            técnicas y métodos...
-                        "
+                        placeholder="Describe etapas, actividades, técnicas y métodos..."
                         @disabled(! $editable)
                     ></textarea>
 
@@ -811,10 +808,7 @@
                         wire:model.live.debounce.700ms="
                             impactoEsperado
                         "
-                        placeholder="
-                            Describe los principales
-                            resultados e impactos...
-                        "
+                        placeholder="Describe los principales resultados e impactos..."
                         @disabled(! $editable)
                     ></textarea>
 

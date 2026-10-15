@@ -22,6 +22,9 @@ class Estadisticas extends Page
     protected string $view =
         'filament.directivo.pages.estadisticas';
 
+    // La vista ya trae su encabezado.
+    protected ?string $heading = '';
+
     protected static ?string $slug =
         'estadisticas';
 

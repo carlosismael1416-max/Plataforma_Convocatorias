@@ -465,4 +465,57 @@
         --text: #fff;
         --hover-text: #fff;
     }
+
+    /* ---------------- Paginación ---------------- */
+
+    .itsva-paginacion {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-top: 16px;
+    }
+
+    .itsva-paginacion-info {
+        color: var(--itsva-texto-suave);
+        font-size: 13px;
+    }
+
+    .itsva-paginacion-botones {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+
+    .itsva-pag-btn {
+        min-width: 36px;
+        height: 36px;
+        padding: 0 12px;
+        border: 1px solid var(--itsva-borde);
+        border-radius: 8px;
+        background: #fff;
+        color: var(--itsva-texto);
+        font: 600 13px var(--itsva-display);
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .itsva-pag-btn:hover:not(.itsva-pag-off):not(.itsva-pag-actual) {
+        border-color: var(--itsva-primario);
+        color: var(--itsva-primario);
+    }
+
+    .itsva-pag-actual {
+        border-color: var(--itsva-primario);
+        background: var(--itsva-primario);
+        color: #fff;
+    }
+
+    .itsva-pag-off {
+        color: #CBD5E1;
+        cursor: default;
+    }
 </style>
