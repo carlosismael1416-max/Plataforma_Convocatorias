@@ -4,6 +4,7 @@ namespace App\Filament\Docente\Pages;
 
 use App\Filament\Concerns\RolDelPanel;
 use App\Models\Propuesta;
+use App\Models\PropuestaRevision;
 use App\Models\User;
 use App\Models\UsuarioConvocatoria;
 use Filament\Notifications\Notification;
@@ -331,6 +332,10 @@ class EditorPropuesta extends Page
             'editable' =>
                 $editable,
 
+            // Observaciones del último dictamen si fue una devolución.
+            'devolucion' =>
+                $this->ultimaDevolucion($propuesta),
+
             'progreso' =>
                 min(100, $progreso),
 
@@ -542,6 +547,17 @@ class EditorPropuesta extends Page
             ],
             true
         );
+    }
+
+    private function ultimaDevolucion(Propuesta $propuesta): ?PropuestaRevision
+    {
+        if ($propuesta->estado !== 'EDITANDO') {
+            return null;
+        }
+
+        $ultima = $propuesta->revisiones()->first();
+
+        return $ultima?->accion === 'DEVOLVER' ? $ultima : null;
     }
 
     private function textoONull(

@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Notificacion;
 use App\Models\Propuesta;
+use App\Models\PropuestaRevision;
 use App\Models\User;
 use App\Models\UsuarioConvocatoria;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -16,7 +17,8 @@ use Illuminate\Validation\ValidationException;
  * - Docentes y directivos envían sus propias propuestas (pasan a ENVIADA).
  * - Cualquier directivo activo las revisa, incluidas las suyas: aprobar,
  *   devolver con observaciones (vuelve a EDITANDO) o rechazar.
- * - Las observaciones llegan al autor como notificación.
+ * - Cada envío y dictamen queda en propuesta_revisiones (historial con las
+ *   observaciones) y el autor recibe el dictamen como notificación.
  */
 class RevisionPropuesta
 {
@@ -93,6 +95,14 @@ class RevisionPropuesta
                 ]);
             }
 
+            PropuestaRevision::create([
+                'propuesta_id' => $actual->id,
+                'user_id' => $autor->getKey(),
+                'accion' => 'ENVIAR',
+                'estado_anterior' => $actual->estado,
+                'estado_nuevo' => 'ENVIADA',
+            ]);
+
             $actual->estado = 'ENVIADA';
             $actual->fecha_envio = now();
             $actual->save();
@@ -158,6 +168,15 @@ class RevisionPropuesta
                     'decision' => 'La propuesta ya no está pendiente de revisión.',
                 ]);
             }
+
+            PropuestaRevision::create([
+                'propuesta_id' => $actual->id,
+                'user_id' => $revisor->getKey(),
+                'accion' => $decision,
+                'estado_anterior' => $actual->estado,
+                'estado_nuevo' => self::DECISIONES[$decision],
+                'observaciones' => $observaciones !== '' ? $observaciones : null,
+            ]);
 
             $actual->estado = self::DECISIONES[$decision];
             $actual->save();

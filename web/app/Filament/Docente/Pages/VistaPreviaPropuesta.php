@@ -1263,6 +1263,11 @@ class VistaPreviaPropuesta extends Page
             'modoRevision' =>
                 $this->esModoRevision(),
 
+            'revisiones' =>
+                $propuesta->revisiones()
+                    ->with('usuario:id,name,apellidos')
+                    ->get(),
+
             'puedeEnviar' =>
                 ! $this->esModoRevision()
                 && $listaParaRevision

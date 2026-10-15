@@ -454,6 +454,15 @@
 
     </div>
 
+    @if ($devolucion)
+        <div class="readonly-warning" style="background: #FFFBEB; border-color: #FCD34D; color: #92400E;">
+            <strong>Propuesta devuelta con observaciones</strong>
+            ({{ $devolucion->created_at?->locale('es')->isoFormat('D MMM YYYY') }}):
+            <span style="white-space: pre-line;">{{ $devolucion->observaciones }}</span>
+            <br>Corrígela y vuelve a enviarla desde la vista previa.
+        </div>
+    @endif
+
     @if (! $editable)
 
         <div class="readonly-warning">

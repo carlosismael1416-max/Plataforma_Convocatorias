@@ -75,8 +75,23 @@
     }
 
     .stat-card {
-        padding: 17px;
-        border-radius: 13px;
+        display: block;
+        padding: 20px;
+        border-radius: 12px;
+        color: inherit;
+        text-decoration: none;
+        transition: border-color .15s, box-shadow .15s, transform .15s;
+    }
+
+    .stat-card:hover {
+        border-color: #7C3AED;
+        box-shadow: 0 4px 12px rgba(124, 58, 237, .12);
+        transform: translateY(-1px);
+    }
+
+    .stat-card:focus-visible {
+        outline: 2px solid #7C3AED;
+        outline-offset: 2px;
     }
 
     .stat-icon {
@@ -112,21 +127,19 @@
 
     .stat-value {
         margin-top: 13px;
-        font-size: 25px;
-        font-weight: 900;
+        font: 700 24px 'DM Sans', sans-serif;
     }
 
     .stat-label {
         margin-top: 3px;
         color: #475569;
-        font-size: 10px;
-        font-weight: 750;
+        font: 600 14px 'DM Sans', sans-serif;
     }
 
     .stat-help {
         margin-top: 4px;
         color: #94A3B8;
-        font-size: 8px;
+        font-size: 12px;
         line-height: 1.4;
     }
 
@@ -442,7 +455,7 @@
 
     <div class="stats-grid">
 
-        <div class="stat-card">
+        <a class="stat-card" href="{{ $urls['porRevisar'] }}">
 
             <div class="stat-icon icon-purple">
                 R
@@ -457,13 +470,12 @@
             </div>
 
             <div class="stat-help">
-                Convocatorias en
-                PENDIENTE_REVISION
+                Convocatorias pendientes de revisión
             </div>
 
-        </div>
+        </a>
 
-        <div class="stat-card">
+        <a class="stat-card" href="{{ $urls['convocatorias'] }}">
 
             <div class="stat-icon icon-blue">
                 C
@@ -478,12 +490,12 @@
             </div>
 
             <div class="stat-help">
-                Total registrado en PostgreSQL
+                Total registradas en la plataforma
             </div>
 
-        </div>
+        </a>
 
-        <div class="stat-card">
+        <a class="stat-card" href="{{ $urls['revisadas'] }}">
 
             <div class="stat-icon icon-green">
                 ✓
@@ -501,27 +513,27 @@
                 Ya no están pendientes de revisión
             </div>
 
-        </div>
+        </a>
 
-        <div class="stat-card">
+        <a class="stat-card" href="{{ $urls['propuestas'] }}">
 
             <div class="stat-icon icon-yellow">
                 P
             </div>
 
             <div class="stat-value">
-                {{ $propuestasDocentes }}
+                {{ $propuestasPorRevisar }}
             </div>
 
             <div class="stat-label">
-                Propuestas
+                Propuestas por revisar
             </div>
 
             <div class="stat-help">
-                Registradas por usuarios DOCENTE
+                {{ $propuestasDocentes }} propuesta(s) de docentes en total
             </div>
 
-        </div>
+        </a>
 
     </div>
 
