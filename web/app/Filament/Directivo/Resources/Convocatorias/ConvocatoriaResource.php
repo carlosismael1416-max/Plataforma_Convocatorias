@@ -25,7 +25,7 @@ class ConvocatoriaResource extends Resource
 
     protected static ?string $navigationLabel = 'Subir convocatoria';
 
-    protected static ?int $navigationSort = 4;
+    protected static ?int $navigationSort = 6;
 
 
     protected static bool $shouldRegisterNavigation = true;

@@ -2,6 +2,7 @@
 
 namespace App\Filament\Docente\Pages;
 
+use App\Filament\Concerns\RolDelPanel;
 use App\Models\Convocatoria;
 use App\Models\EventoCalendario;
 use App\Models\User;
@@ -16,6 +17,8 @@ use Filament\Support\Icons\Heroicon;
 
 class Calendario extends Page
 {
+    use RolDelPanel;
+
     protected static string|BackedEnum|null $navigationIcon =
         Heroicon::OutlinedCalendarDays;
 
@@ -63,7 +66,7 @@ class Calendario extends Page
 
         return $usuario instanceof User
             && (bool) $usuario->estado
-            && $usuario->tieneRol('DOCENTE');
+            && $usuario->tieneRol(static::rolDelPanel());
     }
 
     public function mount(): void
@@ -191,7 +194,7 @@ class Calendario extends Page
         abort_unless(
             $usuario instanceof User
                 && (bool) $usuario->estado
-                && $usuario->tieneRol('DOCENTE'),
+                && $usuario->tieneRol(static::rolDelPanel()),
             403
         );
 

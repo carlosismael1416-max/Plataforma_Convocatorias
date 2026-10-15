@@ -368,7 +368,7 @@
 
             <a
                 href="{{ route(
-                    'filament.docente.pages.buscar-convocatorias'
+                    'filament.' . filament()->getId() . '.pages.buscar-convocatorias'
                 ) }}"
                 class="action-button primary-button"
             >
@@ -931,7 +931,7 @@
 
                         <a
                             href="{{ route(
-                                'filament.docente.pages.buscar-convocatorias'
+                                'filament.' . filament()->getId() . '.pages.buscar-convocatorias'
                             ) }}"
                             class="
                                 action-button

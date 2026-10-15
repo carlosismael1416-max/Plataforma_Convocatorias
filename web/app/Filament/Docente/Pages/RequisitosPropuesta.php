@@ -2,6 +2,7 @@
 
 namespace App\Filament\Docente\Pages;
 
+use App\Filament\Concerns\RolDelPanel;
 use App\Models\ConvocatoriaRequisito;
 use App\Models\Evidencia;
 use App\Models\Propuesta;
@@ -18,6 +19,8 @@ use Livewire\Attributes\Locked;
 
 class RequisitosPropuesta extends Page
 {
+    use RolDelPanel;
+
     use WithFileUploads;
 
     protected static bool $shouldRegisterNavigation = false;
@@ -67,7 +70,7 @@ class RequisitosPropuesta extends Page
 
         return $usuario instanceof User
             && (bool) $usuario->estado
-            && $usuario->tieneRol('DOCENTE');
+            && $usuario->tieneRol(static::rolDelPanel());
     }
 
     public function mount(): void
@@ -144,7 +147,7 @@ class RequisitosPropuesta extends Page
         }
 
         return redirect()->route(
-            'filament.docente.pages.presupuesto-propuesta',
+            'filament.' . filament()->getId() . '.pages.presupuesto-propuesta',
             [
                 'propuesta' =>
                     $this->propuestaId,
@@ -157,7 +160,7 @@ class RequisitosPropuesta extends Page
         $this->propuestaDelUsuario();
 
         return redirect()->route(
-            'filament.docente.pages.objetivos-propuesta',
+            'filament.' . filament()->getId() . '.pages.objetivos-propuesta',
             [
                 'propuesta' =>
                     $this->propuestaId,
@@ -170,7 +173,7 @@ class RequisitosPropuesta extends Page
         $this->propuestaDelUsuario();
 
         return redirect()->route(
-            'filament.docente.pages.vista-previa-propuesta',
+            'filament.' . filament()->getId() . '.pages.vista-previa-propuesta',
             [
                 'propuesta' =>
                     $this->propuestaId,

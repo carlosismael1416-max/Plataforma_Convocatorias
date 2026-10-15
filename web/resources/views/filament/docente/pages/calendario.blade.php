@@ -665,7 +665,7 @@
 
                                 <a
                                     href="{{ route(
-                                        'filament.docente.pages.detalle-convocatoria',
+                                        'filament.' . filament()->getId() . '.pages.detalle-convocatoria',
                                         [
                                             'record' =>
                                                 $evento['id']
@@ -791,7 +791,7 @@
 
                                 <a
                                     href="{{ route(
-                                        'filament.docente.pages.detalle-convocatoria',
+                                        'filament.' . filament()->getId() . '.pages.detalle-convocatoria',
                                         [
                                             'record' =>
                                                 $evento['id']

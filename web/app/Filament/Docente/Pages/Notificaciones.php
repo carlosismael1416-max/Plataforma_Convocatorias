@@ -199,7 +199,7 @@ class Notificaciones extends Page
 
             if ($propuesta) {
                 return redirect()->route(
-                    'filament.docente.pages.vista-previa-propuesta',
+                    'filament.' . filament()->getId() . '.pages.vista-previa-propuesta',
                     [
                         'propuesta' =>
                             $propuesta->id,
@@ -232,7 +232,7 @@ class Notificaciones extends Page
 
             if ($convocatoria) {
                 return redirect()->route(
-                    'filament.docente.pages.detalle-convocatoria',
+                    'filament.' . filament()->getId() . '.pages.detalle-convocatoria',
                     [
                         'record' =>
                             $convocatoria->id,
@@ -247,7 +247,7 @@ class Notificaciones extends Page
             | personal del Docente.
             */
             return redirect()->route(
-                'filament.docente.pages.mis-convocatorias'
+                'filament.' . filament()->getId() . '.pages.mis-convocatorias'
             );
         }
 

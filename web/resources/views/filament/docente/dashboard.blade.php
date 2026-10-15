@@ -325,13 +325,13 @@
                 </p>
 
                 <div class="dd-hero-acciones">
-                    <a class="dd-hero-btn dd-hero-btn-primario" href="{{ route('filament.docente.pages.buscar-convocatorias') }}">
+                    <a class="dd-hero-btn dd-hero-btn-primario" href="{{ route('filament.' . filament()->getId() . '.pages.buscar-convocatorias') }}">
                         {!! $svg('buscar', 15) !!} Buscar convocatoria
                     </a>
-                    <a class="dd-hero-btn" href="{{ route('filament.docente.resources.convocatorias.create') }}">
+                    <a class="dd-hero-btn" href="{{ route('filament.' . filament()->getId() . '.resources.convocatorias.create') }}">
                         {!! $svg('subir', 15) !!} Subir convocatoria
                     </a>
-                    <a class="dd-hero-btn" href="{{ route('filament.docente.pages.propuestas') }}">
+                    <a class="dd-hero-btn" href="{{ route('filament.' . filament()->getId() . '.pages.propuestas') }}">
                         {!! $svg('documento', 15) !!} Mis propuestas
                     </a>
                 </div>
@@ -360,7 +360,7 @@
                         <h2>Convocatorias recomendadas</h2>
                         <p>Publicadas y vigentes, ordenadas por fecha de cierre</p>
                     </div>
-                    <a class="dd-enlace" href="{{ route('filament.docente.pages.buscar-convocatorias') }}">Ver todas →</a>
+                    <a class="dd-enlace" href="{{ route('filament.' . filament()->getId() . '.pages.buscar-convocatorias') }}">Ver todas →</a>
                 </div>
 
                 @if ($recomendadas === [])
@@ -416,7 +416,7 @@
                                 </div>
 
                                 <div class="dd-botones">
-                                    <a class="dd-btn dd-btn-primario" href="{{ route('filament.docente.pages.detalle-convocatoria', ['record' => $c['id']]) }}">Ver detalle</a>
+                                    <a class="dd-btn dd-btn-primario" href="{{ route('filament.' . filament()->getId() . '.pages.detalle-convocatoria', ['record' => $c['id']]) }}">Ver detalle</a>
                                     @if ($c['guardada'])
                                         <button type="button" class="dd-btn dd-btn-secundario" disabled>Guardada</button>
                                     @else
@@ -434,12 +434,12 @@
                 <section>
                     <div class="dd-seccion">
                         <h2>Próximos vencimientos</h2>
-                        <a class="dd-enlace" href="{{ route('filament.docente.pages.calendario') }}">Calendario →</a>
+                        <a class="dd-enlace" href="{{ route('filament.' . filament()->getId() . '.pages.calendario') }}">Calendario →</a>
                     </div>
 
                     <div class="dd-card dd-lista">
                         @forelse ($vencimientos as $v)
-                            <a class="dd-venc" href="{{ route('filament.docente.pages.detalle-convocatoria', ['record' => $v['id']]) }}">
+                            <a class="dd-venc" href="{{ route('filament.' . filament()->getId() . '.pages.detalle-convocatoria', ['record' => $v['id']]) }}">
                                 <div class="dd-venc-dias">
                                     <div @class(['dd-venc-num', 'dd-venc-num-pronto' => $v['dias'] <= 14])>{{ $v['dias'] }}</div>
                                     <div class="dd-venc-txt">días</div>
@@ -460,12 +460,12 @@
                 <section>
                     <div class="dd-seccion">
                         <h2>Mis propuestas recientes</h2>
-                        <a class="dd-enlace" href="{{ route('filament.docente.pages.propuestas') }}">Ver todas →</a>
+                        <a class="dd-enlace" href="{{ route('filament.' . filament()->getId() . '.pages.propuestas') }}">Ver todas →</a>
                     </div>
 
                     <div class="dd-card dd-lista">
                         @forelse ($propuestasRecientes as $p)
-                            <a class="dd-prop" href="{{ route('filament.docente.pages.editor-propuesta', ['propuesta' => $p['id']]) }}">
+                            <a class="dd-prop" href="{{ route('filament.' . filament()->getId() . '.pages.editor-propuesta', ['propuesta' => $p['id']]) }}">
                                 <div class="dd-prop-cabecera">
                                     <p class="dd-prop-titulo">{{ $p['titulo'] }}</p>
                                     <span class="dd-badge dd-badge-{{ $estadoPropuesta[$p['estado']] ?? 'borrador' }}">{{ $p['estado'] }}</span>
@@ -483,7 +483,7 @@
                         @empty
                             <div class="dd-vacio">
                                 Aún no tienes propuestas.
-                                <a href="{{ route('filament.docente.pages.buscar-convocatorias') }}">Busca una convocatoria</a>
+                                <a href="{{ route('filament.' . filament()->getId() . '.pages.buscar-convocatorias') }}">Busca una convocatoria</a>
                                 para empezar.
                             </div>
                         @endforelse

@@ -46,6 +46,8 @@ $publicada = $conv(["titulo" => "ZZ-PAGINAS-PUBLICADA", "estado" => "PUBLICADA",
 $delDocente = $conv(["titulo" => "ZZ-PAGINAS-DOCENTE", "estado" => "PENDIENTE_REVISION", "subido_por_user_id" => 2]);
 $delDirectivo = $conv(["titulo" => "ZZ-PAGINAS-DIRECTIVO", "estado" => "PENDIENTE_REVISION", "subido_por_user_id" => 3]);
 $propuesta = DB::table("propuestas")->insertGetId(["user_id" => 2, "convocatoria_id" => $publicada, "titulo" => "ZZ-PAGINAS-PROPUESTA", "created_at" => now(), "updated_at" => now()]);
+// Propuesta propia del directivo, ya enviada: sirve para sus páginas de propuesta y para revisar-propuesta.
+$propuestaDirectivo = DB::table("propuestas")->insertGetId(["user_id" => 3, "convocatoria_id" => $publicada, "titulo" => "ZZ-PAGINAS-PROPUESTA-DIRECTIVO", "estado" => "ENVIADA", "fecha_envio" => now(), "created_at" => now(), "updated_at" => now()]);
 DB::table("departamentos")->insert(["nombre" => "ZZ-PAGINAS-DEPTO", "created_at" => now(), "updated_at" => now()]);
 DB::table("bitacora_errores")->insert(["mensaje" => "ZZ-PAGINAS-ERROR", "tipo_error" => "PRUEBA", "resuelto" => false, "created_at" => now(), "updated_at" => now()]);
 
@@ -96,7 +98,7 @@ foreach ($rutas as $uri) {
         $url = str_replace("{record}", $id, $uri);
     }
     if (preg_match("#-propuesta$#", $uri) && ! str_contains($uri, "generar")) {
-        $url .= "?propuesta=$propuesta";
+        $url .= "?propuesta=" . (str_starts_with($uri, "directivo/") ? $propuestaDirectivo : $propuesta);
     }
 
     $respuesta = $kernel->handle(Illuminate\Http\Request::create("/$url", "GET"));

@@ -333,7 +333,7 @@
 
         <a
             href="{{ route(
-                'filament.docente.pages.propuestas'
+                'filament.' . filament()->getId() . '.pages.propuestas'
             ) }}"
             class="back-link"
         >
@@ -363,7 +363,7 @@
 
             <a
                 href="{{ route(
-                    'filament.docente.pages.buscar-convocatorias'
+                    'filament.' . filament()->getId() . '.pages.buscar-convocatorias'
                 ) }}"
                 class="gp-empty-action"
             >

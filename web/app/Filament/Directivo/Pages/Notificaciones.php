@@ -16,7 +16,7 @@ class Notificaciones extends Page
 
     protected static ?string $navigationLabel = 'Notificaciones';
 
-    protected static ?int $navigationSort = 7;
+    protected static ?int $navigationSort = 11;
 
 
     protected string $view =
@@ -628,6 +628,28 @@ class Notificaciones extends Page
                         'record' =>
                             $convocatoria->id,
                     ]
+                );
+            }
+        }
+
+        if (
+            $item->propuesta_id
+            !== null
+            && $item->propuesta
+        ) {
+            // Su propia propuesta: la abre en su vista previa.
+            if ($item->propuesta->user_id === auth()->id()) {
+                return route(
+                    'filament.directivo.pages.vista-previa-propuesta',
+                    ['propuesta' => $item->propuesta_id]
+                );
+            }
+
+            // La de otro autor: la abre para revisarla.
+            if (in_array($item->propuesta->estado, ['ENVIADA', 'APROBADA', 'RECHAZADA'], true)) {
+                return route(
+                    'filament.directivo.pages.revisar-propuesta',
+                    ['propuesta' => $item->propuesta_id]
                 );
             }
         }

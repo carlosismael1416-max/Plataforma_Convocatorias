@@ -2,6 +2,7 @@
 
 namespace App\Filament\Docente\Pages;
 
+use App\Filament\Concerns\RolDelPanel;
 use App\Models\Cotizacion;
 use App\Models\CronogramaActividad;
 use App\Models\Evidencia;
@@ -22,6 +23,8 @@ use Livewire\Attributes\Locked;
 
 class EntregablesPropuesta extends Page
 {
+    use RolDelPanel;
+
     use WithFileUploads;
 
     protected static bool $shouldRegisterNavigation = false;
@@ -73,7 +76,7 @@ class EntregablesPropuesta extends Page
 
         return $usuario instanceof User
             && (bool) $usuario->estado
-            && $usuario->tieneRol('DOCENTE');
+            && $usuario->tieneRol(static::rolDelPanel());
     }
 
     public function mount(): void
@@ -567,7 +570,7 @@ class EntregablesPropuesta extends Page
         $this->propuestaDelUsuario();
 
         return redirect()->route(
-            'filament.docente.pages.cronograma-propuesta',
+            'filament.' . filament()->getId() . '.pages.cronograma-propuesta',
             [
                 'propuesta' =>
                     $this->propuestaId,
@@ -615,7 +618,7 @@ class EntregablesPropuesta extends Page
         }
 
         return redirect()->route(
-            'filament.docente.pages.vista-previa-propuesta',
+            'filament.' . filament()->getId() . '.pages.vista-previa-propuesta',
             [
                 'propuesta' =>
                     $this->propuestaId,

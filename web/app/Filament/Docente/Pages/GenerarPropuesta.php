@@ -2,6 +2,7 @@
 
 namespace App\Filament\Docente\Pages;
 
+use App\Filament\Concerns\RolDelPanel;
 use App\Models\Convocatoria;
 use App\Models\Propuesta;
 use App\Models\PropuestaBase;
@@ -16,6 +17,8 @@ use Illuminate\Support\Facades\DB;
 
 class GenerarPropuesta extends Page
 {
+    use RolDelPanel;
+
     protected static string|BackedEnum|null $navigationIcon =
         Heroicon::OutlinedSparkles;
 
@@ -43,7 +46,7 @@ class GenerarPropuesta extends Page
 
         return $usuario instanceof User
             && (bool) $usuario->estado
-            && $usuario->tieneRol('DOCENTE');
+            && $usuario->tieneRol(static::rolDelPanel());
     }
 
     public function mount(): mixed
@@ -100,7 +103,7 @@ class GenerarPropuesta extends Page
 
         if ($existente) {
             return redirect()->route(
-                'filament.docente.pages.editor-propuesta',
+                'filament.' . filament()->getId() . '.pages.editor-propuesta',
                 ['propuesta' => $existente]
             );
         }
@@ -157,7 +160,7 @@ class GenerarPropuesta extends Page
         abort_unless(
             $usuario instanceof User
                 && (bool) $usuario->estado
-                && $usuario->tieneRol('DOCENTE'),
+                && $usuario->tieneRol(static::rolDelPanel()),
             403
         );
 
@@ -395,7 +398,7 @@ class GenerarPropuesta extends Page
             ->send();
 
         return redirect()->route(
-            'filament.docente.pages.editor-propuesta',
+            'filament.' . filament()->getId() . '.pages.editor-propuesta',
             [
                 'propuesta' =>
                     $propuesta->id,

@@ -2,6 +2,7 @@
 
 namespace App\Filament\Docente\Pages;
 
+use App\Filament\Concerns\RolDelPanel;
 use App\Models\Cotizacion;
 use App\Models\PresupuestoItem;
 use App\Models\Propuesta;
@@ -16,6 +17,8 @@ use Livewire\Attributes\Locked;
 
 class CotizacionesPropuesta extends Page
 {
+    use RolDelPanel;
+
     use WithFileUploads;
 
     protected static bool $shouldRegisterNavigation = false;
@@ -61,7 +64,7 @@ class CotizacionesPropuesta extends Page
 
         return $usuario instanceof User
             && (bool) $usuario->estado
-            && $usuario->tieneRol('DOCENTE');
+            && $usuario->tieneRol(static::rolDelPanel());
     }
 
     public function mount(): void
@@ -586,7 +589,7 @@ class CotizacionesPropuesta extends Page
         $this->propuestaDelUsuario();
 
         return redirect()->route(
-            'filament.docente.pages.presupuesto-propuesta',
+            'filament.' . filament()->getId() . '.pages.presupuesto-propuesta',
             [
                 'propuesta' =>
                     $this->propuestaId,
@@ -621,7 +624,7 @@ class CotizacionesPropuesta extends Page
         | bloqueamos el avance si no existen.
         */
         return redirect()->route(
-            'filament.docente.pages.cronograma-propuesta',
+            'filament.' . filament()->getId() . '.pages.cronograma-propuesta',
             [
                 'propuesta' =>
                     $this->propuestaId,
@@ -634,7 +637,7 @@ class CotizacionesPropuesta extends Page
         $this->propuestaDelUsuario();
 
         return redirect()->route(
-            'filament.docente.pages.vista-previa-propuesta',
+            'filament.' . filament()->getId() . '.pages.vista-previa-propuesta',
             [
                 'propuesta' =>
                     $this->propuestaId,

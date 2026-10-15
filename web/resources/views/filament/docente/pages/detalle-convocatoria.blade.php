@@ -1170,7 +1170,7 @@
 
             <a
                 href="{{ route(
-                    'filament.docente.pages.buscar-convocatorias'
+                    'filament.' . filament()->getId() . '.pages.buscar-convocatorias'
                 ) }}"
                 class="
                     detalle-btn
@@ -1212,7 +1212,7 @@
 
             <a
                 href="{{ route(
-                    'filament.docente.pages.generar-propuesta',
+                    'filament.' . filament()->getId() . '.pages.generar-propuesta',
                     [
                         'convocatoria' =>
                             $convocatoria->id
