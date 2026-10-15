@@ -6,6 +6,8 @@ from pathlib import Path
 import psycopg
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
+
+from app.interruptor_motor import motor_activo
 from pydantic import BaseModel, Field
 
 
@@ -434,6 +436,15 @@ def db_check():
 def ejecutar_scraping(
     datos: EjecutarFuenteRequest,
 ):
+    if not motor_activo():
+        raise HTTPException(
+            status_code=409,
+            detail=(
+                "El motor de extracción está apagado. "
+                "Enciéndelo desde el panel de administración."
+            ),
+        )
+
     try:
         fuente = obtener_fuente(
             datos.fuente_id

@@ -66,4 +66,37 @@ class AdminPaginasTest extends TestCase
             $respuesta->assertSee('href="' . url("/admin/{$seccion}") . '" class="dd-card dd-stat"', false);
         }
     }
+
+    public function test_el_admin_apaga_y_enciende_el_motor(): void
+    {
+        $admin = $this->usuarioConRol('ADMINISTRADOR');
+        $this->seed(\Database\Seeders\PermisoSeeder::class);
+        $admin = $admin->fresh();
+
+        $this->actingAs($admin);
+        \Filament\Facades\Filament::setCurrentPanel(\Filament\Facades\Filament::getPanel('admin'));
+
+        \Livewire\Livewire::test(\App\Filament\Admin\Pages\MotorExtraccion::class)
+            ->assertSee('Apagar motor')
+            ->call('cambiarMotor', false)
+            ->assertSee('Encender motor');
+
+        $this->assertFalse(\App\Services\InterruptorMotor::activo());
+        $this->assertSame(
+            $admin->id,
+            \App\Models\AjusteSistema::query()->find('motor_activo')->actualizado_por
+        );
+
+        \Livewire\Livewire::test(\App\Filament\Admin\Dashboard::class)
+            ->assertSee('apagados')
+            ->call('cambiarMotor', true);
+
+        $this->assertTrue(\App\Services\InterruptorMotor::activo());
+    }
+
+    public function test_solo_un_administrador_con_permiso_cambia_el_motor(): void
+    {
+        $this->expectException(\Illuminate\Auth\Access\AuthorizationException::class);
+        \App\Services\InterruptorMotor::cambiar(false, $this->usuarioConRol('DIRECTIVO'));
+    }
 }

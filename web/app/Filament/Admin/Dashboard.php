@@ -8,6 +8,7 @@ use App\Filament\Admin\Pages\MotorExtraccion;
 use App\Filament\Resources\Convocatorias\ConvocatoriaResource;
 use App\Filament\Resources\Fuentes\FuenteResource;
 use App\Filament\Resources\Users\UserResource;
+use App\Filament\Concerns\ControlaMotor;
 use App\Models\User;
 use Filament\Pages\Dashboard as BaseDashboard;
 use Illuminate\Support\Carbon;
@@ -21,6 +22,8 @@ use Illuminate\Support\Facades\Http;
  */
 class Dashboard extends BaseDashboard
 {
+    use ControlaMotor;
+
     protected string $view = 'filament.admin.dashboard';
 
     protected static ?string $title = 'Dashboard';
@@ -61,7 +64,7 @@ class Dashboard extends BaseDashboard
             ->where('created_at', '>=', now()->subWeek())
             ->count();
 
-        return [
+        return $this->datosInterruptor() + [
             'nombre' => trim($usuario->name . ' ' . ($usuario->apellidos ?? '')),
             'fecha' => $hoy->copy()->locale('es')->isoFormat('D [de] MMMM [de] YYYY'),
 

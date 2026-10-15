@@ -2,7 +2,9 @@
 
 namespace App\Filament\Admin\Pages;
 
+use App\Filament\Concerns\ControlaMotor;
 use App\Models\BitacoraError;
+use App\Services\InterruptorMotor;
 use App\Models\EjecucionScraping;
 use App\Models\Fuente;
 use App\Models\User;
@@ -12,6 +14,8 @@ use Illuminate\Support\Facades\Http;
 
 class MotorExtraccion extends Page
 {
+    use ControlaMotor;
+
     protected string $view =
         'filament.admin.pages.motor-extraccion';
 
@@ -64,6 +68,16 @@ class MotorExtraccion extends Page
 
     public function ejecutarCiclo(): void
     {
+        if (! InterruptorMotor::activo()) {
+            Notification::make()
+                ->title('Motor apagado')
+                ->body('Enciende el motor para ejecutar un ciclo.')
+                ->warning()
+                ->send();
+
+            return;
+        }
+
         /*
         |--------------------------------------------------------------------------
         | EVITAR EJECUCIONES SIMULTÁNEAS
@@ -483,7 +497,7 @@ class MotorExtraccion extends Page
             $apiDisponible = false;
         }
 
-        return [
+        return $this->datosInterruptor() + [
             'apiDisponible' => $apiDisponible,
 
             'fuenteContexto' =>

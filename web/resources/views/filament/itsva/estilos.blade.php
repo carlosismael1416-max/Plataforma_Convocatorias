@@ -561,6 +561,33 @@
         display: none !important;
     }
 
+    /* ---------------- Interruptor del motor ---------------- */
+
+    .itsva-interruptor {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 24px;
+        padding: 16px 20px;
+        border: 1px solid var(--itsva-borde);
+        border-radius: 12px;
+        background: #fff;
+    }
+
+    .itsva-interruptor-off { border-color: #FECACA; background: #FEF2F2; }
+    .itsva-interruptor-info { display: flex; align-items: flex-start; gap: 12px; }
+    .itsva-interruptor-punto { flex-shrink: 0; width: 12px; height: 12px; margin-top: 4px; border-radius: 999px; background: #10B981; box-shadow: 0 0 0 4px rgba(16, 185, 129, .15); }
+    .itsva-interruptor-off .itsva-interruptor-punto { background: #EF4444; box-shadow: 0 0 0 4px rgba(239, 68, 68, .15); }
+    .itsva-interruptor-titulo { margin: 0; color: var(--itsva-texto); font: 700 15px var(--itsva-display); }
+    .itsva-interruptor-sub { margin: 2px 0 0; color: var(--itsva-texto-suave); font-size: 13px; }
+    .itsva-interruptor-btn { padding: 9px 18px; border: 0; border-radius: 10px; font: 700 14px var(--itsva-display); cursor: pointer; }
+    .itsva-interruptor-apagar { background: #FEE2E2; color: #B91C1C; }
+    .itsva-interruptor-apagar:hover { background: #FECACA; }
+    .itsva-interruptor-encender { background: #059669; color: #fff; }
+    .itsva-interruptor-encender:hover { background: #047857; }
+
     /* ---------------- Paginación ---------------- */
 
     .itsva-paginacion {

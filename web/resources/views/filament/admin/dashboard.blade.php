@@ -49,6 +49,8 @@
             @endforeach
         </section>
 
+        @include('filament.itsva.interruptor-motor')
+
         {{-- Motor: último ciclo automático --}}
         <section class="dd-card dd-motor">
             <div @class(['dd-motor-cab', 'dd-motor-caido' => ! $apiDisponible || $ciclo === null])>
