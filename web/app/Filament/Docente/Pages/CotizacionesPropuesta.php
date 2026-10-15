@@ -29,6 +29,9 @@ class CotizacionesPropuesta extends Page
     protected string $view =
         'filament.docente.pages.cotizaciones-propuesta';
 
+    // La vista ya trae su encabezado (título, descripción y acciones).
+    protected ?string $heading = '';
+
     // El navegador no puede cambiarla: identifica la propuesta
     // del usuario validada en mount().
     #[Locked]

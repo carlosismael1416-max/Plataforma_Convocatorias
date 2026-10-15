@@ -30,6 +30,9 @@ class GenerarPropuesta extends Page
     protected string $view =
         'filament.docente.pages.generar-propuesta';
 
+    // La vista ya trae su encabezado (título, descripción y acciones).
+    protected ?string $heading = '';
+
     public string $convocatoriaId = '';
 
     public string $tituloPropuesta = '';

@@ -35,6 +35,9 @@ class EntregablesPropuesta extends Page
     protected string $view =
         'filament.docente.pages.entregables-propuesta';
 
+    // La vista ya trae su encabezado (título, descripción y acciones).
+    protected ?string $heading = '';
+
     public const ESTADOS = [
         'PENDIENTE' => 'Pendiente',
         'EN_PROCESO' => 'En proceso',

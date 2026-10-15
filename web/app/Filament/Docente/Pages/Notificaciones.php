@@ -19,6 +19,9 @@ class Notificaciones extends Page
     protected string $view =
         'filament.docente.pages.notificaciones';
 
+    // La vista ya trae su encabezado (título, descripción y acciones).
+    protected ?string $heading = '';
+
     protected static ?string $slug =
         'notificaciones';
 

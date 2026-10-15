@@ -30,6 +30,9 @@ class MisConvocatorias extends Page
     protected string $view =
         'filament.docente.pages.mis-convocatorias';
 
+    // La vista ya trae su encabezado (título, descripción y acciones).
+    protected ?string $heading = '';
+
     public string $buscar = '';
 
     public string $estado = '';

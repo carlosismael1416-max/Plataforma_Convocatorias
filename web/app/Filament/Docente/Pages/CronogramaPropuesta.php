@@ -31,6 +31,9 @@ class CronogramaPropuesta extends Page
     protected string $view =
         'filament.docente.pages.cronograma-propuesta';
 
+    // La vista ya trae su encabezado (título, descripción y acciones).
+    protected ?string $heading = '';
+
     public const ESTADOS = [
         'PENDIENTE' => 'Pendiente',
         'EN_PROCESO' => 'En proceso',

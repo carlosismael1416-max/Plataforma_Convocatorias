@@ -24,6 +24,9 @@ class PresupuestoPropuesta extends Page
     protected string $view =
         'filament.docente.pages.presupuesto-propuesta';
 
+    // La vista ya trae su encabezado (título, descripción y acciones).
+    protected ?string $heading = '';
+
     public const CATEGORIAS = [
         'EQUIPO' => 'Equipo',
         'MATERIALES' => 'Materiales',

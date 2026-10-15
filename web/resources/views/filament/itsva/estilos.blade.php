@@ -457,4 +457,12 @@
     .fi-header-subheading {
         color: var(--itsva-texto-suave);
     }
+
+    /* Botón primario del diseño (Filament elegía un tono claro por contraste). */
+    .fi-btn:not(.fi-outlined).fi-color.fi-color-primary:not(label) {
+        --bg: #1A4B8C;
+        --hover-bg: #163F78;
+        --text: #fff;
+        --hover-text: #fff;
+    }
 </style>

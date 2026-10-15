@@ -76,4 +76,26 @@ class AparienciaTest extends TestCase
 
         $this->assertGuest();
     }
+
+    public function test_paginas_fuera_del_menu_muestran_su_titulo_una_sola_vez(): void
+    {
+        $convocatoria = $this->convocatoria(['fecha_cierre' => today()->addDays(10)]);
+        $this->actingAs($this->usuarioConRol('DOCENTE'));
+
+        $html = $this->get("/docente/detalle-convocatoria/{$convocatoria->id}")->assertOk()->getContent();
+
+        $this->assertStringContainsString('<h1 class="itsva-header-titulo">Detalle de convocatoria</h1>', $html);
+        $this->assertDoesNotMatchRegularExpression('/<h1[^>]*fi-header-heading/', $html);
+    }
+
+    public function test_subir_convocatoria_agrupa_el_formulario_y_explica_la_revision(): void
+    {
+        $this->actingAs($this->usuarioConRol('DOCENTE'));
+
+        $this->get('/docente/convocatorias/create')
+            ->assertOk()
+            ->assertSeeInOrder(['Información básica', 'Descripción y objetivo', 'Fechas y apoyo económico'])
+            ->assertSee('Enviar a revisión')
+            ->assertSee('Queda como pendiente de revisión');
+    }
 }

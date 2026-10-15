@@ -23,6 +23,9 @@ class DetalleConvocatoria extends Page
     protected string $view =
         'filament.docente.pages.detalle-convocatoria';
 
+    // El título ya aparece en el header del panel.
+    protected ?string $heading = '';
+
     public Convocatoria $convocatoria;
 
     public string $tab = 'informacion';
