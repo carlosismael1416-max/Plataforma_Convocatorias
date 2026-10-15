@@ -17,7 +17,7 @@ class BuscarConvocatorias extends Page
 
     protected static ?string $navigationLabel = 'Buscar convocatorias';
 
-    protected static ?int $navigationSort = 2;
+    protected static ?int $navigationSort = 3;
 
 
     use WithPagination;
@@ -42,6 +42,17 @@ class BuscarConvocatorias extends Page
     public string $fechaCierre = '';
 
     public string $orden = 'recientes';
+
+
+    public function mount(): void
+    {
+        // Búsqueda enviada desde el header del panel mediante ?q=
+        $busquedaInicial = request()->query('q');
+
+        if (is_string($busquedaInicial)) {
+            $this->buscar = trim($busquedaInicial);
+        }
+    }
 
     public static function canAccess(): bool
     {

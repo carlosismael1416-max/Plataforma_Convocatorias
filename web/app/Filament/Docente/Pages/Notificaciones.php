@@ -12,7 +12,9 @@ use Illuminate\Database\Eloquent\Builder;
 
 class Notificaciones extends Page
 {
-    protected static ?int $navigationSort = 5;
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-bell';
+
+    protected static ?int $navigationSort = 6;
 
     protected string $view =
         'filament.docente.pages.notificaciones';

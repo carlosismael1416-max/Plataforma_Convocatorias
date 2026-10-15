@@ -14,6 +14,9 @@ class Dashboard extends BaseDashboard
 
     protected static ?string $title = 'Dashboard';
 
+    // El título ya aparece en el header del panel.
+    protected ?string $heading = '';
+
     public string $nombreUsuario = 'Docente';
 
     public int $convocatoriasDisponibles = 0;

@@ -19,12 +19,12 @@ class Propuestas extends Page
         Heroicon::OutlinedDocumentText;
 
     protected static ?string $navigationLabel =
-        'Mis propuestas';
+        'Propuestas';
 
     protected static ?string $title =
         'Mis propuestas';
 
-    protected static ?int $navigationSort = 4;
+    protected static ?int $navigationSort = 5;
 
     protected string $view =
         'filament.docente.pages.propuestas';

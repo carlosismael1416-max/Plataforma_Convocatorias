@@ -2,6 +2,7 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Apariencia\AparienciaItsva;
 use App\Filament\Docente\Dashboard;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
@@ -23,11 +24,9 @@ class DocentePanelProvider extends PanelProvider
 {
     public function panel(Panel $panel): Panel
     {
-        return $panel
+        return AparienciaItsva::aplicar($panel, 'docente')
             ->id('docente')
             ->path('docente')
-
-            ->brandName('Convocatorias ITSVA')
 
             ->colors([
                 'primary' => Color::hex('#1A4B8C'),

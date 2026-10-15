@@ -22,7 +22,7 @@ use Illuminate\Support\Facades\DB;
 class ConvocatoriaResource extends Resource
 {
     protected static ?string $navigationLabel =
-        'Gestión de Convocatorias';
+        'Convocatorias';
 
     protected static ?string $modelLabel =
         'convocatoria';
@@ -31,13 +31,13 @@ class ConvocatoriaResource extends Resource
         'Gestión de Convocatorias';
 
     protected static ?int $navigationSort =
-        7;
+        8;
 
     protected static ?string $model =
         Convocatoria::class;
 
     protected static string|BackedEnum|null $navigationIcon =
-        Heroicon::OutlinedRectangleStack;
+        Heroicon::OutlinedBookOpen;
 
     protected static ?string $recordTitleAttribute =
         'titulo';

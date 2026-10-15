@@ -2,6 +2,7 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Apariencia\AparienciaItsva;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -23,11 +24,9 @@ class DirectivoPanelProvider extends PanelProvider
 {
     public function panel(Panel $panel): Panel
     {
-        return $panel
+        return AparienciaItsva::aplicar($panel, 'directivo')
             ->id('directivo')
             ->path('directivo')
-
-            ->brandName('Convocatorias ITSVA')
 
             ->colors([
                 'primary' => Color::hex('#7C3AED'),

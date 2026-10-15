@@ -22,6 +22,9 @@ class Perfil extends Page
     protected static ?int $navigationSort =
         8;
 
+    // Se abre desde el menú del avatar, no desde la barra lateral.
+    protected static bool $shouldRegisterNavigation = false;
+
     public string $nombre = '';
 
     public ?string $apellidos = null;

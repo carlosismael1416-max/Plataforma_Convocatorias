@@ -2,6 +2,7 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Apariencia\AparienciaItsva;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -23,12 +24,10 @@ class AdminPanelProvider extends PanelProvider
 {
     public function panel(Panel $panel): Panel
     {
-        return $panel
+        return AparienciaItsva::aplicar($panel, 'admin')
             ->default()
             ->id('admin')
             ->path('admin')
-
-            ->brandName('Convocatorias ITSVA')
 
             ->colors([
                 'primary' => Color::hex('#059669'),
