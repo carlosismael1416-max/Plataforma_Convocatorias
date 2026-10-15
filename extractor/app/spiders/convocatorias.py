@@ -1,8 +1,10 @@
+import re
 from urllib.parse import urldefrag, urlparse
 
 import scrapy
 
 from app.extraccion_detalle import extraer_detalle
+from app.seguridad_red import USER_AGENT
 from app.clasificar_convocatoria import clasificar_convocatoria
 from app.procesar_revision_resultado import (
     procesar_revision_resultado,
@@ -35,6 +37,13 @@ class ConvocatoriasSpider(scrapy.Spider):
         "DOWNLOAD_MAXSIZE": 20 * 1024 * 1024,
         "DOWNLOAD_WARNSIZE": 5 * 1024 * 1024,
         "LOG_LEVEL": "WARNING",
+        # Identificación honesta del proyecto (algunos sitios oficiales
+        # rechazan con 406 el User-Agent genérico de Scrapy).
+        "USER_AGENT": USER_AGENT,
+        "DEFAULT_REQUEST_HEADERS": {
+            "Accept": "text/html,application/xhtml+xml,*/*;q=0.8",
+            "Accept-Language": "es-MX,es;q=0.9",
+        },
         "TELNETCONSOLE_ENABLED": False,
     }
 
@@ -80,6 +89,11 @@ class ConvocatoriasSpider(scrapy.Spider):
                 response,
                 titulo_enlace="",
             )
+            return
+
+        # Fuentes distintas de SECIHTI: listado genérico.
+        if self.dominio != "secihti.mx":
+            yield from self.convocatorias_de_listado(response)
             return
 
         if ruta_actual == "/convocatorias":
@@ -296,6 +310,67 @@ class ConvocatoriasSpider(scrapy.Spider):
                 cb_kwargs={
                     "titulo_enlace": titulo,
                 },
+            )
+
+    def convocatorias_de_listado(self, response):
+        """
+        Listado de una fuente oficial cualquiera (p. ej. un sitio WordPress
+        de una secretaría estatal): enlaces del mismo sitio que cuelgan de
+        la ruta del listado o que mencionan «convocatoria».
+        """
+
+        ruta_listado = urlparse(response.url).path.rstrip("/")
+
+        for enlace in response.css("a[href]"):
+            if (
+                self.limite > 0
+                and len(self.enlaces_encontrados) >= self.limite
+            ):
+                return
+
+            url, _ = urldefrag(
+                response.urljoin(enlace.attrib.get("href", "").strip())
+            )
+            parsed = urlparse(url)
+            ruta = parsed.path.rstrip("/")
+            ruta_min = ruta.lower()
+
+            if (
+                parsed.scheme not in ("http", "https")
+                or (parsed.hostname or "").removeprefix("www.") != self.dominio
+                or not ruta
+                or ruta == ruta_listado
+                or parsed.query
+                or re.search(r"/(tag|category|categoria|page|feed|author|wp-content|wp-json)(/|$)", ruta_min)
+                or re.search(r"\.(pdf|docx?|xlsx?|jpe?g|png|zip)$", ruta_min)
+            ):
+                continue
+
+            cuelga_del_listado = bool(ruta_listado) and ruta.startswith(ruta_listado + "/")
+
+            if not cuelga_del_listado and "convocatoria" not in ruta_min:
+                continue
+
+            # Las secciones de listados («/convocatoria-abierta») no son una
+            # convocatoria; sí lo son sus páginas internas.
+            if not cuelga_del_listado and ruta.count("/") < 2:
+                continue
+
+            clave = (self.dominio, ruta)
+
+            if clave in self.enlaces_encontrados:
+                continue
+
+            titulo = " ".join(
+                (enlace.xpath("normalize-space(.)").get() or "").split()
+            )
+
+            self.enlaces_encontrados.add(clave)
+
+            yield scrapy.Request(
+                url=url,
+                callback=self.parse_detalle,
+                cb_kwargs={"titulo_enlace": titulo},
             )
 
     def convocatorias_de_portada(self, response):
