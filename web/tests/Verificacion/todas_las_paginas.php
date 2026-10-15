@@ -67,7 +67,6 @@ $registros = [
     "admin/users" => 2,
     "directivo/convocatorias" => $delDirectivo,
     "directivo/detalle-convocatoria" => $publicada,
-    "directivo/revisar-convocatoria" => $delDocente,
     "docente/convocatorias" => $delDocente,
     "docente/detalle-convocatoria" => $publicada,
 ];

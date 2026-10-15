@@ -21,8 +21,7 @@ class AparienciaTest extends TestCase
                 'Subir convocatoria', 'Calendario', 'Propuestas', 'Notificaciones',
             ]],
             'directivo' => ['DIRECTIVO', '/directivo', [
-                'Dashboard', 'Convocatorias por revisar', 'Propuestas por revisar',
-                'Buscar convocatorias', 'Mis convocatorias', 'Subir convocatoria',
+                'Dashboard', 'Propuestas por revisar', 'Buscar convocatorias', 'Mis convocatorias', 'Subir convocatoria',
                 'Calendario', 'Propuestas', 'Estadísticas', 'Reportes', 'Notificaciones',
             ]],
             'admin' => ['ADMINISTRADOR', '/admin', [
@@ -89,15 +88,15 @@ class AparienciaTest extends TestCase
         $this->assertDoesNotMatchRegularExpression('/<h1[^>]*fi-header-heading/', $html);
     }
 
-    public function test_subir_convocatoria_agrupa_el_formulario_y_explica_la_revision(): void
+    public function test_subir_convocatoria_agrupa_el_formulario_y_explica_la_publicacion(): void
     {
         $this->actingAs($this->usuarioConRol('DOCENTE'));
 
         $this->get('/docente/convocatorias/create')
             ->assertOk()
             ->assertSeeInOrder(['Información básica', 'Descripción y objetivo', 'Fechas y apoyo económico'])
-            ->assertSee('Enviar a revisión')
-            ->assertSee('Queda como pendiente de revisión');
+            ->assertSee('Publicar convocatoria')
+            ->assertSee('Se publica al momento');
     }
 
     public function test_la_paginacion_esta_en_espanol_y_con_el_estilo_propio(): void

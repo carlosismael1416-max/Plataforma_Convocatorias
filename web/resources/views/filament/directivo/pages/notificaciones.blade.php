@@ -545,7 +545,7 @@
             <a
                 href="{{
                     route(
-                        'filament.directivo.pages.convocatorias-por-revisar'
+                        'filament.directivo.pages.propuestas-por-revisar'
                     )
                 }}"
                 class="
@@ -554,7 +554,7 @@
                 "
             >
                 <div class="summary-label">
-                    Por revisar
+                    Propuestas por revisar
                 </div>
 
                 <div class="summary-value">
@@ -562,14 +562,14 @@
                 </div>
 
                 <div class="summary-help">
-                    Abrir convocatorias pendientes →
+                    Abrir propuestas enviadas →
                 </div>
             </a>
 
             <a
                 href="{{
                     route(
-                        'filament.directivo.pages.convocatorias-por-revisar'
+                        'filament.directivo.pages.calendario'
                     )
                 }}"
                 class="
@@ -998,7 +998,7 @@
                     <a
                         href="{{
                             route(
-                                'filament.directivo.pages.convocatorias-por-revisar'
+                                'filament.directivo.pages.propuestas-por-revisar'
                             )
                         }}"
                         style="
@@ -1010,7 +1010,7 @@
                             font-weight:850;
                         "
                     >
-                        Convocatorias por revisar →
+                        Propuestas por revisar →
                     </a>
 
                     <a

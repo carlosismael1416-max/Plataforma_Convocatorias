@@ -5,13 +5,14 @@ namespace App\Filament\Directivo\Resources\Convocatorias\Pages;
 use App\Filament\Directivo\Resources\Convocatorias\ConvocatoriaResource;
 use App\Models\Convocatoria;
 use App\Models\User;
-use App\Services\Avisos;
 use Filament\Actions\Action;
 use Filament\Facades\Filament;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Carbon;
+use Illuminate\Validation\ValidationException;
 
 class CreateConvocatoria extends CreateRecord
 {
@@ -23,12 +24,12 @@ class CreateConvocatoria extends CreateRecord
 
     protected function getCreateFormAction(): Action
     {
-        return parent::getCreateFormAction()->label('Enviar a revisión');
+        return parent::getCreateFormAction()->label('Publicar convocatoria');
     }
 
     protected function getCreateAnotherFormAction(): Action
     {
-        return parent::getCreateAnotherFormAction()->label('Enviar y registrar otra');
+        return parent::getCreateAnotherFormAction()->label('Publicar y registrar otra');
     }
 
     public function getBreadcrumbs(): array
@@ -68,6 +69,15 @@ class CreateConvocatoria extends CreateRecord
             'url_original',
         ];
 
+        if (
+            filled($data['fecha_cierre'] ?? null)
+            && Carbon::parse($data['fecha_cierre'])->lt(today())
+        ) {
+            throw ValidationException::withMessages([
+                'data.fecha_cierre' => 'La fecha de cierre ya pasó: no se puede publicar una convocatoria vencida.',
+            ]);
+        }
+
         $convocatoria = new Convocatoria();
 
         $convocatoria->fill(
@@ -78,11 +88,11 @@ class CreateConvocatoria extends CreateRecord
         // desde el navegador.
         $convocatoria->subido_por_user_id = $usuario->getKey();
         $convocatoria->origen = 'MANUAL';
-        $convocatoria->estado = 'PENDIENTE_REVISION';
+        // Las convocatorias se publican al momento para que todos las vean;
+        // lo que revisa el directivo son las propuestas para participar.
+        $convocatoria->estado = 'PUBLICADA';
 
         $convocatoria->save();
-
-        Avisos::convocatoriaPorRevisar($convocatoria, $usuario);
 
         return $convocatoria;
     }

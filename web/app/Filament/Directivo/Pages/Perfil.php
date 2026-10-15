@@ -403,16 +403,7 @@ class Perfil extends Page
                         Convocatoria $convocatoria
                     ): array {
                         $url =
-                            $convocatoria->estado
-                            === 'PENDIENTE_REVISION'
-                                ? route(
-                                    'filament.directivo.pages.revisar-convocatoria',
-                                    [
-                                        'record' =>
-                                            $convocatoria->id,
-                                    ]
-                                )
-                                : route(
+                            route(
                                     'filament.directivo.pages.detalle-convocatoria',
                                     [
                                         'record' =>

@@ -110,9 +110,8 @@ class AvisosTest extends TestCase
         $this->assertFalse(Avisos::quiere($docente->id, 'avisos_sistema'));
     }
 
-    public function test_subir_una_convocatoria_avisa_a_los_directivos(): void
+    public function test_subir_una_convocatoria_la_publica_al_momento(): void
     {
-        $directivo = $this->usuarioConRol('DIRECTIVO');
         $docente = $this->usuarioConRol('DOCENTE');
 
         $this->actingAs($docente);
@@ -123,15 +122,32 @@ class AvisosTest extends TestCase
                 'titulo' => 'ZZ-SUBIDA',
                 'descripcion' => 'Descripción',
                 'moneda' => 'MXN',
+                'fecha_cierre' => today()->addDays(10)->toDateString(),
             ])
             ->call('create')
             ->assertHasNoFormErrors();
 
-        $this->assertTrue(
-            Notificacion::query()
-                ->where('user_id', $directivo->id)
-                ->where('tipo', 'CONVOCATORIA_REVISION')
-                ->exists()
+        $this->assertSame(
+            'PUBLICADA',
+            \App\Models\Convocatoria::query()->where('titulo', 'ZZ-SUBIDA')->value('estado')
         );
+    }
+
+    public function test_no_se_publica_una_convocatoria_vencida(): void
+    {
+        $this->actingAs($this->usuarioConRol('DOCENTE'));
+        Filament::setCurrentPanel(Filament::getPanel('docente'));
+
+        Livewire::test(\App\Filament\Docente\Resources\Convocatorias\Pages\CreateConvocatoria::class)
+            ->fillForm([
+                'titulo' => 'ZZ-VENCIDA',
+                'descripcion' => 'Descripción',
+                'moneda' => 'MXN',
+                'fecha_cierre' => today()->subDay()->toDateString(),
+            ])
+            ->call('create')
+            ->assertHasFormErrors(['fecha_cierre']);
+
+        $this->assertFalse(\App\Models\Convocatoria::query()->where('titulo', 'ZZ-VENCIDA')->exists());
     }
 }

@@ -90,12 +90,10 @@ class Estadisticas extends Page
             (clone $baseConvocatorias)
                 ->count();
 
+        // Lo que revisa el directivo son las propuestas enviadas.
         $pendientes =
-            (clone $baseConvocatorias)
-                ->where(
-                    'estado',
-                    'PENDIENTE_REVISION'
-                )
+            \App\Models\Propuesta::query()
+                ->where('estado', 'ENVIADA')
                 ->count();
 
         /*

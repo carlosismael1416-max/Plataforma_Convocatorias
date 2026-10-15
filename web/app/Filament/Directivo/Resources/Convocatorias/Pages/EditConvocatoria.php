@@ -63,6 +63,7 @@ class EditConvocatoria extends EditRecord
             if (! in_array(
                 $convocatoria->estado,
                 [
+                    'PUBLICADA',
                     'PENDIENTE_REVISION',
                     'REQUIERE_CORRECCIONES',
                 ],

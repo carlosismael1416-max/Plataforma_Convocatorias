@@ -22,11 +22,11 @@
                 </p>
 
                 <div class="dd-hero-acciones">
-                    <a class="dd-hero-btn dd-hero-btn-primario" href="{{ $urls['porRevisar'] }}">
-                        {!! $svg('portapapeles', 15) !!} Revisar convocatorias
+                    <a class="dd-hero-btn dd-hero-btn-primario" href="{{ $urls['propuestas'] }}">
+                        {!! $svg('portapapeles', 15) !!} Revisar propuestas
                     </a>
-                    <a class="dd-hero-btn" href="{{ $urls['propuestas'] }}">
-                        {!! $svg('aprobado', 15) !!} Revisar propuestas
+                    <a class="dd-hero-btn" href="{{ $urls['buscar'] }}">
+                        {!! $svg('buscar', 15) !!} Buscar convocatorias
                     </a>
                     <a class="dd-hero-btn" href="{{ $urls['subir'] }}">
                         {!! $svg('subir', 15) !!} Subir convocatoria
@@ -54,65 +54,12 @@
 
         <div class="dd-grid">
             <div class="dd-columna">
-                {{-- Convocatorias pendientes --}}
-                <section>
-                    <div class="dd-seccion">
-                        <div>
-                            <h2>Pendientes de revisión</h2>
-                            <p>Convocatorias detectadas o subidas que requieren tu aprobación</p>
-                        </div>
-                        <a class="dd-enlace" href="{{ $urls['porRevisar'] }}">Ver todas →</a>
-                    </div>
-
-                    <div class="dd-card">
-                        @if ($pendientes === [])
-                            <div class="dd-vacio">No hay convocatorias pendientes de revisión.</div>
-                        @else
-                            <div class="dd-tabla-ctn">
-                                <table class="dd-tabla">
-                                    <thead>
-                                        <tr>
-                                            <th>Título</th>
-                                            <th>Organismo</th>
-                                            <th>Fuente</th>
-                                            <th>Encontrada</th>
-                                            <th>Cierre</th>
-                                            <th></th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach ($pendientes as $p)
-                                            <tr>
-                                                <td>
-                                                    <p class="dd-tabla-titulo">{{ $p['titulo'] }}</p>
-                                                    @if ($p['categoria'])
-                                                        <span class="dd-categoria">{{ $p['categoria'] }}</span>
-                                                    @endif
-                                                </td>
-                                                <td class="dd-suave">{{ $p['organismo'] }}</td>
-                                                <td class="{{ $p['manual'] ? 'dd-manual' : 'dd-auto' }}">{{ $p['manual'] ? 'Manual' : 'Automático' }}</td>
-                                                <td class="dd-mono dd-suave">{{ $p['encontrada'] }}</td>
-                                                <td class="dd-mono">{{ $p['cierre'] }}</td>
-                                                <td>
-                                                    <a class="dd-btn dd-btn-chico dd-btn-morado" href="{{ $p['url'] }}">
-                                                        {!! $svg('ojo', 13) !!}&nbsp;Revisar
-                                                    </a>
-                                                </td>
-                                            </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
-                            </div>
-                        @endif
-                    </div>
-                </section>
-
                 {{-- Propuestas pendientes --}}
                 <section>
                     <div class="dd-seccion">
                         <div>
                             <h2>Propuestas por revisar</h2>
-                            <p>Enviadas por docentes y directivos, incluidas las tuyas</p>
+                            <p>Enviadas por docentes y directivos para participar en una convocatoria, incluidas las tuyas</p>
                         </div>
                         <a class="dd-enlace" href="{{ $urls['propuestas'] }}">Ver todas →</a>
                     </div>
@@ -150,6 +97,51 @@
                                                         {!! $svg('ojo', 13) !!}&nbsp;Revisar
                                                     </a>
                                                 </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        @endif
+                    </div>
+                </section>
+
+                {{-- Convocatorias publicadas recientemente --}}
+                <section>
+                    <div class="dd-seccion">
+                        <div>
+                            <h2>Convocatorias recientes</h2>
+                            <p>Publicadas automáticamente por el motor o subidas por el personal</p>
+                        </div>
+                        <a class="dd-enlace" href="{{ $urls['buscar'] }}">Ver todas →</a>
+                    </div>
+
+                    <div class="dd-card">
+                        @if ($recientes === [])
+                            <div class="dd-vacio">No hay convocatorias vigentes por ahora.</div>
+                        @else
+                            <div class="dd-tabla-ctn">
+                                <table class="dd-tabla">
+                                    <thead>
+                                        <tr>
+                                            <th>Título</th>
+                                            <th>Origen</th>
+                                            <th>Publicada</th>
+                                            <th>Cierre</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach ($recientes as $c)
+                                            <tr>
+                                                <td>
+                                                    <p class="dd-tabla-titulo">{{ $c['titulo'] }}</p>
+                                                    <p class="dd-tabla-sub">{{ \Illuminate\Support\Str::limit($c['organismo'], 60) }}</p>
+                                                </td>
+                                                <td class="{{ $c['manual'] ? 'dd-manual' : 'dd-auto' }}">{{ $c['manual'] ? 'Manual' : 'Automático' }}</td>
+                                                <td class="dd-mono dd-suave">{{ $c['publicada'] }}</td>
+                                                <td class="dd-mono">{{ $c['cierre'] }}</td>
+                                                <td><a class="dd-enlace-texto" href="{{ $c['url'] }}">Ver detalle</a></td>
                                             </tr>
                                         @endforeach
                                     </tbody>

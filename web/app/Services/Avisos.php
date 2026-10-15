@@ -2,7 +2,6 @@
 
 namespace App\Services;
 
-use App\Models\Convocatoria;
 use App\Models\Notificacion;
 use App\Models\NotificacionPreferencia;
 use App\Models\Propuesta;
@@ -17,7 +16,8 @@ use Illuminate\Support\Carbon;
  * - fechas_proximas: convocatorias guardadas y propuestas en preparación
  *   cuya convocatoria cierra en los próximos días.
  * - nuevas_propuestas: envíos (para directivos) y dictámenes (para autores).
- * - convocatorias_revision: convocatorias subidas a mano que esperan revisión.
+ * - convocatorias_revision: cambios detectados en convocatorias que el
+ *   usuario sigue (los registra el seguimiento del extractor).
  */
 class Avisos
 {
@@ -93,32 +93,6 @@ class Avisos
                 'titulo' => 'Tu propuesta aún no se envía',
                 'mensaje' => '«' . $p->titulo . '»: la convocatoria cierra el '
                     . $p->convocatoria->fecha_cierre->locale('es')->isoFormat('D [de] MMMM') . '.',
-            ]);
-        }
-    }
-
-    /** Avisa a los directivos de una convocatoria subida a mano. */
-    public static function convocatoriaPorRevisar(Convocatoria $convocatoria, User $autor): void
-    {
-        $directivos = User::query()
-            ->where('estado', true)
-            ->whereHas('role', fn ($q) => $q->where('nombre', 'DIRECTIVO'))
-            ->whereKeyNot($autor->getKey())
-            ->pluck('id');
-
-        foreach ($directivos as $id) {
-            if (! self::quiere($id, 'convocatorias_revision')) {
-                continue;
-            }
-
-            Notificacion::create([
-                'user_id' => $id,
-                'convocatoria_id' => $convocatoria->id,
-                'titulo' => 'Convocatoria por revisar',
-                'mensaje' => trim($autor->name . ' ' . ($autor->apellidos ?? ''))
-                    . ' subió «' . $convocatoria->titulo . '».',
-                'tipo' => 'CONVOCATORIA_REVISION',
-                'leida' => false,
             ]);
         }
     }

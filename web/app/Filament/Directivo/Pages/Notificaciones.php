@@ -281,18 +281,15 @@ class Notificaciones extends Page
                 ->count();
 
         $porRevisar =
-            Convocatoria::query()
-                ->where(
-                    'estado',
-                    'PENDIENTE_REVISION'
-                )
+            \App\Models\Propuesta::query()
+                ->where('estado', 'ENVIADA')
                 ->count();
 
         $proximosCierres =
             Convocatoria::query()
-                ->where(
+                ->whereIn(
                     'estado',
-                    'PENDIENTE_REVISION'
+                    ['PUBLICADA', 'ACTIVA']
                 )
                 ->whereNotNull(
                     'fecha_cierre'
@@ -616,21 +613,6 @@ class Notificaciones extends Page
         ) {
             $convocatoria =
                 $item->convocatoria;
-
-            if (
-                $convocatoria
-                &&
-                $convocatoria->estado
-                    === 'PENDIENTE_REVISION'
-            ) {
-                return route(
-                    'filament.directivo.pages.revisar-convocatoria',
-                    [
-                        'record' =>
-                            $convocatoria->id,
-                    ]
-                );
-            }
 
             if ($convocatoria) {
                 return route(

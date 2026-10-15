@@ -85,6 +85,8 @@ class ConvocatoriaResource extends Resource
             && in_array(
                 $record->estado,
                 [
+                    // Quien la subió puede corregirla también ya publicada.
+                    'PUBLICADA',
                     'PENDIENTE_REVISION',
                     'REQUIERE_CORRECCIONES',
                 ],
