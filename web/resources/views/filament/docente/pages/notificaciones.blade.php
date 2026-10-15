@@ -361,14 +361,14 @@
 
     .preference-name {
         color: #334155;
-        font-size: 10px;
-        font-weight: 800;
+        font-size: 13px;
+        font-weight: 700;
     }
 
     .preference-description {
         margin-top: 3px;
         color: #94A3B8;
-        font-size: 8px;
+        font-size: 12px;
         line-height: 1.4;
     }
 
@@ -377,18 +377,30 @@
         height: 20px;
         flex: 0 0 36px;
         padding: 3px;
+        border: 0;
         border-radius: 999px;
         background: #CBD5E1;
-        opacity: .65;
+        cursor: pointer;
+        transition: background .15s;
     }
 
     .switch-knob {
+        display: block;
         width: 14px;
         height: 14px;
         border-radius: 50%;
         background: white;
         box-shadow:
             0 1px 2px rgba(0,0,0,.15);
+        transition: transform .15s;
+    }
+
+    .switch-on {
+        background: #1A4B8C;
+    }
+
+    .switch-on .switch-knob {
+        transform: translateX(16px);
     }
 
     .alert-box {
@@ -923,112 +935,33 @@
                 Preferencias
             </div>
 
-            <div class="preference">
-
-                <div>
-
-                    <div class="preference-name">
-                        Nuevas convocatorias
+            @foreach ([
+                'fechas_proximas' => ['Fechas de cierre', 'Aviso cuando una convocatoria guardada o tu propuesta en preparación cierra en los próximos 7 días.'],
+                'nuevas_propuestas' => ['Cambios en propuestas', 'Aviso cuando un directivo aprueba, devuelve o rechaza tu propuesta.'],
+            ] as $campo => [$nombre, $descripcion])
+                <div class="preference">
+                    <div>
+                        <div class="preference-name">{{ $nombre }}</div>
+                        <div class="preference-description">{{ $descripcion }}</div>
                     </div>
 
-                    <div
-                        class="
-                            preference-description
-                        "
+                    <button
+                        type="button"
+                        role="switch"
+                        aria-checked="{{ $preferencias[$campo] ? 'true' : 'false' }}"
+                        aria-label="{{ $nombre }}"
+                        class="switch {{ $preferencias[$campo] ? 'switch-on' : '' }}"
+                        wire:click="alternarPreferencia('{{ $campo }}')"
+                        wire:loading.attr="disabled"
                     >
-                        Avisos de nuevas oportunidades.
-                    </div>
-
+                        <span class="switch-knob"></span>
+                    </button>
                 </div>
-
-                <div class="switch">
-                    <div class="switch-knob"></div>
-                </div>
-
-            </div>
-
-            <div class="preference">
-
-                <div>
-
-                    <div class="preference-name">
-                        Fechas de cierre
-                    </div>
-
-                    <div
-                        class="
-                            preference-description
-                        "
-                    >
-                        Recordatorios relacionados
-                        con vencimientos.
-                    </div>
-
-                </div>
-
-                <div class="switch">
-                    <div class="switch-knob"></div>
-                </div>
-
-            </div>
-
-            <div class="preference">
-
-                <div>
-
-                    <div class="preference-name">
-                        Cambios en propuestas
-                    </div>
-
-                    <div
-                        class="
-                            preference-description
-                        "
-                    >
-                        Avisos relacionados con
-                        propuestas propias.
-                    </div>
-
-                </div>
-
-                <div class="switch">
-                    <div class="switch-knob"></div>
-                </div>
-
-            </div>
-
-            <div class="preference">
-
-                <div>
-
-                    <div class="preference-name">
-                        Avisos por correo
-                    </div>
-
-                    <div
-                        class="
-                            preference-description
-                        "
-                    >
-                        Preferencia para futuros
-                        avisos por correo electrónico.
-                    </div>
-
-                </div>
-
-                <div class="switch">
-                    <div class="switch-knob"></div>
-                </div>
-
-            </div>
+            @endforeach
 
             <div class="alert-box">
-                Las preferencias todavía no pueden
-                modificarse porque actualmente no
-                existe una estructura persistente
-                para almacenarlas. No se simulan
-                configuraciones que no estén
-                registradas en PostgreSQL.
+                El historial de tus propuestas siempre queda disponible
+                en su vista previa, aunque desactives los avisos.
             </div>
 
         </aside>

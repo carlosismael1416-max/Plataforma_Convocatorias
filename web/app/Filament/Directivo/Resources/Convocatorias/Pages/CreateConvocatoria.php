@@ -5,6 +5,7 @@ namespace App\Filament\Directivo\Resources\Convocatorias\Pages;
 use App\Filament\Directivo\Resources\Convocatorias\ConvocatoriaResource;
 use App\Models\Convocatoria;
 use App\Models\User;
+use App\Services\Avisos;
 use Filament\Actions\Action;
 use Filament\Facades\Filament;
 use Filament\Resources\Pages\CreateRecord;
@@ -80,6 +81,8 @@ class CreateConvocatoria extends CreateRecord
         $convocatoria->estado = 'PENDIENTE_REVISION';
 
         $convocatoria->save();
+
+        Avisos::convocatoriaPorRevisar($convocatoria, $usuario);
 
         return $convocatoria;
     }
