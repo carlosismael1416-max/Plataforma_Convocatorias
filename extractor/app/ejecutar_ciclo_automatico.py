@@ -30,6 +30,10 @@ from app.seguimiento_convocatorias import (
     seguir_convocatorias,
 )
 
+from app.interruptor_motor import (
+    motor_activo,
+)
+
 
 BASE_DIR = (
     Path(__file__)
@@ -503,6 +507,25 @@ def ejecutar_ciclo(
         time.monotonic()
         + SEGUNDOS_MAX_CICLO
     )
+
+    # El administrador puede apagar el buscador y el motor desde la web.
+    if not motor_activo():
+        ahora = datetime.now().astimezone().isoformat()
+        resultado = {
+            "estado": "APAGADO",
+            "inicio": ahora,
+            "fin": ahora,
+            "mensaje": "El motor está apagado desde el panel de administración.",
+        }
+
+        (BASE_DIR / "ciclo_automatico_ultimo.json").write_text(
+            json.dumps(resultado, ensure_ascii=False, indent=2),
+            encoding="utf-8",
+        )
+
+        print("Motor apagado desde el panel de administración: no se ejecuta el ciclo.")
+
+        return resultado
 
     conexion_lock = conectar()
 

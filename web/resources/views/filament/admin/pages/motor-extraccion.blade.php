@@ -606,6 +606,8 @@
         </div>
 
 
+        @include('filament.itsva.interruptor-motor')
+
         @if ($fuenteContexto)
 
             <div class="context-box">
@@ -766,6 +768,7 @@
                                 wire:target="ejecutarCiclo"
                                 @disabled(
                                     $ejecucionActiva !== null
+                                    || ! $motorActivo
                                 )
                                 title="{{
                                     $ejecucionActiva
