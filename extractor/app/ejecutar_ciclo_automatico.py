@@ -388,9 +388,10 @@ SEGUNDOS_MIN_FUENTE = 420
 
 def fuentes_pendientes(conexion) -> list[dict]:
     """
-    Fuentes oficiales activas que ya cumplieron su frecuencia
-    (frecuencia_scraping en minutos; 1440 si no tiene). Las que
-    requieren JavaScript se omiten (bajo consumo, sin navegador).
+    Fuentes oficiales activas, configuradas a mano, que ya cumplieron
+    su frecuencia (frecuencia_scraping en minutos; 1440 si no tiene).
+    Se omiten las que requieren JavaScript (bajo consumo, sin
+    navegador) y las creadas automáticamente al publicar descubrimientos.
     """
 
     with conexion.cursor() as cursor:
@@ -400,6 +401,9 @@ def fuentes_pendientes(conexion) -> list[dict]:
             FROM fuentes
             WHERE activa = TRUE
               AND COALESCE(requiere_javascript, FALSE) = FALSE
+              -- Las fuentes que crea el motor al publicar un descubrimiento
+              -- solo registran el origen; no son listados que raspar.
+              AND COALESCE(selector_config->>'creada_automaticamente', 'false') <> 'true'
               AND (
                   ultima_ejecucion IS NULL
                   OR ultima_ejecucion

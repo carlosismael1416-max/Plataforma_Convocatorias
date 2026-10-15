@@ -717,113 +717,6 @@ def descubrir_google(
     }
 
 
-def seleccionar_dominios(
-    resultados_google: list[dict],
-    max_dominios: int,
-) -> list[dict]:
-    dominios = {}
-
-    for item in resultados_google:
-        if item[
-            "estado_google"
-        ] == "DESCARTAR":
-            continue
-
-        dominio = (
-            item.get(
-                "dominio"
-            )
-            or ""
-        ).lower()
-
-        if not dominio:
-            continue
-
-        base_url = (
-            base_desde_resultado(
-                item
-            )
-        )
-
-        if not base_url:
-            continue
-
-        prioridad = item[
-            "puntaje_google"
-        ]
-
-        # Instituciones públicas/académicas
-        # reciben prioridad para la prueba.
-        if dominio.endswith(
-            ".gob.mx"
-        ):
-            prioridad += 20
-
-        elif dominio.endswith(
-            ".edu.mx"
-        ):
-            prioridad += 15
-
-        elif ".edu." in dominio:
-            prioridad += 5
-
-        actual = (
-            dominios.get(
-                dominio
-            )
-        )
-
-        nuevo = {
-            "dominio":
-                dominio,
-
-            "base_url":
-                base_url,
-
-            "prioridad":
-                prioridad,
-
-            "titulo_origen":
-                item[
-                    "titulo"
-                ],
-
-            "puntaje_google":
-                item[
-                    "puntaje_google"
-                ],
-        }
-
-        if (
-            actual is None
-            or nuevo[
-                "prioridad"
-            ]
-            > actual[
-                "prioridad"
-            ]
-        ):
-            dominios[
-                dominio
-            ] = nuevo
-
-    lista = list(
-        dominios.values()
-    )
-
-    lista.sort(
-        key=lambda item:
-            item[
-                "prioridad"
-            ],
-        reverse=True,
-    )
-
-    return lista[
-        :max_dominios
-    ]
-
-
 def extraer_sitemap(
     base_url: str,
 ) -> dict:
@@ -1765,29 +1658,20 @@ def ejecutar(
     # 3. Construir fallback
     # ==================================
 
-    fallback_set = set(
-        directo[
-            "dominios_fallback"
-        ]
-    )
-
-    seleccionados = (
-        seleccionar_dominios(
-            resultados_google,
-            max(
-                max_dominios * 2,
-                10,
-            ),
-        )
-    )
-
     objetivos = []
 
-    # Los portales institucionales tienen
-    # prioridad sobre el rastreo de medios.
+    # Solo se exploran portales institucionales
+    # mexicanos: los portales extranjeros y los
+    # sitios de noticias generaban candidatos que
+    # el clasificador terminaba descartando.
     for portal in directo[
         "portales"
     ]:
+        if not str(
+            portal["dominio"]
+        ).endswith(".mx"):
+            continue
+
         objetivos.append({
             "dominio":
                 portal[
@@ -1815,17 +1699,11 @@ def ejecutar(
                 ],
         })
 
-    # Solo exploramos medios/dominios donde
-    # la ruta directa no pudo terminar.
-    for dominio in seleccionados:
-        if dominio[
-            "dominio"
-        ] not in fallback_set:
-            continue
-
-        objetivos.append(
-            dominio
-        )
+    # Ya no se rastrean los sitios de noticias
+    # (dominios_fallback): sus sitemaps solo
+    # aportaban notas que no eran convocatorias.
+    # Las de las fuentes oficiales se obtienen en
+    # la fase de fuentes del ciclo.
 
     # Deduplicar por URL base.
     objetivos_unicos = {}
