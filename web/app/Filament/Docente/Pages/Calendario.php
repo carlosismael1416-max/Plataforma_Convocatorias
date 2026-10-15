@@ -30,6 +30,9 @@ class Calendario extends Page
     protected string $view =
         'filament.docente.pages.calendario';
 
+    // El título ya aparece en el header del panel.
+    protected ?string $heading = '';
+
     public int $mes;
 
     public int $anio;

@@ -32,6 +32,9 @@ class BuscarConvocatorias extends Page
     protected string $view =
         'filament.docente.pages.buscar-convocatorias';
 
+    // La vista ya trae su encabezado (título, descripción y acciones).
+    protected ?string $heading = '';
+
     public string $buscar = '';
 
     public string $categoria = '';

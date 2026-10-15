@@ -1,11 +1,16 @@
 @php
     $usuario = filament()->auth()->user();
 
-    // Título: el elemento activo del menú lateral.
+    // Título: el elemento activo del menú lateral; si la página no está en
+    // el menú (detalle, perfil, editor...), su propia etiqueta.
+    $pagina = request()->route()?->getControllerClass();
+
     $titulo = collect(filament()->getNavigation())
         ->flatMap(fn ($grupo) => $grupo->getItems())
         ->first(fn ($item) => $item->isActive())
-        ?->getLabel() ?? 'Convocatorias ITSVA';
+        ?->getLabel()
+        ?? (is_string($pagina) && is_subclass_of($pagina, \Filament\Pages\Page::class) ? $pagina::getNavigationLabel() : null)
+        ?? 'Convocatorias ITSVA';
 
     $paginas = collect(filament()->getPages());
     $buscador = $paginas->first(fn (string $p): bool => class_basename($p) === 'BuscarConvocatorias');
