@@ -1,17 +1,20 @@
-<x-acceso titulo="Recuperar contraseña" subtitulo="Te enviaremos un enlace para crear una nueva contraseña">
+<x-acceso titulo="Recuperar contraseña" subtitulo="Escribe tu correo institucional y te enviaremos un enlace para crear una nueva contraseña.">
     <form method="POST" action="{{ route('password.email') }}">
         @csrf
 
-        <label for="email">Correo electrónico</label>
-        <input
-            id="email"
-            name="email"
-            type="email"
-            value="{{ old('email') }}"
-            autocomplete="username"
-            required
-            autofocus
-        >
+        <div class="campo">
+            <label for="email">Correo institucional</label>
+            <input
+                id="email"
+                name="email"
+                type="email"
+                value="{{ old('email') }}"
+                placeholder="usuario@itsva.edu.mx"
+                autocomplete="username"
+                required
+                autofocus
+            >
+        </div>
 
         @if ($errors->any())
             <div class="error" role="alert">
@@ -19,12 +22,8 @@
             </div>
         @endif
 
-        <button type="submit">
-            Enviar enlace
-        </button>
+        <button type="submit" class="boton">Enviar enlace</button>
     </form>
 
-    <a class="enlace" href="{{ route('login') }}">
-        Volver a iniciar sesión
-    </a>
+    <a class="enlace volver" href="{{ route('login') }}">← Volver a iniciar sesión</a>
 </x-acceso>

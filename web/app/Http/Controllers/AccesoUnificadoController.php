@@ -43,7 +43,7 @@ class AccesoUnificadoController extends Controller
             'email' => $datos['email'],
             'password' => $datos['password'],
             'estado' => true,
-        ])) {
+        ], $request->boolean('remember'))) {
             throw ValidationException::withMessages([
                 'email' => 'Credenciales incorrectas o cuenta inactiva.',
             ]);
