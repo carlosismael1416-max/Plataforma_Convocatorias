@@ -135,11 +135,20 @@ class BuscarConvocatorias extends Page
                     'nombre',
                 ]);
 
-        // Solo lo que ven todos los usuarios: publicadas (y las cerradas como
-        // historial). Lo que el validador no aprobó es interno del motor.
+        // Por defecto, lo mismo que ve el docente (publicadas y vigentes); el
+        // historial de cerradas solo con su filtro. Lo que el validador no
+        // aprobó es interno del motor y no se muestra.
         $query =
             Convocatoria::query()
-                ->whereIn('estado', self::ESTADOS_VISIBLES)
+                ->when(
+                    $this->estado === 'HISTORIAL',
+                    fn ($q) => $q->historial(),
+                    fn ($q) => $q->when(
+                        $this->estado === 'TODAS',
+                        fn ($t) => $t->where(fn ($w) => $w->visibles()->orWhere(fn ($h) => $h->historial())),
+                        fn ($v) => $v->visibles(),
+                    ),
+                )
                 ->with([
                     'categoria',
                     'organismo',
@@ -244,14 +253,6 @@ class BuscarConvocatorias extends Page
             );
         }
 
-        if (
-            in_array($this->estado, self::ESTADOS_VISIBLES, true)
-        ) {
-            $query->where(
-                'estado',
-                $this->estado
-            );
-        }
 
         if (
             $this->fechaCierre
@@ -311,52 +312,23 @@ class BuscarConvocatorias extends Page
         |--------------------------------------------------------------------------
         */
 
-        $total =
-            Convocatoria::query()
-                ->whereIn('estado', self::ESTADOS_VISIBLES)
-                ->count();
-
         $abiertas =
             Convocatoria::query()
-                ->whereIn(
-                    'estado',
-                    [
-                        'PUBLICADA',
-                        'ACTIVA',
-                    ]
-                )
+                ->visibles()
                 ->count();
 
         $enRevision =
             Convocatoria::query()
-                ->where('estado', 'CERRADA')
+                ->historial()
                 ->count();
+
+        $total = $abiertas + $enRevision;
 
         $proximasCerrar =
             Convocatoria::query()
-                ->whereNotNull(
-                    'fecha_cierre'
-                )
-                ->whereDate(
-                    'fecha_cierre',
-                    '>=',
-                    now()->toDateString()
-                )
-                ->whereDate(
-                    'fecha_cierre',
-                    '<=',
-                    now()
-                        ->addDays(30)
-                        ->toDateString()
-                )
-                ->whereNotIn(
-                    'estado',
-                    [
-                        'CERRADA',
-                        'DESCARTADA',
-                        'ARCHIVADA',
-                    ]
-                )
+                ->visibles()
+                ->whereNotNull('fecha_cierre')
+                ->whereDate('fecha_cierre', '<=', now()->addDays(30)->toDateString())
                 ->count();
 
         /*
@@ -369,6 +341,8 @@ class BuscarConvocatorias extends Page
             DB::table(
                 'convocatorias'
             )
+                ->whereIn('convocatorias.estado', ['PUBLICADA', 'ACTIVA'])
+                ->where(fn ($q) => $q->whereNull('convocatorias.fecha_cierre')->orWhereDate('convocatorias.fecha_cierre', '>=', today()))
                 ->join(
                     'categorias',
                     'categorias.id',
@@ -507,6 +481,12 @@ class BuscarConvocatorias extends Page
         string $estado
     ): string {
         return match ($estado) {
+            'HISTORIAL' =>
+                'Cerradas (historial)',
+
+            'TODAS' =>
+                'Vigentes y cerradas',
+
             'BORRADOR' =>
                 'Borrador',
 

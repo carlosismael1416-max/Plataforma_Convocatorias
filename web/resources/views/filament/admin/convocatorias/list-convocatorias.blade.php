@@ -319,15 +319,15 @@
             <div class="stat">
                 <div class="stat-icon yellow">{!! \App\Filament\Apariencia\Iconos::svg('portapapeles', 20) !!}</div>
                 <div class="stat-value">{{ $pendientesRevision }}</div>
-                <div class="stat-label">Pendientes de revisión</div>
-                <div class="stat-help">Esperando validación</div>
+                <div class="stat-label">No publicadas (validador)</div>
+                <div class="stat-help">Internas; el motor las revalida solo</div>
             </div>
 
             <div class="stat">
                 <div class="stat-icon blue">{!! \App\Filament\Apariencia\Iconos::svg('aprobado', 20) !!}</div>
                 <div class="stat-value">{{ $publicadasActivas }}</div>
-                <div class="stat-label">Publicadas / activas</div>
-                <div class="stat-help">Disponibles para usuarios</div>
+                <div class="stat-label">Vigentes</div>
+                <div class="stat-help">Las mismas que ve el docente</div>
             </div>
 
             <div class="stat">

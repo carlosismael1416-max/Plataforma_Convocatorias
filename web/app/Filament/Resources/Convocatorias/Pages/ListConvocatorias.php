@@ -49,26 +49,15 @@ class ListConvocatorias extends ListRecords
                 )
                 ->count();
 
+        // Mismo criterio que el docente: publicadas y vigentes.
         $publicadasActivas =
             Convocatoria::query()
-                ->whereIn(
-                    'estado',
-                    [
-                        'PUBLICADA',
-                        'ACTIVA',
-                    ]
-                )
+                ->visibles()
                 ->count();
 
         $cerradasArchivadas =
             Convocatoria::query()
-                ->whereIn(
-                    'estado',
-                    [
-                        'CERRADA',
-                        'ARCHIVADA',
-                    ]
-                )
+                ->where(fn ($q) => $q->historial()->orWhere('estado', 'ARCHIVADA'))
                 ->count();
 
         $scraping =
