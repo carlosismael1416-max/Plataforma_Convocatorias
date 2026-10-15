@@ -52,4 +52,18 @@ class AdminPaginasTest extends TestCase
             ->assertOk()
             ->assertDontSee('fi-breadcrumbs', false);
     }
+
+    public function test_dashboard_admin_con_estadisticas_enlazadas_y_estado_del_sistema(): void
+    {
+        $respuesta = $this->actingAs($this->usuarioConRol('ADMINISTRADOR'))
+            ->get('/admin')
+            ->assertOk()
+            ->assertSee('Estado del sistema')
+            ->assertSee('Historial de ejecuciones')
+            ->assertDontSee('NLP');
+
+        foreach (['fuentes', 'motor-extraccion', 'convocatorias', 'bitacora-errores'] as $seccion) {
+            $respuesta->assertSee('href="' . url("/admin/{$seccion}") . '" class="dd-card dd-stat"', false);
+        }
+    }
 }

@@ -3,12 +3,20 @@
 namespace App\Filament\Directivo;
 
 use App\Filament\Directivo\Pages;
+use App\Filament\Directivo\Resources\Convocatorias\ConvocatoriaResource;
 use App\Models\Convocatoria;
 use App\Models\Propuesta;
+use App\Models\PropuestaRevision;
 use App\Models\User;
 use App\Services\Avisos;
 use Filament\Pages\Dashboard as BaseDashboard;
+use Illuminate\Support\Carbon;
 
+/**
+ * Dashboard directivo según el diseño de Figma (DashboardDirectivo): banner,
+ * estadísticas, pendientes de revisión, resumen del mes y accesos rápidos.
+ * Todo con datos reales.
+ */
 class Dashboard extends BaseDashboard
 {
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-home';
@@ -17,12 +25,9 @@ class Dashboard extends BaseDashboard
 
     protected static ?int $navigationSort = 1;
 
+    protected string $view = 'filament.directivo.dashboard';
 
-    protected string $view =
-        'filament.directivo.dashboard';
-
-    protected static ?string $title =
-        'Dashboard';
+    protected static ?string $title = 'Dashboard';
 
     // El título ya aparece en el header del panel.
     protected ?string $heading = '';
@@ -33,260 +38,141 @@ class Dashboard extends BaseDashboard
 
         return $usuario instanceof User
             && (bool) $usuario->estado
-            && $usuario->tieneRol(
-                'DIRECTIVO'
-            );
+            && $usuario->tieneRol('DIRECTIVO');
     }
 
     protected function getViewData(): array
     {
-        Avisos::generarAvisosDeCierre(auth()->user());
+        /** @var User $usuario */
+        $usuario = auth()->user();
+        $hoy = Carbon::today();
+        $inicioMes = $hoy->copy()->startOfMonth();
 
-        $usuario =
-            User::query()
-                ->with('role')
-                ->whereKey(
-                    auth()->id()
-                )
-                ->firstOrFail();
+        Avisos::generarAvisosDeCierre($usuario);
 
-        /*
-        |--------------------------------------------------------------------------
-        | Indicadores
-        |--------------------------------------------------------------------------
-        */
+        $disponibles = fn () => Convocatoria::query()
+            ->whereIn('estado', ['PUBLICADA', 'ACTIVA'])
+            ->noVencidas();
 
-        $porRevisar =
-            Convocatoria::query()
-                ->where(
-                    'estado',
-                    'PENDIENTE_REVISION'
-                )
-                ->count();
+        $dictamenesMes = PropuestaRevision::query()
+            ->where('created_at', '>=', $inicioMes)
+            ->whereIn('accion', ['APROBAR', 'DEVOLVER', 'RECHAZAR']);
 
-        $totalConvocatorias =
-            Convocatoria::query()
-                ->count();
+        $porRevisar = Convocatoria::query()->where('estado', 'PENDIENTE_REVISION')->count();
+        $propuestasPorRevisar = Propuesta::query()->where('estado', 'ENVIADA')->count();
 
-        /*
-        | Consideramos revisada una convocatoria
-        | cuando ya salió del estado inicial
-        | PENDIENTE_REVISION/BORRADOR.
-        |
-        | No estamos ejecutando aquí ningún
-        | flujo de aprobación.
-        */
-        $revisadas =
-            Convocatoria::query()
-                ->whereIn(
-                    'estado',
-                    [
-                        'REQUIERE_CORRECCIONES',
-                        'PUBLICADA',
-                        'ACTIVA',
-                        'CERRADA',
-                        'DESCARTADA',
-                        'ARCHIVADA',
-                    ]
-                )
-                ->count();
-
-        /*
-        | Únicamente propuestas cuyo propietario
-        | tiene rol DOCENTE.
-        |
-        | De esta manera no contamos propuestas
-        | administrativas/de prueba pertenecientes
-        | a otros roles.
-        */
-        $propuestasDocentes =
-            Propuesta::query()
-                ->whereHas(
-                    'usuario.role',
-                    fn ($query) =>
-                        $query->where(
-                            'nombre',
-                            'DOCENTE'
-                        )
-                )
-                ->count();
-
-        /*
-        |--------------------------------------------------------------------------
-        | Convocatorias pendientes
-        |--------------------------------------------------------------------------
-        */
-
-        $pendientes =
-            Convocatoria::query()
-                ->with([
-                    'organismo',
-                    'fuente',
-                    'categoria',
-                ])
-                ->where(
-                    'estado',
-                    'PENDIENTE_REVISION'
-                )
-                ->orderByDesc(
-                    'created_at'
-                )
-                ->orderByDesc('id')
-                ->limit(5)
-                ->get();
-
-        /*
-        |--------------------------------------------------------------------------
-        | Próximos cierres
-        |--------------------------------------------------------------------------
-        */
-
-        $proximosCierres =
-            Convocatoria::query()
-                ->with([
-                    'organismo',
-                ])
-                ->whereNotNull(
-                    'fecha_cierre'
-                )
-                ->whereDate(
-                    'fecha_cierre',
-                    '>=',
-                    now()->toDateString()
-                )
-                ->whereNotIn(
-                    'estado',
-                    [
-                        'CERRADA',
-                        'DESCARTADA',
-                        'ARCHIVADA',
-                    ]
-                )
-                ->orderBy(
-                    'fecha_cierre'
-                )
-                ->limit(5)
-                ->get();
-
-        /*
-        |--------------------------------------------------------------------------
-        | Actividad basada únicamente en datos reales
-        |--------------------------------------------------------------------------
-        |
-        | No tenemos un historial general de actividad.
-        | Por eso mostramos registros recientes reales
-        | de convocatorias y propuestas de docentes.
-        |--------------------------------------------------------------------------
-        */
-
-        $actividadConvocatorias =
-            Convocatoria::query()
-                ->latest('created_at')
-                ->limit(5)
-                ->get()
-                ->map(
-                    fn (
-                        Convocatoria $convocatoria
-                    ): array => [
-                        'tipo' =>
-                            'CONVOCATORIA',
-
-                        'titulo' =>
-                            'Convocatoria registrada: '
-                            . $convocatoria
-                                ->titulo,
-
-                        'fecha' =>
-                            $convocatoria
-                                ->created_at,
-                    ]
-                );
-
-        $actividadPropuestas =
-            Propuesta::query()
-                ->with('usuario')
-                ->whereHas(
-                    'usuario.role',
-                    fn ($query) =>
-                        $query->where(
-                            'nombre',
-                            'DOCENTE'
-                        )
-                )
-                ->latest('created_at')
-                ->limit(5)
-                ->get()
-                ->map(
-                    fn (
-                        Propuesta $propuesta
-                    ): array => [
-                        'tipo' =>
-                            'PROPUESTA',
-
-                        'titulo' =>
-                            'Propuesta registrada: '
-                            . $propuesta->titulo,
-
-                        'fecha' =>
-                            $propuesta
-                                ->created_at,
-                    ]
-                );
-
-        $actividadReciente =
-            $actividadConvocatorias
-                ->concat(
-                    $actividadPropuestas
-                )
-                ->filter(
-                    fn (array $item): bool =>
-                        $item['fecha']
-                        !== null
-                )
-                ->sortByDesc(
-                    fn (array $item): int =>
-                        $item['fecha']
-                            ->timestamp
-                )
-                ->take(5)
-                ->values();
+        $detectadasMes = Convocatoria::query()->where('created_at', '>=', $inicioMes)->count();
+        $publicadasMes = Convocatoria::query()
+            ->where('created_at', '>=', $inicioMes)
+            ->whereIn('estado', ['PUBLICADA', 'ACTIVA', 'CERRADA'])
+            ->count();
+        $pendientesMes = Convocatoria::query()
+            ->where('created_at', '>=', $inicioMes)
+            ->where('estado', 'PENDIENTE_REVISION')
+            ->count();
 
         return [
-            'usuario' =>
-                $usuario,
-
-            'porRevisar' =>
-                $porRevisar,
-
-            'totalConvocatorias' =>
-                $totalConvocatorias,
-
-            'revisadas' =>
-                $revisadas,
-
-            'propuestasDocentes' =>
-                $propuestasDocentes,
-
-            'propuestasPorRevisar' =>
-                Propuesta::query()
-                    ->where('estado', 'ENVIADA')
-                    ->count(),
+            'nombre' => trim($usuario->name . ' ' . ($usuario->apellidos ?? '')),
+            'departamento' => $usuario->departamento?->nombre,
+            'fecha' => $hoy->copy()->locale('es')->isoFormat('D [de] MMMM [de] YYYY'),
 
             'urls' => [
                 'porRevisar' => Pages\ConvocatoriasPorRevisar::getUrl(),
-                'convocatorias' => Pages\Estadisticas::getUrl(),
-                'revisadas' => Pages\Reportes::getUrl(),
                 'propuestas' => Pages\PropuestasPorRevisar::getUrl(),
+                'subir' => ConvocatoriaResource::getUrl('create'),
+                'reportes' => Pages\Reportes::getUrl(),
+                'estadisticas' => Pages\Estadisticas::getUrl(),
+                'calendario' => Pages\Calendario::getUrl(),
+                'buscar' => Pages\BuscarConvocatorias::getUrl(),
             ],
 
-            'pendientes' =>
-                $pendientes,
+            'estadisticas' => [
+                [
+                    'etiqueta' => 'Convocatorias por revisar',
+                    'valor' => $porRevisar,
+                    'sub' => $porRevisar > 0 ? 'Acción requerida' : 'Sin pendientes',
+                    'icono' => 'portapapeles',
+                    'color' => 'ambar',
+                    'url' => Pages\ConvocatoriasPorRevisar::getUrl(),
+                ],
+                [
+                    'etiqueta' => 'Propuestas por revisar',
+                    'valor' => $propuestasPorRevisar,
+                    'sub' => (clone $dictamenesMes)->where('accion', 'APROBAR')->count() . ' aprobada(s) este mes',
+                    'icono' => 'aprobado',
+                    'color' => 'verde',
+                    'url' => Pages\PropuestasPorRevisar::getUrl(),
+                ],
+                [
+                    'etiqueta' => 'Propuestas rechazadas',
+                    'valor' => Propuesta::query()->where('estado', 'RECHAZADA')->count(),
+                    'sub' => 'Con observaciones',
+                    'icono' => 'rechazado',
+                    'color' => 'rojo',
+                    'url' => Pages\PropuestasPorRevisar::getUrl(),
+                ],
+                [
+                    'etiqueta' => 'Convocatorias activas',
+                    'valor' => $disponibles()->count(),
+                    'sub' => 'Publicadas y vigentes',
+                    'icono' => 'libro',
+                    'color' => 'azul',
+                    'url' => Pages\BuscarConvocatorias::getUrl(),
+                ],
+            ],
 
-            'proximosCierres' =>
-                $proximosCierres,
+            'pendientes' => Convocatoria::query()
+                ->with(['organismo:id,nombre', 'categoria:id,nombre'])
+                ->where('estado', 'PENDIENTE_REVISION')
+                ->latest()
+                ->limit(5)
+                ->get()
+                ->map(fn (Convocatoria $c): array => [
+                    'titulo' => $c->titulo,
+                    'organismo' => $c->organismo?->nombre ?? 'Sin organismo',
+                    'categoria' => $c->categoria?->nombre,
+                    'manual' => $c->origen === 'MANUAL',
+                    'encontrada' => $c->created_at?->locale('es')->isoFormat('D MMM YYYY'),
+                    'cierre' => $c->fecha_cierre?->locale('es')->isoFormat('D MMM YYYY') ?? 'Sin fecha',
+                    'url' => Pages\RevisarConvocatoria::getUrl(['record' => $c->id]),
+                ])
+                ->all(),
 
-            'actividadReciente' =>
-                $actividadReciente,
+            'propuestasPendientes' => Propuesta::query()
+                ->with(['usuario:id,name,apellidos', 'convocatoria:id,titulo'])
+                ->where('estado', 'ENVIADA')
+                ->orderBy('fecha_envio')
+                ->limit(5)
+                ->get()
+                ->map(fn (Propuesta $p): array => [
+                    'titulo' => $p->titulo,
+                    'autor' => trim(($p->usuario?->name ?? '') . ' ' . ($p->usuario?->apellidos ?? '')),
+                    'propia' => $p->user_id === $usuario->id,
+                    'convocatoria' => $p->convocatoria?->titulo,
+                    'enviada' => $p->fecha_envio?->locale('es')->isoFormat('D MMM YYYY'),
+                    'url' => Pages\RevisarPropuesta::getUrl(['propuesta' => $p->id]),
+                ])
+                ->all(),
+
+            'resumen' => [
+                ['etiqueta' => 'Detectadas este mes', 'valor' => $detectadasMes, 'max' => max($detectadasMes, 1), 'color' => '#1A4B8C'],
+                ['etiqueta' => 'Ya revisadas', 'valor' => $publicadasMes, 'max' => max($detectadasMes, 1), 'color' => '#059669'],
+                ['etiqueta' => 'Siguen pendientes', 'valor' => $pendientesMes, 'max' => max($detectadasMes, 1), 'color' => '#D97706'],
+                ['etiqueta' => 'Dictámenes de propuestas', 'valor' => (clone $dictamenesMes)->count(), 'max' => max((clone $dictamenesMes)->count(), 1), 'color' => '#7C3AED'],
+            ],
+
+            'proximosCierres' => $disponibles()
+                ->whereNotNull('fecha_cierre')
+                ->orderBy('fecha_cierre')
+                ->limit(4)
+                ->get(['id', 'titulo', 'fecha_cierre'])
+                ->map(fn (Convocatoria $c): array => [
+                    'titulo' => $c->titulo,
+                    'dias' => (int) $hoy->diffInDays($c->fecha_cierre),
+                    'cierre' => $c->fecha_cierre->locale('es')->isoFormat('D MMM YYYY'),
+                    'url' => Pages\DetalleConvocatoria::getUrl(['record' => $c->id]),
+                ])
+                ->all(),
         ];
     }
 }
