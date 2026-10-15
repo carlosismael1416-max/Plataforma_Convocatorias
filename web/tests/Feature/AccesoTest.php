@@ -37,6 +37,23 @@ class AccesoTest extends TestCase
         }
     }
 
+    public function test_recordarme_crea_la_cookie_persistente(): void
+    {
+        $usuario = $this->usuarioConRol('DOCENTE');
+
+        $respuesta = $this->post('/login', [
+            'email' => $usuario->email,
+            'password' => 'password',
+            'remember' => '1',
+        ]);
+
+        $respuesta->assertRedirect('/docente');
+        $this->assertNotNull(
+            collect($respuesta->headers->getCookies())
+                ->first(fn ($cookie) => str_starts_with($cookie->getName(), 'remember_web_'))
+        );
+    }
+
     public function test_envia_enlace_solo_a_cuentas_activas_con_el_mismo_mensaje(): void
     {
         Notification::fake();
