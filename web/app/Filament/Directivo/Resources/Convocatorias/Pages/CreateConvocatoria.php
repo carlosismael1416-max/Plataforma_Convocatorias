@@ -5,6 +5,7 @@ namespace App\Filament\Directivo\Resources\Convocatorias\Pages;
 use App\Filament\Directivo\Resources\Convocatorias\ConvocatoriaResource;
 use App\Models\Convocatoria;
 use App\Models\User;
+use Filament\Actions\Action;
 use Filament\Facades\Filament;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -14,6 +15,25 @@ use Illuminate\Support\Arr;
 class CreateConvocatoria extends CreateRecord
 {
     protected static string $resource = ConvocatoriaResource::class;
+
+    protected static ?string $title = 'Subir convocatoria manual';
+
+    protected ?string $subheading = 'Registra una convocatoria que no fue detectada automáticamente.';
+
+    protected function getCreateFormAction(): Action
+    {
+        return parent::getCreateFormAction()->label('Enviar a revisión');
+    }
+
+    protected function getCreateAnotherFormAction(): Action
+    {
+        return parent::getCreateAnotherFormAction()->label('Enviar y registrar otra');
+    }
+
+    public function getBreadcrumbs(): array
+    {
+        return [];
+    }
 
     protected function handleRecordCreation(array $data): Model
     {

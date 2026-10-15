@@ -607,18 +607,8 @@
 
                 <div class="page-subtitle">
                     Genera reportes institucionales
-                    utilizando la información real
-                    almacenada en PostgreSQL.
-                </div>
-
-                <div style="margin-top:12px;">
-                    <button
-                        type="button"
-                        class="secondary-btn"
-                        wire:click="probarBoton"
-                    >
-                        Probar interacción
-                    </button>
+                    con la información registrada
+                    en la plataforma.
                 </div>
 
             </div>
@@ -1429,8 +1419,8 @@
                         <div class="generate-help">
                             Se exportarán los datos reales
                             mostrados por los filtros
-                            actuales. No se modificará
-                            ningún registro de PostgreSQL.
+                            actuales. La exportación no
+                            modifica ningún registro.
                         </div>
 
                         <button

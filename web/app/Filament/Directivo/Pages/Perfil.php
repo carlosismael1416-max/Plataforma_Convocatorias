@@ -26,6 +26,9 @@ class Perfil extends Page
     protected string $view =
         'filament.directivo.pages.perfil';
 
+    // La vista ya trae su encabezado.
+    protected ?string $heading = '';
+
     protected static ?string $slug =
         'perfil';
 

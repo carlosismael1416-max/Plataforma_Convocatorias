@@ -1037,9 +1037,7 @@
                                     type="text"
                                     maxlength="255"
                                     wire:model="actividad"
-                                    placeholder="
-                                        Nombre de la actividad
-                                    "
+                                    placeholder="Nombre de la actividad"
                                 >
 
                                 @error('actividad')
@@ -1111,9 +1109,7 @@
                                     wire:model="
                                         responsable
                                     "
-                                    placeholder="
-                                        Responsable
-                                    "
+                                    placeholder="Responsable"
                                 >
 
                                 @error('responsable')
@@ -1193,9 +1189,7 @@
                                 wire:model="
                                     descripcion
                                 "
-                                placeholder="
-                                    Descripción de la actividad...
-                                "
+                                placeholder="Descripción de la actividad..."
                             ></textarea>
 
                             @error('descripcion')

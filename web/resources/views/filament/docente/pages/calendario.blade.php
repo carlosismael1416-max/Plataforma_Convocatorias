@@ -958,9 +958,7 @@
                             <input
                                 type="text"
                                 wire:model="tituloEvento"
-                                placeholder="
-                                    Nombre del evento
-                                "
+                                placeholder="Nombre del evento"
                             >
 
                             @error('tituloEvento')
@@ -1175,9 +1173,7 @@
                                 wire:model="
                                     descripcionEvento
                                 "
-                                placeholder="
-                                    Descripción del evento
-                                "
+                                placeholder="Descripción del evento"
                             ></textarea>
 
                             @error(

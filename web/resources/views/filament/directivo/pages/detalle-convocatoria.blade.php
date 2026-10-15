@@ -1206,8 +1206,7 @@
                 </div>
 
                 <div class="source-text">
-                    Información almacenada
-                    actualmente en PostgreSQL para
+                    Fuente de la que se obtuvo
                     esta convocatoria.
                 </div>
 

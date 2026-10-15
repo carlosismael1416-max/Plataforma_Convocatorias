@@ -955,9 +955,7 @@
                                     class="input"
                                     maxlength="255"
                                     wire:model="proveedor"
-                                    placeholder="
-                                        Nombre del proveedor
-                                    "
+                                    placeholder="Nombre del proveedor"
                                 >
 
                                 @error('proveedor')

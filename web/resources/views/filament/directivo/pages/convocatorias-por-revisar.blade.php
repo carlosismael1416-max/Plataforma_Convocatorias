@@ -475,10 +475,9 @@
             </div>
 
             <div>
-                Esta sección muestra únicamente
-                convocatorias con estado
-                PENDIENTE_REVISION. La consulta general
-                se mantiene en “Buscar Convocatorias”.
+                Aquí solo aparecen las convocatorias
+                pendientes de revisión. Para consultar
+                todas, usa “Buscar convocatorias”.
             </div>
 
         </div>
@@ -488,10 +487,7 @@
             <input
                 class="input"
                 type="text"
-                placeholder="
-                    Buscar por título, organismo,
-                    categoría o fuente...
-                "
+                placeholder="Buscar por título, organismo, categoría o fuente..."
                 wire:model="buscar"
                 wire:keydown.enter="
                     aplicarBusqueda
@@ -953,7 +949,7 @@
             <div class="pagination">
                 {{
                     $convocatorias
-                        ->links()
+                        ->links('pagination.itsva')
                 }}
             </div>
 

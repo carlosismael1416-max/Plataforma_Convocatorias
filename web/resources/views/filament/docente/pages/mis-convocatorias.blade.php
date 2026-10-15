@@ -952,7 +952,7 @@
         @if ($seguimientos->hasPages())
 
             <div class="pagination">
-                {{ $seguimientos->links() }}
+                {{ $seguimientos->links('pagination.itsva') }}
             </div>
 
         @endif

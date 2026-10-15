@@ -834,7 +834,7 @@
                     <div class="pagination-box">
                         {{
                             $notificaciones
-                                ->links()
+                                ->links('pagination.itsva')
                         }}
                     </div>
 
@@ -854,8 +854,7 @@
 
                         <div class="config-help">
                             Estos cambios se guardan
-                            para tu usuario en
-                            PostgreSQL.
+                            en tu cuenta.
                         </div>
 
                         @php

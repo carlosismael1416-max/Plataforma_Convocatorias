@@ -13,6 +13,9 @@ class RevisarConvocatoria extends Page
     protected string $view =
         'filament.directivo.pages.revisar-convocatoria';
 
+    // El título ya aparece en el header del panel.
+    protected ?string $heading = '';
+
     protected static ?string $slug =
         'revisar-convocatoria/{record}';
 
