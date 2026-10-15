@@ -944,7 +944,7 @@
                         }}
                     "
                     href="{{ route(
-                        'filament.docente.pages.editor-propuesta',
+                        'filament.' . filament()->getId() . '.pages.editor-propuesta',
                         [
                             'propuesta' =>
                                 $propuesta->id
@@ -973,7 +973,7 @@
                         }}
                     "
                     href="{{ route(
-                        'filament.docente.pages.objetivos-propuesta',
+                        'filament.' . filament()->getId() . '.pages.objetivos-propuesta',
                         [
                             'propuesta' =>
                                 $propuesta->id
@@ -997,7 +997,7 @@
                         }}
                     "
                     href="{{ route(
-                        'filament.docente.pages.requisitos-propuesta',
+                        'filament.' . filament()->getId() . '.pages.requisitos-propuesta',
                         [
                             'propuesta' =>
                                 $propuesta->id
@@ -1025,7 +1025,7 @@
                         }}
                     "
                     href="{{ route(
-                        'filament.docente.pages.presupuesto-propuesta',
+                        'filament.' . filament()->getId() . '.pages.presupuesto-propuesta',
                         [
                             'propuesta' =>
                                 $propuesta->id
@@ -1053,7 +1053,7 @@
                         }}
                     "
                     href="{{ route(
-                        'filament.docente.pages.cotizaciones-propuesta',
+                        'filament.' . filament()->getId() . '.pages.cotizaciones-propuesta',
                         [
                             'propuesta' =>
                                 $propuesta->id
@@ -1081,7 +1081,7 @@
                         }}
                     "
                     href="{{ route(
-                        'filament.docente.pages.cronograma-propuesta',
+                        'filament.' . filament()->getId() . '.pages.cronograma-propuesta',
                         [
                             'propuesta' =>
                                 $propuesta->id
@@ -1109,7 +1109,7 @@
                         }}
                     "
                     href="{{ route(
-                        'filament.docente.pages.entregables-propuesta',
+                        'filament.' . filament()->getId() . '.pages.entregables-propuesta',
                         [
                             'propuesta' =>
                                 $propuesta->id

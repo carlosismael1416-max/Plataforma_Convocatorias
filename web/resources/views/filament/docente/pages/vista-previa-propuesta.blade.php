@@ -524,9 +524,51 @@
             grid-template-columns: 1fr;
         }
     }
+
+    .modo-revision .edit-link,
+    .modo-revision .solo-autor {
+        display: none !important;
+    }
+
+    .dictamen {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin-top: 16px;
+        padding-top: 16px;
+        border-top: 1px solid #F0F4FB;
+    }
+
+    .dictamen-etiqueta { color: #334155; font-size: 13px; font-weight: 600; }
+    .dictamen-etiqueta span { color: #94A3B8; font-weight: 400; }
+
+    .dictamen textarea {
+        width: 100%;
+        padding: 10px 12px;
+        border: 1px solid #DDE3EE;
+        border-radius: 8px;
+        color: #1A2C4E;
+        font: 13px Inter, sans-serif;
+        resize: vertical;
+    }
+
+    .dictamen .btn { justify-content: center; width: 100%; }
+    .dictamen .dictamen-rechazar { border-color: #FECACA; color: #B91C1C; }
+
+    .estado-envio {
+        margin-top: 12px;
+        padding: 12px 14px;
+        border-radius: 10px;
+        font-size: 13px;
+        line-height: 1.45;
+    }
+
+    .estado-envio.enviada { background: #EFF6FF; color: #1D4ED8; border: 1px solid #BFDBFE; }
+    .estado-envio.aprobada { background: #ECFDF5; color: #047857; border: 1px solid #A7F3D0; }
+    .estado-envio.rechazada { background: #FEF2F2; color: #B91C1C; border: 1px solid #FECACA; }
 </style>
 
-<div class="proposal-preview">
+<div class="proposal-preview {{ $modoRevision ? 'modo-revision' : '' }}">
 
     <div class="preview-top">
 
@@ -546,9 +588,9 @@
         <div class="top-actions">
 
             <a
-                class="btn"
+                class="btn solo-autor"
                 href="{{ route(
-                    'filament.docente.pages.editor-propuesta',
+                    'filament.' . filament()->getId() . '.pages.editor-propuesta',
                     [
                         'propuesta' =>
                             $propuesta->id,
@@ -650,7 +692,7 @@
                         <a
                             class="edit-link"
                             href="{{ route(
-                                'filament.docente.pages.editor-propuesta',
+                                'filament.' . filament()->getId() . '.pages.editor-propuesta',
                                 [
                                     'propuesta' =>
                                         $propuesta->id,
@@ -774,7 +816,7 @@
                         <a
                             class="edit-link"
                             href="{{ route(
-                                'filament.docente.pages.editor-propuesta',
+                                'filament.' . filament()->getId() . '.pages.editor-propuesta',
                                 [
                                     'propuesta' =>
                                         $propuesta->id,
@@ -810,7 +852,7 @@
                         <a
                             class="edit-link"
                             href="{{ route(
-                                'filament.docente.pages.editor-propuesta',
+                                'filament.' . filament()->getId() . '.pages.editor-propuesta',
                                 [
                                     'propuesta' =>
                                         $propuesta->id,
@@ -846,7 +888,7 @@
                         <a
                             class="edit-link"
                             href="{{ route(
-                                'filament.docente.pages.editor-propuesta',
+                                'filament.' . filament()->getId() . '.pages.editor-propuesta',
                                 [
                                     'propuesta' =>
                                         $propuesta->id,
@@ -882,7 +924,7 @@
                         <a
                             class="edit-link"
                             href="{{ route(
-                                'filament.docente.pages.editor-propuesta',
+                                'filament.' . filament()->getId() . '.pages.editor-propuesta',
                                 [
                                     'propuesta' =>
                                         $propuesta->id,
@@ -919,7 +961,7 @@
                         <a
                             class="edit-link"
                             href="{{ route(
-                                'filament.docente.pages.objetivos-propuesta',
+                                'filament.' . filament()->getId() . '.pages.objetivos-propuesta',
                                 [
                                     'propuesta' =>
                                         $propuesta->id,
@@ -997,7 +1039,7 @@
                         <a
                             class="edit-link"
                             href="{{ route(
-                                'filament.docente.pages.requisitos-propuesta',
+                                'filament.' . filament()->getId() . '.pages.requisitos-propuesta',
                                 [
                                     'propuesta' =>
                                         $propuesta->id,
@@ -1149,7 +1191,7 @@
                         <a
                             class="edit-link"
                             href="{{ route(
-                                'filament.docente.pages.presupuesto-propuesta',
+                                'filament.' . filament()->getId() . '.pages.presupuesto-propuesta',
                                 [
                                     'propuesta' =>
                                         $propuesta->id,
@@ -1312,7 +1354,7 @@
                         <a
                             class="edit-link"
                             href="{{ route(
-                                'filament.docente.pages.cotizaciones-propuesta',
+                                'filament.' . filament()->getId() . '.pages.cotizaciones-propuesta',
                                 [
                                     'propuesta' =>
                                         $propuesta->id,
@@ -1506,7 +1548,7 @@
                         <a
                             class="edit-link"
                             href="{{ route(
-                                'filament.docente.pages.cronograma-propuesta',
+                                'filament.' . filament()->getId() . '.pages.cronograma-propuesta',
                                 [
                                     'propuesta' =>
                                         $propuesta->id,
@@ -1636,7 +1678,7 @@
                         <a
                             class="edit-link"
                             href="{{ route(
-                                'filament.docente.pages.entregables-propuesta',
+                                'filament.' . filament()->getId() . '.pages.entregables-propuesta',
                                 [
                                     'propuesta' =>
                                         $propuesta->id,
@@ -1890,19 +1932,81 @@
                 @if ($listaParaRevision)
 
                     Las secciones principales están
-                    completas y la propuesta puede
-                    revisarse antes del futuro flujo
-                    de envío.
+                    completas.
 
                 @else
 
                     Aún existen secciones principales
-                    incompletas. Puedes regresar a
-                    editarlas desde esta vista.
+                    incompletas. Complétalas para poder
+                    enviar la propuesta a revisión.
 
                 @endif
 
             </div>
+
+            @switch ($propuesta->estado)
+                @case ('ENVIADA')
+                    <div class="estado-envio enviada">
+                        Enviada a revisión
+                        @if ($propuesta->fecha_envio)
+                            el {{ $propuesta->fecha_envio->locale('es')->isoFormat('D [de] MMMM [de] YYYY') }}
+                        @endif.
+                        {{ $modoRevision ? '' : 'Un directivo emitirá el dictamen.' }}
+                    </div>
+                    @break
+                @case ('APROBADA')
+                    <div class="estado-envio aprobada">Propuesta aprobada.</div>
+                    @break
+                @case ('RECHAZADA')
+                    <div class="estado-envio rechazada">Propuesta rechazada. Revisa las observaciones en tus notificaciones.</div>
+                    @break
+            @endswitch
+
+            @if ($modoRevision && $propuesta->estado === 'ENVIADA')
+                <div class="dictamen">
+                    <div class="summary-title">Dictamen</div>
+
+                    <label for="observaciones" class="dictamen-etiqueta">
+                        Observaciones para el autor
+                        <span>(obligatorias para devolver o rechazar)</span>
+                    </label>
+
+                    <textarea
+                        id="observaciones"
+                        rows="5"
+                        wire:model="observaciones"
+                        placeholder="Qué debe corregir o por qué se rechaza…"
+                    ></textarea>
+
+                    <button type="button" class="btn btn-primary" wire:click="aprobar"
+                        wire:confirm="¿Aprobar esta propuesta?" wire:loading.attr="disabled">
+                        Aprobar
+                    </button>
+
+                    <button type="button" class="btn" wire:click="devolver" wire:loading.attr="disabled">
+                        Devolver con observaciones
+                    </button>
+
+                    <button type="button" class="btn dictamen-rechazar" wire:click="rechazar"
+                        wire:confirm="¿Rechazar esta propuesta? El autor ya no podrá editarla." wire:loading.attr="disabled">
+                        Rechazar
+                    </button>
+                </div>
+            @endif
+
+            @if ($puedeEnviar)
+                <button
+                    type="button"
+                    class="btn btn-primary"
+                    style="width: 100%; margin-top: 12px;"
+                    wire:click="enviarARevision"
+                    wire:confirm="¿Enviar la propuesta a revisión? Mientras se revisa no podrás editarla."
+                    wire:loading.attr="disabled"
+                    wire:target="enviarARevision"
+                >
+                    Enviar a revisión
+                </button>
+            @endif
 
             <div class="summary">
 
@@ -1979,9 +2083,9 @@
             <div class="side-actions">
 
                 <a
-                    class="btn"
+                    class="btn solo-autor"
                     href="{{ route(
-                        'filament.docente.pages.editor-propuesta',
+                        'filament.' . filament()->getId() . '.pages.editor-propuesta',
                         [
                             'propuesta' =>
                                 $propuesta->id,

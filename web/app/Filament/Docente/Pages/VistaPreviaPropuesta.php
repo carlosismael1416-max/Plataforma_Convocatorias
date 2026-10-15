@@ -2,6 +2,7 @@
 
 namespace App\Filament\Docente\Pages;
 
+use App\Filament\Concerns\RolDelPanel;
 use App\Models\Cotizacion;
 use App\Models\CronogramaActividad;
 use App\Models\Evidencia;
@@ -11,7 +12,11 @@ use App\Models\PropuestaEntregable;
 use App\Models\PropuestaObjetivo;
 use App\Models\PropuestaRequisito;
 use App\Models\User;
+use App\Services\RevisionPropuesta;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Validation\ValidationException;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
@@ -22,6 +27,8 @@ use Livewire\Attributes\Locked;
 
 class VistaPreviaPropuesta extends Page
 {
+    use RolDelPanel;
+
     protected static bool $shouldRegisterNavigation = false;
 
     protected static ?string $title =
@@ -47,7 +54,7 @@ class VistaPreviaPropuesta extends Page
 
         return $usuario instanceof User
             && (bool) $usuario->estado
-            && $usuario->tieneRol('DOCENTE');
+            && $usuario->tieneRol(static::rolDelPanel());
     }
 
     public function mount(): void
@@ -60,16 +67,52 @@ class VistaPreviaPropuesta extends Page
             'Propuesta no especificada.'
         );
 
-        $propuesta = Propuesta::query()
+        $propuesta = $this->consultaPropuestas()
             ->whereKey($id)
-            ->where(
-                'user_id',
-                auth()->id()
-            )
             ->firstOrFail();
 
         $this->propuestaId =
             $propuesta->id;
+    }
+
+    /**
+     * Propuestas que esta página puede mostrar: solo las del usuario.
+     * La revisión del directivo la amplía a las enviadas por otros.
+     */
+    protected function consultaPropuestas(): Builder
+    {
+        return Propuesta::query()
+            ->where('user_id', auth()->id());
+    }
+
+    protected function esModoRevision(): bool
+    {
+        return false;
+    }
+
+    public function enviarARevision(): void
+    {
+        $propuesta = $this->consultaPropuestas()
+            ->whereKey($this->propuestaId)
+            ->firstOrFail();
+
+        try {
+            RevisionPropuesta::enviar($propuesta, auth()->user());
+        } catch (ValidationException $e) {
+            Notification::make()
+                ->title('No se pudo enviar')
+                ->body(collect($e->errors())->flatten()->first())
+                ->warning()
+                ->send();
+
+            return;
+        }
+
+        Notification::make()
+            ->title('Propuesta enviada a revisión')
+            ->body('Un directivo la revisará; recibirás una notificación con el dictamen.')
+            ->success()
+            ->send();
     }
 
     public function descargarEvidencia(
@@ -812,7 +855,7 @@ class VistaPreviaPropuesta extends Page
     protected function getViewData(): array
     {
         $propuesta =
-            Propuesta::query()
+            $this->consultaPropuestas()
                 ->with([
                     'usuario',
                     'convocatoria.organismo',
@@ -820,10 +863,6 @@ class VistaPreviaPropuesta extends Page
                 ])
                 ->whereKey(
                     $this->propuestaId
-                )
-                ->where(
-                    'user_id',
-                    auth()->id()
                 )
                 ->firstOrFail();
 
@@ -1220,6 +1259,18 @@ class VistaPreviaPropuesta extends Page
 
             'seccionesPrincipales' =>
                 $seccionesPrincipales,
+
+            'modoRevision' =>
+                $this->esModoRevision(),
+
+            'puedeEnviar' =>
+                ! $this->esModoRevision()
+                && $listaParaRevision
+                && in_array(
+                    $propuesta->estado,
+                    RevisionPropuesta::EDITABLES,
+                    true
+                ),
         ];
     }
 }

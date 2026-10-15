@@ -2,6 +2,7 @@
 
 namespace App\Filament\Docente\Pages;
 
+use App\Filament\Concerns\RolDelPanel;
 use App\Models\Propuesta;
 use App\Models\User;
 use App\Models\UsuarioConvocatoria;
@@ -14,6 +15,8 @@ use Livewire\WithPagination;
 
 class MisConvocatorias extends Page
 {
+    use RolDelPanel;
+
     use WithPagination;
 
     protected static string|BackedEnum|null $navigationIcon =
@@ -49,7 +52,7 @@ class MisConvocatorias extends Page
 
         return $usuario instanceof User
             && (bool) $usuario->estado
-            && $usuario->tieneRol('DOCENTE');
+            && $usuario->tieneRol(static::rolDelPanel());
     }
 
     public function mount(): void
@@ -287,7 +290,7 @@ class MisConvocatorias extends Page
         }
 
         return redirect()->route(
-            'filament.docente.pages.detalle-convocatoria',
+            'filament.' . filament()->getId() . '.pages.detalle-convocatoria',
             [
                 'record' => $convocatoria->id,
             ]
@@ -356,7 +359,7 @@ class MisConvocatorias extends Page
         $seguimiento->save();
 
         return redirect()->route(
-            'filament.docente.pages.generar-propuesta',
+            'filament.' . filament()->getId() . '.pages.generar-propuesta',
             [
                 'convocatoria' => $convocatoria->id,
             ]

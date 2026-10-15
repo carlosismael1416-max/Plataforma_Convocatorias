@@ -375,7 +375,7 @@
         <a
     href="{{
         route(
-            'filament.docente.pages.generar-propuesta'
+            'filament.' . filament()->getId() . '.pages.generar-propuesta'
         )
     }}"
     class="prop-new"

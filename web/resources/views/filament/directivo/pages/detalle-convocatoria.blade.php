@@ -408,9 +408,10 @@
         border-radius: 8px;
         background: white;
         color: #475569;
-        font-size: 9px;
-        font-weight: 850;
+        font-size: 13px;
+        font-weight: 700;
         text-decoration: none;
+        cursor: pointer;
     }
 
     .btn-primary {
@@ -1154,6 +1155,24 @@
                             Abrir fuente oficial
                         </a>
 
+                    @endif
+
+                    @if ($disponible)
+                        @if ($guardada)
+                            <a href="{{ route('filament.directivo.pages.mis-convocatorias') }}" class="btn">
+                                ✓ En Mis convocatorias
+                            </a>
+                        @else
+                            <button type="button" class="btn" wire:click="guardarConvocatoria"
+                                wire:loading.attr="disabled" wire:target="guardarConvocatoria">
+                                + Guardar en Mis convocatorias
+                            </button>
+                        @endif
+
+                        <a href="{{ route('filament.directivo.pages.generar-propuesta', ['convocatoria' => $convocatoria->id]) }}"
+                            class="btn btn-primary">
+                            {{ $tienePropuesta ? 'Ver / continuar propuesta' : 'Generar propuesta' }}
+                        </a>
                     @endif
 
                     <a

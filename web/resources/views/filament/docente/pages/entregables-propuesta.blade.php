@@ -1408,37 +1408,37 @@
                         'datos' => [
                             1,
                             'Datos de propuesta',
-                            'filament.docente.pages.editor-propuesta',
+                            'filament.' . filament()->getId() . '.pages.editor-propuesta',
                         ],
 
                         'objetivos' => [
                             2,
                             'Objetivos',
-                            'filament.docente.pages.objetivos-propuesta',
+                            'filament.' . filament()->getId() . '.pages.objetivos-propuesta',
                         ],
 
                         'requisitos' => [
                             3,
                             'Requisitos',
-                            'filament.docente.pages.requisitos-propuesta',
+                            'filament.' . filament()->getId() . '.pages.requisitos-propuesta',
                         ],
 
                         'presupuesto' => [
                             4,
                             'Presupuesto',
-                            'filament.docente.pages.presupuesto-propuesta',
+                            'filament.' . filament()->getId() . '.pages.presupuesto-propuesta',
                         ],
 
                         'cotizaciones' => [
                             5,
                             'Cotizaciones',
-                            'filament.docente.pages.cotizaciones-propuesta',
+                            'filament.' . filament()->getId() . '.pages.cotizaciones-propuesta',
                         ],
 
                         'cronograma' => [
                             6,
                             'Cronograma',
-                            'filament.docente.pages.cronograma-propuesta',
+                            'filament.' . filament()->getId() . '.pages.cronograma-propuesta',
                         ],
                     ];
                 @endphp
@@ -1489,7 +1489,7 @@
                         }}
                     "
                     href="{{ route(
-                        'filament.docente.pages.entregables-propuesta',
+                        'filament.' . filament()->getId() . '.pages.entregables-propuesta',
                         [
                             'propuesta' =>
                                 $propuesta->id,

@@ -17,7 +17,7 @@ class BuscarConvocatorias extends Page
 
     protected static ?string $navigationLabel = 'Buscar convocatorias';
 
-    protected static ?int $navigationSort = 3;
+    protected static ?int $navigationSort = 4;
 
 
     use WithPagination;

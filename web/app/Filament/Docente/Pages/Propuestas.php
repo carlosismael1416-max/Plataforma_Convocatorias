@@ -2,6 +2,7 @@
 
 namespace App\Filament\Docente\Pages;
 
+use App\Filament\Concerns\RolDelPanel;
 use App\Models\Propuesta;
 use App\Models\User;
 use BackedEnum;
@@ -13,6 +14,8 @@ use Livewire\WithPagination;
 
 class Propuestas extends Page
 {
+    use RolDelPanel;
+
     use WithPagination;
 
     protected static string|BackedEnum|null $navigationIcon =
@@ -44,7 +47,7 @@ class Propuestas extends Page
 
         return $usuario instanceof User
             && (bool) $usuario->estado
-            && $usuario->tieneRol('DOCENTE');
+            && $usuario->tieneRol(static::rolDelPanel());
     }
 
     public function updatedBuscar(): void
@@ -79,7 +82,7 @@ class Propuestas extends Page
         );
 
         return redirect()->route(
-            'filament.docente.pages.editor-propuesta',
+            'filament.' . filament()->getId() . '.pages.editor-propuesta',
             [
                 'propuesta' => $propuesta->id,
             ]
@@ -94,7 +97,7 @@ class Propuestas extends Page
         );
 
         return redirect()->route(
-            'filament.docente.pages.vista-previa-propuesta',
+            'filament.' . filament()->getId() . '.pages.vista-previa-propuesta',
             [
                 'propuesta' => $propuesta->id,
             ]
@@ -135,7 +138,7 @@ class Propuestas extends Page
         }
 
         return redirect()->route(
-            'filament.docente.pages.detalle-convocatoria',
+            'filament.' . filament()->getId() . '.pages.detalle-convocatoria',
             [
                 'record' => $convocatoria->id,
             ]

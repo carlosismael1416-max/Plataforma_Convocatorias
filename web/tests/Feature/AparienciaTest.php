@@ -21,8 +21,9 @@ class AparienciaTest extends TestCase
                 'Subir convocatoria', 'Calendario', 'Propuestas', 'Notificaciones',
             ]],
             'directivo' => ['DIRECTIVO', '/directivo', [
-                'Dashboard', 'Convocatorias por revisar', 'Buscar convocatorias',
-                'Subir convocatoria', 'Estadísticas', 'Reportes', 'Notificaciones',
+                'Dashboard', 'Convocatorias por revisar', 'Propuestas por revisar',
+                'Buscar convocatorias', 'Mis convocatorias', 'Subir convocatoria',
+                'Calendario', 'Propuestas', 'Estadísticas', 'Reportes', 'Notificaciones',
             ]],
             'admin' => ['ADMINISTRADOR', '/admin', [
                 'Dashboard', 'Usuarios', 'Roles y permisos', 'Fuentes web',
