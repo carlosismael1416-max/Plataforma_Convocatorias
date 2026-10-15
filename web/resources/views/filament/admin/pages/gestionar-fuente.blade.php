@@ -46,7 +46,7 @@
 
         .eyebrow {
             color: var(--primary);
-            font-size: 10px;
+            font-size: 12px;
             font-weight: 900;
             text-transform: uppercase;
             letter-spacing: .06em;
@@ -73,7 +73,7 @@
             border-radius: 999px;
             background: #D1FAE5;
             color: #047857;
-            font-size: 10px;
+            font-size: 12px;
             font-weight: 850;
             white-space: nowrap;
         }
@@ -103,7 +103,7 @@
             display: block;
             margin-bottom: 4px;
             color: #94A3B8;
-            font-size: 9px;
+            font-size: 12px;
             text-transform: uppercase;
         }
 
@@ -155,7 +155,7 @@
         .card-description {
             margin-top: 4px;
             color: var(--muted);
-            font-size: 10px;
+            font-size: 12px;
             line-height: 1.5;
         }
 
@@ -166,7 +166,7 @@
             border-radius: 8px;
             background: white;
             color: var(--primary);
-            font-size: 9px;
+            font-size: 12px;
             font-weight: 850;
             cursor: pointer;
         }
@@ -192,7 +192,7 @@
             display: block;
             margin-bottom: 5px;
             color: #94A3B8;
-            font-size: 9px;
+            font-size: 12px;
             font-weight: 800;
             text-transform: uppercase;
         }
@@ -210,7 +210,7 @@
             background: #0F172A;
             color: #E2E8F0;
             font-family: monospace;
-            font-size: 10px;
+            font-size: 12px;
             line-height: 1.6;
             overflow-x: auto;
         }
@@ -237,26 +237,26 @@
             justify-content: center;
             background: var(--primary-soft);
             color: var(--primary-dark);
-            font-size: 9px;
+            font-size: 12px;
             font-weight: 900;
         }
 
         .execution-title {
             color: #334155;
-            font-size: 10px;
+            font-size: 12px;
             font-weight: 800;
         }
 
         .execution-meta {
             margin-top: 3px;
             color: #94A3B8;
-            font-size: 9px;
+            font-size: 12px;
         }
 
         .badge {
             padding: 5px 8px;
             border-radius: 999px;
-            font-size: 9px;
+            font-size: 12px;
             font-weight: 850;
             white-space: nowrap;
         }
@@ -292,20 +292,20 @@
             justify-content: center;
             background: #FEE2E2;
             color: #B91C1C;
-            font-size: 10px;
+            font-size: 12px;
             font-weight: 900;
         }
 
         .error-title {
             color: #334155;
-            font-size: 10px;
+            font-size: 12px;
             font-weight: 800;
         }
 
         .error-text {
             margin-top: 3px;
             color: #94A3B8;
-            font-size: 9px;
+            font-size: 12px;
             line-height: 1.45;
         }
 
@@ -325,7 +325,7 @@
         .state-text {
             margin-top: 5px;
             color: #059669;
-            font-size: 9px;
+            font-size: 12px;
             line-height: 1.5;
         }
 
@@ -335,7 +335,7 @@
             gap: 12px;
             padding: 9px 0;
             border-bottom: 1px solid #EEF2F7;
-            font-size: 10px;
+            font-size: 12px;
         }
 
         .side-row:last-child {
@@ -364,7 +364,7 @@
             border: 1px solid var(--border);
             background: white;
             color: #475569;
-            font-size: 10px;
+            font-size: 12px;
             font-weight: 850;
             cursor: pointer;
         }
@@ -387,7 +387,7 @@
             border-radius: 10px;
             background: #ECFDF5;
             color: #047857;
-            font-size: 9px;
+            font-size: 12px;
             line-height: 1.5;
             text-align: center;
         }
@@ -462,7 +462,7 @@
             padding: 26px 18px;
             text-align: center;
             color: #94A3B8;
-            font-size: 10px;
+            font-size: 12px;
             line-height: 1.6;
         }
 
@@ -479,7 +479,7 @@
             border-radius: 10px;
             background: #F8FAFC;
             color: #64748B;
-            font-size: 10px;
+            font-size: 12px;
             line-height: 1.6;
         }
 

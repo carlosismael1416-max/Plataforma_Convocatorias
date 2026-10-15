@@ -118,7 +118,7 @@
     .avatar-help {
         margin-top: 8px;
         color: #94A3B8;
-        font-size: 9px;
+        font-size: 12px;
     }
 
     .profile-name {
@@ -131,7 +131,7 @@
     .profile-email {
         margin-top: 4px;
         color: var(--muted);
-        font-size: 10px;
+        font-size: 12px;
         word-break: break-word;
     }
 
@@ -144,7 +144,7 @@
         border-radius: 999px;
         background: #E8EEF8;
         color: var(--primary);
-        font-size: 9px;
+        font-size: 12px;
         font-weight: 850;
     }
 
@@ -169,14 +169,14 @@
         display: block;
         margin-bottom: 3px;
         color: #94A3B8;
-        font-size: 8px;
+        font-size: 11px;
         text-transform: uppercase;
         letter-spacing: .04em;
     }
 
     .profile-data-value {
         color: #334155;
-        font-size: 10px;
+        font-size: 12px;
         font-weight: 750;
     }
 
@@ -200,7 +200,7 @@
         display: flex;
         align-items: center;
         gap: 6px;
-        font-size: 10px;
+        font-size: 12px;
         font-weight: 850;
     }
 
@@ -229,7 +229,7 @@
     .status-help {
         margin-top: 4px;
         color: #64748B;
-        font-size: 8px;
+        font-size: 11px;
         line-height: 1.4;
     }
 
@@ -256,7 +256,7 @@
     .section-description {
         margin-top: 5px;
         color: var(--muted);
-        font-size: 10px;
+        font-size: 12px;
         line-height: 1.5;
     }
 
@@ -275,7 +275,7 @@
         display: block;
         margin-bottom: 6px;
         color: #334155;
-        font-size: 10px;
+        font-size: 12px;
         font-weight: 800;
     }
 
@@ -309,14 +309,14 @@
     .field-help {
         margin-top: 5px;
         color: #94A3B8;
-        font-size: 8px;
+        font-size: 11px;
         line-height: 1.4;
     }
 
     .field-error {
         margin-top: 5px;
         color: var(--danger);
-        font-size: 8px;
+        font-size: 11px;
     }
 
     .info-box {
@@ -325,7 +325,7 @@
         border-radius: 9px;
         background: #EFF6FF;
         color: #1E40AF;
-        font-size: 9px;
+        font-size: 12px;
         line-height: 1.5;
     }
 
@@ -344,14 +344,14 @@
 
     .security-title {
         color: #334155;
-        font-size: 10px;
+        font-size: 12px;
         font-weight: 800;
     }
 
     .security-description {
         margin-top: 4px;
         color: #94A3B8;
-        font-size: 8px;
+        font-size: 11px;
         line-height: 1.45;
     }
 

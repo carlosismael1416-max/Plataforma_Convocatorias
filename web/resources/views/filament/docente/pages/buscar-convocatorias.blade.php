@@ -68,7 +68,7 @@
             display: block;
             margin-bottom: 6px;
             color: #64748B;
-            font-size: 10px;
+            font-size: 12px;
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: .03em;
@@ -195,7 +195,7 @@
             border-radius: 20px;
             background: #F0F4FB;
             color: #1A4B8C;
-            font-size: 10px;
+            font-size: 12px;
             font-weight: 650;
         }
 

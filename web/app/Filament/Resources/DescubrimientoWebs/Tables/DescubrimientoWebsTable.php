@@ -23,29 +23,47 @@ class DescubrimientoWebsTable
             ->defaultSort('id', 'desc')
             ->columns([
                 TextColumn::make('titulo')
-                    ->searchable()
+                    ->label('Título')
+                    ->state(fn ($record): string => $record->tituloLegible())
+                    ->searchable(['titulo', 'url_original'])
                     ->limit(80)
-                    ->tooltip(fn ($record): ?string => $record->titulo),
+                    ->tooltip(fn ($record): ?string => $record->url_original),
                 TextColumn::make('dominio')
+                    ->label('Dominio')
                     ->searchable(),
                 TextColumn::make('estado')
+                    ->label('Estado')
                     ->badge()
+                    ->formatStateUsing(fn (?string $state): string => str_replace('_', ' ', ucfirst(mb_strtolower((string) $state))))
+                    ->color(fn (?string $state): string => match ($state) {
+                        'PROCESADO', 'APROBADO' => 'success',
+                        'NUEVO', 'REVISION', 'REVISION_FINAL', 'EN_PROCESO' => 'warning',
+                        'ERROR', 'ERROR_TEMPORAL', 'FUENTE_INACCESIBLE' => 'danger',
+                        default => 'gray',
+                    })
                     ->searchable(),
                 TextColumn::make('evaluacion_score')
                     ->label('Evaluación')
                     ->numeric()
                     ->sortable(),
                 TextColumn::make('categoria_objetivo')
+                    ->label('Categoría')
+                    ->formatStateUsing(fn (?string $state): string => str_replace('_', ' ', ucfirst(mb_strtolower((string) $state))))
                     ->searchable(),
                 TextColumn::make('decision_objetivo')
+                    ->label('Decisión')
+                    ->formatStateUsing(fn (?string $state): string => ucfirst(mb_strtolower((string) $state)))
                     ->searchable(),
                 TextColumn::make('estado_temporal')
+                    ->label('Vigencia')
+                    ->formatStateUsing(fn (?string $state): string => str_replace('_', ' ', ucfirst(mb_strtolower((string) $state))))
                     ->searchable(),
                 TextColumn::make('intentos_procesamiento')
                     ->label('Intentos')
                     ->numeric(),
                 TextColumn::make('updated_at')
-                    ->dateTime()
+                    ->label('Actualizado')
+                    ->since()
                     ->sortable(),
                 $oculta(TextColumn::make('url_hash')->searchable()),
                 $oculta(TextColumn::make('metodo_descubrimiento')->searchable()),

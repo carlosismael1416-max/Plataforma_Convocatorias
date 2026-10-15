@@ -66,7 +66,7 @@
     .mini-btn {
         min-height: 29px;
         padding: 0 8px;
-        font-size: 9px;
+        font-size: 12px;
     }
 
     .btn-primary {
@@ -133,7 +133,7 @@
         border-radius: 999px;
         background: #E8EEF8;
         color: var(--primary);
-        font-size: 10px;
+        font-size: 12px;
         font-weight: 800;
     }
 
@@ -168,7 +168,7 @@
         border-radius: 12px;
         background: #E8EEF8;
         color: var(--primary);
-        font-size: 10px;
+        font-size: 12px;
         font-weight: 900;
     }
 
@@ -188,14 +188,14 @@
     .deliverable-description {
         margin-top: 4px;
         color: var(--muted);
-        font-size: 10px;
+        font-size: 12px;
         line-height: 1.5;
     }
 
     .status {
         padding: 5px 8px;
         border-radius: 999px;
-        font-size: 9px;
+        font-size: 12px;
         font-weight: 800;
         white-space: nowrap;
     }
@@ -244,12 +244,12 @@
         display: block;
         margin-bottom: 3px;
         color: #94A3B8;
-        font-size: 8px;
+        font-size: 11px;
     }
 
     .meta-value {
         color: #334155;
-        font-size: 9px;
+        font-size: 12px;
         font-weight: 800;
     }
 
@@ -262,7 +262,7 @@
     .evidence-title {
         margin-bottom: 7px;
         color: #64748B;
-        font-size: 9px;
+        font-size: 12px;
         font-weight: 800;
         text-transform: uppercase;
     }
@@ -277,7 +277,7 @@
 
     .evidence-name {
         color: #334155;
-        font-size: 9px;
+        font-size: 12px;
         font-weight: 700;
     }
 
@@ -315,7 +315,7 @@
         display: block;
         margin-bottom: 5px;
         color: #475569;
-        font-size: 9px;
+        font-size: 12px;
         font-weight: 800;
     }
 
@@ -347,7 +347,7 @@
     .field-error {
         margin-top: 4px;
         color: #DC2626;
-        font-size: 9px;
+        font-size: 12px;
     }
 
     .upload-box {
@@ -360,14 +360,14 @@
 
     .upload-title {
         margin-bottom: 4px;
-        font-size: 10px;
+        font-size: 12px;
         font-weight: 800;
     }
 
     .upload-help {
         margin-bottom: 9px;
         color: var(--muted);
-        font-size: 9px;
+        font-size: 12px;
     }
 
     .form-actions {
@@ -391,7 +391,7 @@
         border-radius: 10px;
         background: #ECFDF5;
         color: #065F46;
-        font-size: 10px;
+        font-size: 12px;
     }
 
     .empty {
@@ -408,7 +408,7 @@
         border-radius: 9px;
         background: #FFFBEB;
         color: #92400E;
-        font-size: 10px;
+        font-size: 12px;
     }
 
     .sidebar {
@@ -425,7 +425,7 @@
         justify-content: space-between;
         gap: 10px;
         margin-bottom: 9px;
-        font-size: 10px;
+        font-size: 12px;
     }
 
     .sidebar-row span {
@@ -448,7 +448,7 @@
         display: flex;
         justify-content: space-between;
         margin-bottom: 7px;
-        font-size: 10px;
+        font-size: 12px;
         font-weight: 800;
     }
 
@@ -479,7 +479,7 @@
         border-radius: 8px;
         color: #475569;
         text-decoration: none;
-        font-size: 10px;
+        font-size: 12px;
         font-weight: 700;
     }
 
@@ -491,7 +491,7 @@
         justify-content: center;
         border: 1px solid #CBD5E1;
         border-radius: 50%;
-        font-size: 9px;
+        font-size: 12px;
     }
 
     .step.complete .step-number {
@@ -1189,7 +1189,7 @@
                                 style="
                                     margin-top:6px;
                                     color:#64748B;
-                                    font-size:9px;
+                                    font-size:12px;
                                 "
                             >
                                 Cargando archivo...

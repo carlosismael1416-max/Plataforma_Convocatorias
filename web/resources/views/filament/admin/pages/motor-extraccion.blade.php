@@ -79,7 +79,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 10px;
+            font-size: 12px;
             font-weight: 900;
         }
 
@@ -118,7 +118,7 @@
         .stat-help {
             margin-top: 4px;
             color: #94A3B8;
-            font-size: 9px;
+            font-size: 12px;
         }
 
         .layout {
@@ -158,7 +158,7 @@
         .card-description {
             margin-top: 3px;
             color: var(--muted);
-            font-size: 10px;
+            font-size: 12px;
         }
 
         .primary-btn {
@@ -168,7 +168,7 @@
             border-radius: 9px;
             background: var(--primary);
             color: white;
-            font-size: 10px;
+            font-size: 12px;
             font-weight: 850;
             cursor: pointer;
         }
@@ -195,7 +195,7 @@
             justify-content: center;
             background: var(--primary-soft);
             color: var(--primary-dark);
-            font-size: 10px;
+            font-size: 12px;
             font-weight: 900;
         }
 
@@ -211,7 +211,7 @@
             gap: 11px;
             margin-top: 5px;
             color: #94A3B8;
-            font-size: 9px;
+            font-size: 12px;
         }
 
         .execution-summary {
@@ -226,7 +226,7 @@
             border-radius: 999px;
             background: #F1F5F9;
             color: #64748B;
-            font-size: 8px;
+            font-size: 11px;
             font-weight: 800;
         }
 
@@ -243,7 +243,7 @@
         .badge {
             padding: 6px 9px;
             border-radius: 999px;
-            font-size: 9px;
+            font-size: 12px;
             font-weight: 850;
             white-space: nowrap;
         }
@@ -278,18 +278,18 @@
 
         .source-name {
             color: #334155;
-            font-size: 10px;
+            font-size: 12px;
             font-weight: 800;
         }
 
         .source-info {
             margin-top: 3px;
             color: #94A3B8;
-            font-size: 8px;
+            font-size: 11px;
         }
 
         .mini-status {
-            font-size: 9px;
+            font-size: 12px;
             font-weight: 850;
         }
 
@@ -307,7 +307,7 @@
 
         .count {
             color: #475569;
-            font-size: 9px;
+            font-size: 12px;
             text-align: right;
         }
 
@@ -331,7 +331,7 @@
         .engine-box-text {
             margin-top: 5px;
             color: #059669;
-            font-size: 9px;
+            font-size: 12px;
             line-height: 1.5;
         }
 
@@ -341,7 +341,7 @@
             gap: 12px;
             padding: 10px 0;
             border-bottom: 1px solid #EEF2F7;
-            font-size: 10px;
+            font-size: 12px;
         }
 
         .info-row:last-child {
@@ -367,7 +367,7 @@
             gap: 10px;
             margin-bottom: 7px;
             color: #64748B;
-            font-size: 9px;
+            font-size: 12px;
         }
 
         .progress {
@@ -405,20 +405,20 @@
             align-items: center;
             background: #FEF3C7;
             color: #B45309;
-            font-size: 9px;
+            font-size: 12px;
             font-weight: 900;
         }
 
         .alert-title {
             color: #334155;
-            font-size: 9px;
+            font-size: 12px;
             font-weight: 800;
         }
 
         .alert-description {
             margin-top: 3px;
             color: #94A3B8;
-            font-size: 8px;
+            font-size: 11px;
             line-height: 1.4;
         }
 
@@ -429,7 +429,7 @@
             border: 1px solid #A7F3D0;
             background: #ECFDF5;
             color: #047857;
-            font-size: 9px;
+            font-size: 12px;
             line-height: 1.5;
         }
 
@@ -497,7 +497,7 @@
             padding: 30px 20px;
             text-align: center;
             color: #94A3B8;
-            font-size: 10px;
+            font-size: 12px;
             line-height: 1.6;
         }
 
@@ -515,7 +515,7 @@
             border-radius: 11px;
             background: #EFF6FF;
             color: #1D4ED8;
-            font-size: 10px;
+            font-size: 12px;
         }
 
         .context-box a {
@@ -564,7 +564,7 @@
             border-radius: 9px;
             background: white;
             color: #475569;
-            font-size: 10px;
+            font-size: 12px;
             font-weight: 850;
             cursor: pointer;
         }
@@ -599,7 +599,7 @@
 
                 <span class="status-dot"></span>
 
-                Monitor conectado a PostgreSQL
+                {{ $apiDisponible ? 'Extractor en línea' : 'Extractor sin respuesta' }}
 
             </div>
 
@@ -655,7 +655,7 @@
 
                 <div class="stat-help">
                     Ciclos registrados
-                    en PostgreSQL
+                    por el motor
                 </div>
 
             </div>
@@ -1237,9 +1237,8 @@
                                 </div>
 
                                 <div class="engine-box-text">
-                                    PostgreSQL no contiene
-                                    todavía ciclos registrados
-                                    por el extractor.
+                                    Todavía no hay ciclos
+                                    registrados por el extractor.
                                 </div>
 
                             </div>
@@ -1552,28 +1551,11 @@
                         <div class="info-row">
 
                             <span>
-                                Monitor
+                                API del extractor
                             </span>
 
-                            <strong
-                                style="color:#059669;"
-                            >
-                                PostgreSQL
-                            </strong>
-
-                        </div>
-
-
-                        <div class="info-row">
-
-                            <span>
-                                Laravel → Python
-                            </span>
-
-                            <strong
-                                style="color:#D97706;"
-                            >
-                                Pendiente
+                            <strong style="color: {{ $apiDisponible ? '#059669' : '#DC2626' }};">
+                                {{ $apiDisponible ? 'Disponible' : 'Sin respuesta' }}
                             </strong>
 
                         </div>
@@ -1582,11 +1564,14 @@
 
 
                     <div class="visual-note">
-                        El extractor Python existe,
-                        pero la ejecución remota desde
-                        Laravel se conectará durante
-                        la Fase 3. Esta pantalla no
-                        crea ejecuciones ficticias.
+                        @if ($apiDisponible)
+                            «Ejecutar ciclo» envía la fuente a la API del
+                            extractor; el ciclo automático corre además
+                            cada 6 horas (00:00, 06:00, 12:00 y 18:00).
+                        @else
+                            La API del extractor no respondió. Revisa el
+                            servicio convocatorias-itsva-api.service.
+                        @endif
                     </div>
 
                 </section>

@@ -46,7 +46,7 @@
 
         .eyebrow {
             color: var(--primary);
-            font-size: 10px;
+            font-size: 12px;
             font-weight: 900;
             text-transform: uppercase;
             letter-spacing: .06em;
@@ -72,7 +72,7 @@
             border-radius: 999px;
             background: #FEF3C7;
             color: #92400E;
-            font-size: 10px;
+            font-size: 12px;
             font-weight: 850;
             white-space: nowrap;
         }
@@ -102,7 +102,7 @@
             display: block;
             margin-bottom: 4px;
             color: #94A3B8;
-            font-size: 9px;
+            font-size: 12px;
             text-transform: uppercase;
         }
 
@@ -155,7 +155,7 @@
         .card-description {
             margin-top: 3px;
             color: var(--muted);
-            font-size: 10px;
+            font-size: 12px;
             line-height: 1.5;
         }
 
@@ -164,7 +164,7 @@
             border-radius: 999px;
             background: var(--primary-soft);
             color: var(--primary-dark);
-            font-size: 9px;
+            font-size: 12px;
             font-weight: 850;
             white-space: nowrap;
         }
@@ -205,7 +205,7 @@
             justify-content: center;
             background: var(--primary-soft);
             color: var(--primary-dark);
-            font-size: 9px;
+            font-size: 12px;
             font-weight: 900;
         }
 
@@ -216,20 +216,20 @@
 
         .timeline-title {
             color: #334155;
-            font-size: 10px;
+            font-size: 12px;
             font-weight: 850;
         }
 
         .timeline-text {
             margin-top: 3px;
             color: #94A3B8;
-            font-size: 9px;
+            font-size: 12px;
             line-height: 1.45;
         }
 
         .timeline-time {
             color: #94A3B8;
-            font-size: 8px;
+            font-size: 11px;
             white-space: nowrap;
         }
 
@@ -244,7 +244,7 @@
             background: #F8FAFC;
             color: #64748B;
             text-align: left;
-            font-size: 9px;
+            font-size: 12px;
             font-weight: 850;
         }
 
@@ -252,7 +252,7 @@
             padding: 13px;
             border-bottom: 1px solid #EEF2F7;
             color: #475569;
-            font-size: 9px;
+            font-size: 12px;
         }
 
         .source-table tr:last-child td {
@@ -268,7 +268,7 @@
             display: inline-flex;
             padding: 5px 8px;
             border-radius: 999px;
-            font-size: 8px;
+            font-size: 11px;
             font-weight: 850;
         }
 
@@ -308,25 +308,25 @@
             justify-content: center;
             background: #FEE2E2;
             color: #B91C1C;
-            font-size: 9px;
+            font-size: 12px;
             font-weight: 900;
         }
 
         .document-name {
             color: #334155;
-            font-size: 10px;
+            font-size: 12px;
             font-weight: 800;
         }
 
         .document-meta {
             margin-top: 3px;
             color: #94A3B8;
-            font-size: 8px;
+            font-size: 11px;
         }
 
         .document-state {
             color: var(--primary);
-            font-size: 9px;
+            font-size: 12px;
             font-weight: 850;
         }
 
@@ -359,20 +359,20 @@
             justify-content: center;
             background: #FEE2E2;
             color: #B91C1C;
-            font-size: 10px;
+            font-size: 12px;
             font-weight: 900;
         }
 
         .error-title {
             color: #334155;
-            font-size: 10px;
+            font-size: 12px;
             font-weight: 850;
         }
 
         .error-description {
             margin-top: 3px;
             color: #94A3B8;
-            font-size: 9px;
+            font-size: 12px;
             line-height: 1.5;
         }
 
@@ -384,7 +384,7 @@
             background: #F1F5F9;
             color: #475569;
             font-family: monospace;
-            font-size: 8px;
+            font-size: 11px;
         }
 
         .side-content {
@@ -407,7 +407,7 @@
         .state-text {
             margin-top: 5px;
             color: #B45309;
-            font-size: 9px;
+            font-size: 12px;
             line-height: 1.5;
         }
 
@@ -417,7 +417,7 @@
             gap: 12px;
             padding: 10px 0;
             border-bottom: 1px solid #EEF2F7;
-            font-size: 10px;
+            font-size: 12px;
         }
 
         .info-row:last-child {
@@ -443,7 +443,7 @@
             gap: 10px;
             margin-bottom: 7px;
             color: #64748B;
-            font-size: 9px;
+            font-size: 12px;
         }
 
         .progress {
@@ -472,7 +472,7 @@
             border-radius: 9px;
             background: white;
             color: #475569;
-            font-size: 10px;
+            font-size: 12px;
             font-weight: 850;
             cursor: pointer;
         }
@@ -490,7 +490,7 @@
             background: #ECFDF5;
             color: #047857;
             text-align: center;
-            font-size: 9px;
+            font-size: 12px;
             line-height: 1.5;
         }
 
@@ -617,7 +617,7 @@
             padding: 28px 18px;
             color: #94A3B8;
             text-align: center;
-            font-size: 10px;
+            font-size: 12px;
             line-height: 1.6;
         }
 
@@ -639,7 +639,7 @@
             padding: 11px 13px;
             border-bottom: 1px solid #EEF2F7;
             text-align: left;
-            font-size: 9px;
+            font-size: 12px;
         }
 
         .api-table th {

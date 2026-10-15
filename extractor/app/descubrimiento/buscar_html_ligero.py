@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from app.descubrimiento.codificacion import decodificar_html
 from app.seguridad_red import SesionSegura
 
 
@@ -1190,14 +1191,9 @@ def descargar_html(
             partes
         )
 
-        encoding = (
-            respuesta.encoding
-            or "utf-8"
-        )
-
-        texto = contenido.decode(
-            encoding,
-            errors="replace",
+        texto = decodificar_html(
+            contenido,
+            respuesta,
         )
 
         return (

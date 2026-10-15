@@ -85,7 +85,7 @@
         .stat-help {
             margin-top: 4px;
             color: #94A3B8;
-            font-size: 10px;
+            font-size: 12px;
         }
 
         .toolbar {
@@ -187,7 +187,7 @@
             border-radius: 999px;
             background: #FEF3C7;
             color: #92400E;
-            font-size: 10px;
+            font-size: 12px;
             font-weight: 850;
             white-space: nowrap;
         }
@@ -217,7 +217,7 @@
             display: block;
             margin-bottom: 4px;
             color: #94A3B8;
-            font-size: 9px;
+            font-size: 12px;
             text-transform: uppercase;
         }
 
@@ -239,7 +239,7 @@
 
         .origin {
             color: #94A3B8;
-            font-size: 10px;
+            font-size: 12px;
         }
 
         .actions {
@@ -254,7 +254,7 @@
             border: 1px solid var(--border);
             background: white;
             color: #475569;
-            font-size: 10px;
+            font-size: 12px;
             font-weight: 850;
             cursor: pointer;
         }

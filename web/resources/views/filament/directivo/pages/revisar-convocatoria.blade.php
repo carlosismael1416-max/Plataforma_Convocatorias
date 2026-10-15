@@ -107,7 +107,7 @@
             display: block;
             margin-bottom: 4px;
             color: #94A3B8;
-            font-size: 9px;
+            font-size: 12px;
             text-transform: uppercase;
         }
 
@@ -161,7 +161,7 @@
             border-radius: 999px;
             background: #D1FAE5;
             color: #065F46;
-            font-size: 10px;
+            font-size: 12px;
             font-weight: 850;
             white-space: nowrap;
         }
@@ -194,7 +194,7 @@
             display: block;
             margin-bottom: 5px;
             color: #94A3B8;
-            font-size: 9px;
+            font-size: 12px;
             text-transform: uppercase;
             font-weight: 800;
         }
@@ -235,7 +235,7 @@
             justify-content: center;
             background: var(--primary-soft);
             color: var(--primary);
-            font-size: 10px;
+            font-size: 12px;
             font-weight: 900;
         }
 
@@ -248,7 +248,7 @@
         .requirement-text {
             margin-top: 3px;
             color: #94A3B8;
-            font-size: 10px;
+            font-size: 12px;
             line-height: 1.45;
         }
 
@@ -257,7 +257,7 @@
             border-radius: 999px;
             background: #FEE2E2;
             color: #991B1B;
-            font-size: 9px;
+            font-size: 12px;
             font-weight: 850;
             white-space: nowrap;
         }
@@ -293,7 +293,7 @@
             justify-content: center;
             background: #FEE2E2;
             color: #B91C1C;
-            font-size: 9px;
+            font-size: 12px;
             font-weight: 900;
         }
 
@@ -306,7 +306,7 @@
         .document-help {
             margin-top: 3px;
             color: #94A3B8;
-            font-size: 9px;
+            font-size: 12px;
         }
 
         .document-button {
@@ -316,7 +316,7 @@
             border-radius: 8px;
             background: white;
             color: var(--primary);
-            font-size: 9px;
+            font-size: 12px;
             font-weight: 850;
             cursor: pointer;
         }
@@ -372,7 +372,7 @@
             align-items: center;
             padding: 9px 0;
             border-bottom: 1px solid #EEF2F7;
-            font-size: 10px;
+            font-size: 12px;
         }
 
         .check-item:last-child {
@@ -389,7 +389,7 @@
             justify-content: center;
             background: #D1FAE5;
             color: #047857;
-            font-size: 9px;
+            font-size: 12px;
             font-weight: 900;
         }
 
@@ -460,7 +460,7 @@
         .visual-note {
             margin-top: 13px;
             color: #94A3B8;
-            font-size: 9px;
+            font-size: 12px;
             line-height: 1.45;
             text-align: center;
         }
@@ -514,7 +514,7 @@
             border-radius: 10px;
             background: #F8FAFC;
             color: #94A3B8;
-            font-size: 10px;
+            font-size: 12px;
             line-height: 1.5;
         }
 
@@ -560,20 +560,20 @@
             display: block;
             margin-bottom: 4px;
             color: #94A3B8;
-            font-size: 8px;
+            font-size: 11px;
             text-transform: uppercase;
         }
 
         .change-text {
             color: #334155;
-            font-size: 10px;
+            font-size: 12px;
             font-weight: 800;
         }
 
         .change-meta {
             margin-top: 9px;
             color: #64748B;
-            font-size: 9px;
+            font-size: 12px;
             line-height: 1.5;
         }
 

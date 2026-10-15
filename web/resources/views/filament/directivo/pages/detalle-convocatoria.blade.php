@@ -50,7 +50,7 @@
 
     .organization {
         color: var(--primary);
-        font-size: 10px;
+        font-size: 12px;
         font-weight: 850;
         text-transform: uppercase;
         letter-spacing: .04em;
@@ -71,7 +71,7 @@
         gap: 6px;
         padding: 6px 9px;
         border-radius: 999px;
-        font-size: 9px;
+        font-size: 12px;
         font-weight: 850;
         white-space: nowrap;
     }
@@ -135,13 +135,13 @@
         display: block;
         margin-bottom: 4px;
         color: #94A3B8;
-        font-size: 8px;
+        font-size: 11px;
         text-transform: uppercase;
     }
 
     .meta-value {
         color: #334155;
-        font-size: 10px;
+        font-size: 12px;
         font-weight: 850;
     }
 
@@ -188,7 +188,7 @@
         border-radius: 9px;
         background: #F8FAFC;
         color: #94A3B8;
-        font-size: 9px;
+        font-size: 12px;
     }
 
     .tags {
@@ -203,7 +203,7 @@
         border-radius: 999px;
         background: var(--primary-soft);
         color: var(--primary-dark);
-        font-size: 8px;
+        font-size: 11px;
         font-weight: 800;
     }
 
@@ -233,27 +233,27 @@
         border-radius: 50%;
         background: var(--primary-soft);
         color: var(--primary);
-        font-size: 8px;
+        font-size: 11px;
         font-weight: 900;
     }
 
     .requirement-title {
         color: #334155;
-        font-size: 10px;
+        font-size: 12px;
         font-weight: 800;
     }
 
     .requirement-description {
         margin-top: 3px;
         color: #64748B;
-        font-size: 9px;
+        font-size: 12px;
         line-height: 1.5;
     }
 
     .requirement-meta {
         margin-top: 5px;
         color: #94A3B8;
-        font-size: 7px;
+        font-size: 11px;
     }
 
     .documents {
@@ -289,13 +289,13 @@
         border-radius: 9px;
         background: #FEE2E2;
         color: #B91C1C;
-        font-size: 8px;
+        font-size: 11px;
         font-weight: 900;
     }
 
     .document-name {
         color: #334155;
-        font-size: 10px;
+        font-size: 12px;
         font-weight: 800;
         overflow-wrap: anywhere;
     }
@@ -303,7 +303,7 @@
     .document-meta {
         margin-top: 3px;
         color: #94A3B8;
-        font-size: 8px;
+        font-size: 11px;
     }
 
     .document-btn {
@@ -316,7 +316,7 @@
         border-radius: 7px;
         background: white;
         color: var(--primary);
-        font-size: 8px;
+        font-size: 11px;
         font-weight: 850;
         text-decoration: none;
     }
@@ -348,7 +348,7 @@
         gap: 10px;
         padding: 8px 0;
         border-bottom: 1px solid #EEF2F7;
-        font-size: 9px;
+        font-size: 12px;
     }
 
     .side-row:last-child {
@@ -375,7 +375,7 @@
     }
 
     .deadline-label {
-        font-size: 8px;
+        font-size: 11px;
         font-weight: 800;
     }
 
@@ -387,7 +387,7 @@
 
     .deadline-help {
         margin-top: 4px;
-        font-size: 8px;
+        font-size: 11px;
         line-height: 1.4;
     }
 
@@ -429,7 +429,7 @@
 
     .source-label {
         color: #8B5CF6;
-        font-size: 7px;
+        font-size: 11px;
         text-transform: uppercase;
         font-weight: 850;
     }
@@ -437,14 +437,14 @@
     .source-name {
         margin-top: 5px;
         color: #5B21B6;
-        font-size: 10px;
+        font-size: 12px;
         font-weight: 850;
     }
 
     .source-text {
         margin-top: 5px;
         color: #7C3AED;
-        font-size: 8px;
+        font-size: 11px;
         line-height: 1.45;
     }
 

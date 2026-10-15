@@ -119,7 +119,7 @@
         .stat-help {
             margin-top: 5px;
             color: #94A3B8;
-            font-size: 10px;
+            font-size: 12px;
         }
 
         .layout {
@@ -208,7 +208,7 @@
         .quick-text {
             margin-top: 4px;
             color: var(--muted);
-            font-size: 10px;
+            font-size: 12px;
             line-height: 1.45;
         }
 
@@ -234,7 +234,7 @@
             justify-content: center;
             background: var(--primary-soft);
             color: var(--primary-dark);
-            font-size: 10px;
+            font-size: 12px;
             font-weight: 900;
         }
 
@@ -247,13 +247,13 @@
         .execution-meta {
             margin-top: 4px;
             color: #94A3B8;
-            font-size: 9px;
+            font-size: 12px;
         }
 
         .status {
             padding: 5px 8px;
             border-radius: 999px;
-            font-size: 9px;
+            font-size: 12px;
             font-weight: 850;
             white-space: nowrap;
         }
@@ -290,7 +290,7 @@
         .source-url {
             margin-top: 3px;
             color: #94A3B8;
-            font-size: 9px;
+            font-size: 12px;
         }
 
         .source-state {
@@ -298,7 +298,7 @@
             align-items: center;
             gap: 6px;
             color: #047857;
-            font-size: 9px;
+            font-size: 12px;
             font-weight: 850;
         }
 
@@ -328,7 +328,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 10px;
+            font-size: 12px;
             font-weight: 900;
         }
 
@@ -344,14 +344,14 @@
 
         .alert-title {
             color: #334155;
-            font-size: 10px;
+            font-size: 12px;
             font-weight: 800;
         }
 
         .alert-text {
             margin-top: 3px;
             color: #94A3B8;
-            font-size: 9px;
+            font-size: 12px;
             line-height: 1.4;
         }
 
@@ -361,7 +361,7 @@
             gap: 14px;
             padding: 11px 19px;
             border-bottom: 1px solid #EEF2F7;
-            font-size: 10px;
+            font-size: 12px;
         }
 
         .info-row:last-child {
@@ -415,7 +415,7 @@
 
         .section-link {
             color: var(--primary-dark);
-            font-size: 10px;
+            font-size: 12px;
             font-weight: 850;
             text-decoration: none;
             white-space: nowrap;
@@ -456,7 +456,7 @@
             padding: 28px 20px;
             text-align: center;
             color: #94A3B8;
-            font-size: 10px;
+            font-size: 12px;
             line-height: 1.6;
         }
 
@@ -946,8 +946,7 @@
                             </div>
 
                             El motor todavía no tiene
-                            ciclos registrados en
-                            PostgreSQL.
+                            ciclos registrados.
 
                         </div>
 
@@ -975,7 +974,7 @@
                                 "
                             >
                                 Fuentes configuradas
-                                en PostgreSQL
+                                para el motor
                             </div>
 
                         </div>

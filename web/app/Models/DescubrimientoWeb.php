@@ -74,4 +74,40 @@ class DescubrimientoWeb extends Model
             'convocatoria_id'
         );
     }
+
+    /**
+     * Título para mostrar: repara el texto mal decodificado ("AmÃ©rico") de
+     * registros antiguos y, si no hay título (p. ej. sitemaps), lo deriva de
+     * la ruta de la URL. No modifica el registro.
+     */
+    public function tituloLegible(): string
+    {
+        $titulo = trim((string) $this->titulo);
+
+        if ($titulo !== '' && str_contains($titulo, 'Ã')) {
+            $reparado = mb_convert_encoding($titulo, 'ISO-8859-1', 'UTF-8');
+
+            if (mb_check_encoding($reparado, 'UTF-8')) {
+                $titulo = $reparado;
+            }
+        }
+
+        if ($titulo !== '') {
+            return $titulo;
+        }
+
+        $ruta = (string) parse_url((string) $this->url_original, PHP_URL_PATH);
+        $tramo = collect(explode('/', trim($ruta, '/')))
+            ->reverse()
+            ->first(fn (string $parte): bool => preg_match('/[a-z]{3,}/i', $parte) === 1);
+
+        if (! $tramo) {
+            return (string) ($this->url_original ?: 'Sin título');
+        }
+
+        $tramo = preg_replace('/\.(html?|php|aspx?)$/i', '', urldecode($tramo));
+        $tramo = preg_replace('/[-_]+\d{4,}$/', '', $tramo);
+
+        return '(sin título) ' . ucfirst(str_replace(['-', '_'], ' ', $tramo));
+    }
 }

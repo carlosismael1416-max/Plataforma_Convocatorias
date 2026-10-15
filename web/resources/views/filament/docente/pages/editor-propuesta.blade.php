@@ -101,7 +101,7 @@
     .card-description {
         margin-top: 4px;
         color: #64748B;
-        font-size: 10px;
+        font-size: 12px;
         line-height: 1.5;
     }
 
@@ -111,7 +111,7 @@
         border-radius: 20px;
         background: #E8EEF8;
         color: #1A4B8C;
-        font-size: 9px;
+        font-size: 12px;
         font-weight: 700;
     }
 
@@ -130,7 +130,7 @@
         display: block;
         margin-bottom: 6px;
         color: #475569;
-        font-size: 10px;
+        font-size: 12px;
         font-weight: 700;
     }
 
@@ -190,13 +190,13 @@
         margin-top: 5px;
         color: #94A3B8;
         text-align: right;
-        font-size: 9px;
+        font-size: 12px;
     }
 
     .field-error {
         margin-top: 5px;
         color: #DC2626;
-        font-size: 9px;
+        font-size: 12px;
     }
 
     .editor-bottom {
@@ -226,7 +226,7 @@
     .status-label,
     .progress-label {
         color: #64748B;
-        font-size: 10px;
+        font-size: 12px;
         font-weight: 700;
     }
 
@@ -238,7 +238,7 @@
         border-radius: 20px;
         background: #F1F5F9;
         color: #475569;
-        font-size: 9px;
+        font-size: 12px;
         font-weight: 700;
     }
 
@@ -295,7 +295,7 @@
         border-radius: 8px;
         color: #475569;
         text-decoration: none;
-        font-size: 10px;
+        font-size: 12px;
         font-weight: 600;
     }
 
@@ -324,7 +324,7 @@
         border-radius: 50%;
         background: #F1F5F9;
         color: #64748B;
-        font-size: 9px;
+        font-size: 12px;
         font-weight: 700;
     }
 
@@ -352,7 +352,7 @@
         gap: 12px;
         padding: 6px 0;
         color: #64748B;
-        font-size: 9px;
+        font-size: 12px;
     }
 
     .summary-item strong {
@@ -369,7 +369,7 @@
         background: #F8FAFC;
         color: #64748B;
         text-align: center;
-        font-size: 9px;
+        font-size: 12px;
     }
 
     .readonly-warning {

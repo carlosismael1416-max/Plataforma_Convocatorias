@@ -90,7 +90,7 @@
         .summary-help {
             margin-top: 4px;
             color: #94A3B8;
-            font-size: 10px;
+            font-size: 12px;
         }
 
         .layout {
@@ -126,7 +126,7 @@
             border-radius: 999px;
             background: var(--primary-soft);
             color: var(--primary-dark);
-            font-size: 10px;
+            font-size: 12px;
             font-weight: 850;
         }
 
@@ -146,7 +146,7 @@
             border-radius: 999px;
             background: white;
             color: #475569;
-            font-size: 10px;
+            font-size: 12px;
             font-weight: 800;
             cursor: pointer;
         }
@@ -228,7 +228,7 @@
             border-radius: 999px;
             background: #EDE9FE;
             color: #6D28D9;
-            font-size: 8px;
+            font-size: 11px;
             font-weight: 900;
             text-transform: uppercase;
         }
@@ -236,14 +236,14 @@
         .notification-text {
             margin-top: 5px;
             color: var(--muted);
-            font-size: 10px;
+            font-size: 12px;
             line-height: 1.55;
         }
 
         .notification-time {
             margin-top: 7px;
             color: #94A3B8;
-            font-size: 9px;
+            font-size: 12px;
         }
 
         .menu-btn {
@@ -290,14 +290,14 @@
 
         .preference-name {
             color: #334155;
-            font-size: 10px;
+            font-size: 12px;
             font-weight: 800;
         }
 
         .preference-help {
             margin-top: 3px;
             color: #94A3B8;
-            font-size: 9px;
+            font-size: 12px;
             line-height: 1.4;
         }
 
@@ -332,7 +332,7 @@
             border-radius: 10px;
             background: #F5F3FF;
             color: #5B21B6;
-            font-size: 10px;
+            font-size: 12px;
             line-height: 1.5;
         }
 
@@ -414,7 +414,7 @@
             border-radius: 7px;
             background: white;
             color: #64748B;
-            font-size: 8px;
+            font-size: 11px;
             font-weight: 850;
             cursor: pointer;
             white-space: nowrap;
@@ -440,7 +440,7 @@
 
         .empty-help {
             margin-top: 6px;
-            font-size: 10px;
+            font-size: 12px;
         }
 
         button.switch {
@@ -454,7 +454,7 @@
             border-radius: 9px;
             background: #F8FAFC;
             color: #64748B;
-            font-size: 9px;
+            font-size: 12px;
             line-height: 1.5;
         }
 
@@ -1006,7 +1006,7 @@
                             margin-bottom:10px;
                             color:#7C3AED;
                             text-decoration:none;
-                            font-size:10px;
+                            font-size:12px;
                             font-weight:850;
                         "
                     >
@@ -1024,7 +1024,7 @@
                             margin-bottom:10px;
                             color:#7C3AED;
                             text-decoration:none;
-                            font-size:10px;
+                            font-size:12px;
                             font-weight:850;
                         "
                     >
@@ -1041,7 +1041,7 @@
                             display:block;
                             color:#7C3AED;
                             text-decoration:none;
-                            font-size:10px;
+                            font-size:12px;
                             font-weight:850;
                         "
                     >

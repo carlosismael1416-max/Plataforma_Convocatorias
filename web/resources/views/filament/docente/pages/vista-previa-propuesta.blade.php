@@ -77,7 +77,7 @@
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        font-size: 9px;
+        font-size: 12px;
     }
 
     .layout {
@@ -104,7 +104,7 @@
 
     .institution {
         color: var(--primary);
-        font-size: 10px;
+        font-size: 12px;
         font-weight: 800;
         text-transform: uppercase;
         letter-spacing: .08em;
@@ -124,7 +124,7 @@
         gap: 12px;
         margin-top: 15px;
         color: var(--muted);
-        font-size: 10px;
+        font-size: 12px;
     }
 
     .status-badge {
@@ -132,7 +132,7 @@
         border-radius: 999px;
         background: #FEF3C7;
         color: #92400E;
-        font-size: 9px;
+        font-size: 12px;
         font-weight: 800;
     }
 
@@ -178,7 +178,7 @@
         border-radius: 8px;
         background: #E8EEF8;
         color: var(--primary);
-        font-size: 10px;
+        font-size: 12px;
         font-weight: 900;
     }
 
@@ -207,12 +207,12 @@
         display: block;
         margin-bottom: 4px;
         color: #94A3B8;
-        font-size: 9px;
+        font-size: 12px;
     }
 
     .data-value {
         color: #334155;
-        font-size: 10px;
+        font-size: 12px;
         font-weight: 800;
     }
 
@@ -242,7 +242,7 @@
         border-radius: 50%;
         background: #E8EEF8;
         color: var(--primary);
-        font-size: 8px;
+        font-size: 11px;
         font-weight: 900;
     }
 
@@ -258,14 +258,14 @@
 
     .item-title {
         color: #334155;
-        font-size: 10px;
+        font-size: 12px;
         font-weight: 800;
     }
 
     .item-sub {
         margin-top: 3px;
         color: #64748B;
-        font-size: 9px;
+        font-size: 12px;
         line-height: 1.5;
     }
 
@@ -286,7 +286,7 @@
         background: #F8FAFC;
         border-bottom: 1px solid var(--border);
         color: #64748B;
-        font-size: 9px;
+        font-size: 12px;
         text-align: left;
     }
 
@@ -294,7 +294,7 @@
         padding: 10px 11px;
         border-bottom: 1px solid #EEF2F7;
         color: #334155;
-        font-size: 9px;
+        font-size: 12px;
         vertical-align: top;
     }
 
@@ -320,7 +320,7 @@
         border-radius: 9px;
         background: #EFF6FF;
         color: #1E3A8A;
-        font-size: 10px;
+        font-size: 12px;
         font-weight: 800;
     }
 
@@ -346,7 +346,7 @@
         border-radius: 9px;
         background: #E8EEF8;
         color: var(--primary);
-        font-size: 9px;
+        font-size: 12px;
         font-weight: 900;
     }
 
@@ -358,14 +358,14 @@
     }
 
     .timeline-title {
-        font-size: 10px;
+        font-size: 12px;
         font-weight: 800;
     }
 
     .timeline-date {
         margin-top: 3px;
         color: var(--muted);
-        font-size: 9px;
+        font-size: 12px;
     }
 
     .files {
@@ -380,7 +380,7 @@
         border: 1px dashed #CBD5E1;
         border-radius: 9px;
         color: var(--muted);
-        font-size: 10px;
+        font-size: 12px;
         text-align: center;
     }
 
@@ -404,7 +404,7 @@
         justify-content: space-between;
         gap: 10px;
         margin-bottom: 7px;
-        font-size: 10px;
+        font-size: 12px;
         font-weight: 800;
     }
 
@@ -425,7 +425,7 @@
         margin-top: 14px;
         padding: 11px;
         border-radius: 9px;
-        font-size: 9px;
+        font-size: 12px;
         line-height: 1.5;
     }
 
@@ -450,7 +450,7 @@
     .summary-title {
         margin-bottom: 10px;
         color: #64748B;
-        font-size: 9px;
+        font-size: 12px;
         font-weight: 800;
         text-transform: uppercase;
     }
@@ -460,7 +460,7 @@
         justify-content: space-between;
         gap: 10px;
         margin-bottom: 8px;
-        font-size: 9px;
+        font-size: 12px;
     }
 
     .summary-row span {

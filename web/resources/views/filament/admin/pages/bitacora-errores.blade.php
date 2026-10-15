@@ -78,7 +78,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 10px;
+            font-size: 12px;
             font-weight: 900;
         }
 
@@ -117,7 +117,7 @@
         .stat-help {
             margin-top: 4px;
             color: #94A3B8;
-            font-size: 9px;
+            font-size: 12px;
         }
 
         .filters-card,
@@ -137,7 +137,7 @@
         .section-description {
             margin-top: 4px;
             color: var(--muted);
-            font-size: 10px;
+            font-size: 12px;
         }
 
         .filters {
@@ -156,7 +156,7 @@
             color: #64748B;
             display: flex;
             align-items: center;
-            font-size: 10px;
+            font-size: 12px;
         }
 
         .errors-table {
@@ -170,7 +170,7 @@
             background: #F8FAFC;
             border-bottom: 1px solid var(--border);
             color: #64748B;
-            font-size: 9px;
+            font-size: 12px;
             font-weight: 850;
             text-align: left;
         }
@@ -179,7 +179,7 @@
             padding: 14px 12px;
             border-bottom: 1px solid #EEF2F7;
             color: #475569;
-            font-size: 9px;
+            font-size: 12px;
             vertical-align: middle;
         }
 
@@ -189,7 +189,7 @@
 
         .error-title {
             color: #334155;
-            font-size: 10px;
+            font-size: 12px;
             font-weight: 850;
         }
 
@@ -201,14 +201,14 @@
             background: #F1F5F9;
             color: #475569;
             font-family: monospace;
-            font-size: 8px;
+            font-size: 11px;
         }
 
         .badge {
             display: inline-flex;
             padding: 5px 8px;
             border-radius: 999px;
-            font-size: 8px;
+            font-size: 11px;
             font-weight: 850;
             white-space: nowrap;
         }
@@ -235,7 +235,7 @@
 
         .action {
             color: var(--primary);
-            font-size: 9px;
+            font-size: 12px;
             font-weight: 850;
             text-decoration: none;
         }
@@ -269,7 +269,7 @@
         .source-meta {
             margin-top: 3px;
             color: #94A3B8;
-            font-size: 9px;
+            font-size: 12px;
         }
 
         .notice {
@@ -278,7 +278,7 @@
             border-radius: 10px;
             background: #ECFDF5;
             color: #047857;
-            font-size: 9px;
+            font-size: 12px;
             line-height: 1.5;
         }
 
@@ -316,7 +316,7 @@
             outline: none;
             background: #FBFCFE;
             color: #475569;
-            font-size: 10px;
+            font-size: 12px;
         }
 
         .filter-control:focus {
@@ -337,7 +337,7 @@
             border-radius: 8px;
             background: white;
             color: #64748B;
-            font-size: 9px;
+            font-size: 12px;
             font-weight: 850;
             cursor: pointer;
         }
@@ -358,7 +358,7 @@
             border-radius: 10px;
             background: #EFF6FF;
             color: #1D4ED8;
-            font-size: 10px;
+            font-size: 12px;
         }
 
         .context-filter strong {
@@ -369,7 +369,7 @@
             border: 0;
             background: transparent;
             color: #1D4ED8;
-            font-size: 9px;
+            font-size: 12px;
             font-weight: 850;
             cursor: pointer;
         }
@@ -397,7 +397,7 @@
 
         .empty-text {
             color: #94A3B8;
-            font-size: 10px;
+            font-size: 12px;
             line-height: 1.6;
         }
 
@@ -413,7 +413,7 @@
             background: #F8FAFC;
             color: #64748B;
             text-align: center;
-            font-size: 10px;
+            font-size: 12px;
         }
 
 
