@@ -41,7 +41,17 @@ def convocatorias_a_revisar(conexion, limite: int = MAX_POR_CICLO) -> list[dict]
     with conexion.cursor() as cursor:
         cursor.execute(
             """
-            SELECT c.id, c.titulo, c.url_original, c.fecha_cierre
+            SELECT
+                c.id, c.titulo, c.url_original, c.fecha_cierre,
+                (
+                    c.fuente_id IS NOT NULL
+                    AND (
+                        NULLIF(BTRIM(COALESCE(c.descripcion, '')), '') IS NULL
+                        OR NULLIF(BTRIM(COALESCE(c.objetivo, '')), '') IS NULL
+                        OR c.organismo_id IS NULL
+                        OR c.monto_maximo IS NULL
+                    )
+                ) AS incompleta
             FROM convocatorias c
             LEFT JOIN convocatoria_seguimientos s ON s.convocatoria_id = c.id
             WHERE c.estado IN ('PUBLICADA', 'ACTIVA')
@@ -58,7 +68,7 @@ def convocatorias_a_revisar(conexion, limite: int = MAX_POR_CICLO) -> list[dict]
         )
 
         return [
-            {"id": f[0], "titulo": f[1], "url": f[2], "fecha_cierre": f[3]}
+            {"id": f[0], "titulo": f[1], "url": f[2], "fecha_cierre": f[3], "incompleta": f[4]}
             for f in cursor.fetchall()
         ]
 
@@ -306,6 +316,23 @@ def revisar_convocatoria(conexion, conv: dict) -> str:
             return "CAMBIOS"
 
 
+def completar_datos(convocatoria_id: int) -> list[str]:
+    """Corre el enriquecimiento (solo llena campos vacíos)."""
+
+    from app.enriquecer_convocatoria import (
+        aplicar_enriquecimiento,
+        cargar_contexto,
+        construir_enriquecimiento,
+    )
+
+    contexto = cargar_contexto(convocatoria_id, None)
+
+    return aplicar_enriquecimiento(
+        contexto,
+        construir_enriquecimiento(contexto),
+    )
+
+
 def seguir_convocatorias(*, terminar_antes_de: float, limite: int = MAX_POR_CICLO) -> dict:
     resultado = {
         "revisadas": 0,
@@ -313,6 +340,7 @@ def seguir_convocatorias(*, terminar_antes_de: float, limite: int = MAX_POR_CICL
         "iniciales": 0,
         "errores": 0,
         "pospuestas": 0,
+        "completadas": 0,
         "resultados": [],
     }
 
@@ -340,8 +368,25 @@ def seguir_convocatorias(*, terminar_antes_de: float, limite: int = MAX_POR_CICL
             resultado["con_cambios"] += estado == "CAMBIOS"
             resultado["iniciales"] += estado == "INICIAL"
             resultado["errores"] += estado == "ERROR"
-            resultado["resultados"].append({"id": conv["id"], "estado": estado})
-            print(f"  [{estado}] {conv['id']} {conv['titulo'][:80]}")
+            campos = []
+
+            # A las publicadas incompletas se les completa la información
+            # con el enriquecimiento (descripción, objetivo, organismo, montos
+            # y fechas). Pesa más (lee los PDF), por eso solo cuando falta algo.
+            if (
+                estado != "ERROR"
+                and conv.get("incompleta")
+                and terminar_antes_de - time.monotonic() > 300
+            ):
+                try:
+                    campos = completar_datos(conv["id"])
+                except Exception as error:  # noqa: BLE001
+                    print("No se pudo completar la convocatoria", conv["id"], error)
+
+                resultado["completadas"] += bool(campos)
+
+            resultado["resultados"].append({"id": conv["id"], "estado": estado, "campos_completados": campos})
+            print(f"  [{estado}] {conv['id']} {conv['titulo'][:80]}" + (f" (+{', '.join(campos)})" if campos else ""))
     finally:
         conexion.close()
 

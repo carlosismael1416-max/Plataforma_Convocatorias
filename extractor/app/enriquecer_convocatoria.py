@@ -17,6 +17,11 @@ import requests
 
 from selectolax.parser import HTMLParser
 
+from app.enriquecer_datos_extra import (
+    descripcion_de_pagina,
+    extraer_fechas_publicacion_inicio,
+    extraer_montos,
+)
 from app.analizar_pdf import (
     extraer_texto_pdf_bytes,
 )
@@ -249,6 +254,11 @@ def cargar_contexto(
             c.fuente_id,
             c.url_original,
             c.contenido_hash,
+            c.monto_minimo,
+            c.monto_maximo,
+            c.moneda,
+            c.fecha_publicacion,
+            c.fecha_inicio,
 
             d.id AS descubrimiento_id,
             d.categoria_objetivo,
@@ -1809,6 +1819,23 @@ def construir_enriquecimiento(
             ],
         )
 
+    # Sin PDF (o sin texto útil en él): la descripción sale de la
+    # propia página oficial.
+    if not descripcion:
+        descripcion = descripcion_de_pagina(
+            texto_pagina,
+            contexto["titulo"],
+        )
+
+    montos = extraer_montos(
+        texto_total + "\n" + texto_pagina
+    )
+
+    fechas_extra = extraer_fechas_publicacion_inicio(
+        lineas + limpiar_lineas(texto_pagina),
+        fechas_en_linea,
+    )
+
     fecha_pdf, evidencia_pdf = (
         extraer_fecha_cierre(
             texto_total,
@@ -1884,6 +1911,21 @@ def construir_enriquecimiento(
         "contenido_hash":
             contenido_hash,
 
+        "monto_minimo":
+            montos["monto_minimo"],
+
+        "monto_maximo":
+            montos["monto_maximo"],
+
+        "moneda":
+            montos["moneda"],
+
+        "fecha_publicacion":
+            fechas_extra["fecha_publicacion"],
+
+        "fecha_inicio":
+            fechas_extra["fecha_inicio"],
+
         "documentos_procesados":
             documentos_procesados,
 
@@ -1895,6 +1937,47 @@ def construir_enriquecimiento(
                 lineas
             ),
     }
+
+
+def campos_extra(
+    contexto: dict,
+    resultado: dict,
+    campos: dict,
+) -> dict:
+    """
+    Montos y fechas de publicación/inicio: solo llenan campos vacíos y
+    respetan las restricciones de la tabla (cierre >= inicio y
+    máximo >= mínimo).
+    """
+
+    extra = {}
+
+    if contexto.get("monto_maximo") is None and resultado.get("monto_maximo") is not None:
+        minimo = resultado.get("monto_minimo")
+        minimo_actual = contexto.get("monto_minimo")
+
+        if minimo_actual is None or resultado["monto_maximo"] >= minimo_actual:
+            extra["monto_maximo"] = resultado["monto_maximo"]
+
+            if minimo_actual is None and minimo is not None and minimo <= resultado["monto_maximo"]:
+                extra["monto_minimo"] = minimo
+
+            if resultado.get("moneda") and resultado["moneda"] != (contexto.get("moneda") or "MXN"):
+                extra["moneda"] = resultado["moneda"]
+
+    if contexto.get("fecha_publicacion") is None and resultado.get("fecha_publicacion"):
+        extra["fecha_publicacion"] = resultado["fecha_publicacion"]
+
+    cierre = campos.get("fecha_cierre") or contexto.get("fecha_cierre")
+
+    if (
+        contexto.get("fecha_inicio") is None
+        and resultado.get("fecha_inicio")
+        and (cierre is None or resultado["fecha_inicio"] <= cierre)
+    ):
+        extra["fecha_inicio"] = resultado["fecha_inicio"]
+
+    return extra
 
 
 def aplicar_enriquecimiento(
@@ -2001,6 +2084,10 @@ def aplicar_enriquecimiento(
         ] = resultado[
             "contenido_hash"
         ]
+
+    campos.update(
+        campos_extra(contexto, resultado, campos)
+    )
 
     if not campos:
         return []

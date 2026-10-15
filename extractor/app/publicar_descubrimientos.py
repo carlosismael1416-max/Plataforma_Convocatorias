@@ -1938,7 +1938,7 @@ def procesar_aprobados(
 # Revalidación de convocatorias pendientes que llegaron por scraping
 # (no por un descubrimiento). Sin este paso nadie las volvía a
 # enriquecer ni validar. Las MANUAL las revisa un directivo.
-MAX_REVALIDACIONES = 3
+MAX_REVALIDACIONES = 5
 HORAS_ENTRE_REVALIDACIONES = 20
 # Extracción en vista previa (300 s) + PDF del enriquecimiento.
 SEGUNDOS_MAX_POR_REVALIDACION = 600
@@ -2007,9 +2007,15 @@ def revalidar_pendientes(
                 fecha_cierre IS NULL
                 OR fecha_cierre >= CURRENT_DATE
               )
-          AND updated_at < NOW()
-              - make_interval(hours => %s)
-        ORDER BY updated_at, id
+          AND (
+                updated_at < NOW()
+                    - make_interval(hours => %s)
+                -- Recién guardada y nunca revisada (p. ej. por la fase de
+                -- fuentes oficiales): se valida en el siguiente ciclo, no
+                -- 20 h después.
+                OR updated_at <= created_at + INTERVAL '1 minute'
+              )
+        ORDER BY (updated_at <= created_at + INTERVAL '1 minute') DESC, updated_at, id
         LIMIT %s
         """,
         (
