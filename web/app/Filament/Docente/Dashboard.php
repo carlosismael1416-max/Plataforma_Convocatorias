@@ -2,6 +2,7 @@
 
 namespace App\Filament\Docente;
 
+use App\Filament\Docente\Pages;
 use App\Models\Convocatoria;
 use App\Models\Propuesta;
 use App\Models\User;
@@ -116,6 +117,7 @@ class Dashboard extends BaseDashboard
                     'sub' => '+' . $this->disponibles()->where('created_at', '>=', now()->subWeek())->count() . ' esta semana',
                     'icono' => 'libro',
                     'color' => 'azul',
+                    'url' => Pages\BuscarConvocatorias::getUrl(),
                 ],
                 [
                     'etiqueta' => 'Mis convocatorias',
@@ -127,6 +129,7 @@ class Dashboard extends BaseDashboard
                         ->count() . ' por vencer pronto',
                     'icono' => 'marcador',
                     'color' => 'morado',
+                    'url' => Pages\MisConvocatorias::getUrl(),
                 ],
                 [
                     'etiqueta' => 'Propuestas en proceso',
@@ -134,6 +137,7 @@ class Dashboard extends BaseDashboard
                     'sub' => (clone $propuestas)->where('estado', 'LISTA')->count() . ' lista(s) para enviar',
                     'icono' => 'documento',
                     'color' => 'verde',
+                    'url' => Pages\Propuestas::getUrl(),
                 ],
                 [
                     'etiqueta' => 'Próximos cierres',
@@ -144,6 +148,7 @@ class Dashboard extends BaseDashboard
                     'sub' => 'En los próximos 30 días',
                     'icono' => 'reloj',
                     'color' => 'ambar',
+                    'url' => Pages\Calendario::getUrl(),
                 ],
             ],
 

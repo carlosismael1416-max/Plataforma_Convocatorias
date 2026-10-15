@@ -69,4 +69,15 @@ class DashboardDocenteTest extends TestCase
 
         $this->assertSame(0, UsuarioConvocatoria::query()->where('user_id', $docente->id)->count());
     }
+
+    public function test_las_estadisticas_son_enlaces_a_su_seccion(): void
+    {
+        $this->comoDocente();
+
+        $respuesta = $this->get('/docente')->assertOk();
+
+        foreach (['buscar-convocatorias', 'mis-convocatorias', 'propuestas', 'calendario'] as $seccion) {
+            $respuesta->assertSee('href="' . url("/docente/{$seccion}") . '" class="dd-card dd-stat"', false);
+        }
+    }
 }

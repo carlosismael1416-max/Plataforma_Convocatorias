@@ -109,7 +109,18 @@
             box-shadow: 0 1px 3px rgba(0, 0, 0, .04);
         }
 
-        .dd-stat { display: flex; align-items: flex-start; gap: 16px; padding: 20px; }
+        .dd-stat {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            padding: 20px;
+            color: inherit;
+            text-decoration: none;
+            transition: border-color .15s, box-shadow .15s, transform .15s;
+        }
+
+        .dd-stat:hover { border-color: #1A4B8C; box-shadow: 0 4px 12px rgba(26, 75, 140, .12); transform: translateY(-1px); }
+        .dd-stat:focus-visible { outline: 2px solid #2563EB; outline-offset: 2px; }
 
         .dd-stat-icono {
             display: flex;
@@ -330,14 +341,14 @@
         {{-- Estadísticas --}}
         <section class="dd-stats">
             @foreach ($estadisticas as $estadistica)
-                <div class="dd-card dd-stat">
+                <a href="{{ $estadistica['url'] }}" class="dd-card dd-stat">
                     <div class="dd-stat-icono dd-{{ $estadistica['color'] }}">{!! $svg($estadistica['icono'], 20) !!}</div>
                     <div>
                         <p class="dd-stat-etiqueta">{{ $estadistica['etiqueta'] }}</p>
                         <p class="dd-stat-valor">{{ $estadistica['valor'] }}</p>
                         <p class="dd-stat-sub">{{ $estadistica['sub'] }}</p>
                     </div>
-                </div>
+                </a>
             @endforeach
         </section>
 
