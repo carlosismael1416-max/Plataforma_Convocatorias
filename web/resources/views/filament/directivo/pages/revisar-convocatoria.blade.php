@@ -1627,9 +1627,15 @@
 
                     <textarea
                         class="textarea"
-                        placeholder="Se habilitará durante el flujo de decisión."
-                        disabled
+                        rows="5"
+                        wire:model="observaciones"
+                        placeholder="Qué debe corregirse o por qué se rechaza…"
                     ></textarea>
+
+                    <div class="visual-note" style="margin-top: 8px; text-align: left;">
+                        Obligatorias para solicitar corrección o rechazar.
+                        Quien subió la convocatoria las recibirá.
+                    </div>
 
                 </section>
 
@@ -1642,34 +1648,31 @@
                     <div class="decision-actions">
 
                         <button
-                            class="
-                                decision-btn
-                                approve
-                            "
+                            class="decision-btn approve"
                             type="button"
-                            disabled
+                            wire:click="aprobar"
+                            wire:confirm="¿Publicar esta convocatoria? Será visible para docentes y directivos."
+                            wire:loading.attr="disabled"
                         >
-                            ✓ Aprobar convocatoria
+                            ✓ Aprobar y publicar
                         </button>
 
                         <button
-                            class="
-                                decision-btn
-                                correction
-                            "
+                            class="decision-btn correction"
                             type="button"
-                            disabled
+                            wire:click="solicitarCorrecciones"
+                            wire:loading.attr="disabled"
                         >
                             Solicitar corrección
                         </button>
 
                         <button
-                            class="
-                                decision-btn
-                                reject
-                            "
+                            class="decision-btn reject"
                             type="button"
-                            disabled
+                            wire:click="rechazar"
+                            wire:confirm="¿Rechazar esta convocatoria? Quedará descartada y no se publicará."
+                            wire:loading.attr="disabled"
+                            @disabled(! $rechazoDisponible)
                         >
                             Rechazar convocatoria
                         </button>
@@ -1677,9 +1680,13 @@
                     </div>
 
                     <div class="visual-note">
-                        Las decisiones y cambios
-                        de estado se habilitarán
-                        durante la FASE 4.
+                        @if ($rechazoDisponible)
+                            La decisión queda registrada en el historial
+                            de la convocatoria.
+                        @else
+                            «Rechazar» se habilita al aplicar la migración
+                            pendiente (php artisan migrate).
+                        @endif
                     </div>
 
                 </section>

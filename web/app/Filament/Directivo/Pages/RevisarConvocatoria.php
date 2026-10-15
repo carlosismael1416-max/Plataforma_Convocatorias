@@ -4,6 +4,9 @@ namespace App\Filament\Directivo\Pages;
 
 use App\Models\Convocatoria;
 use App\Models\User;
+use App\Services\DecisionDirectivoConvocatoria;
+use Filament\Notifications\Notification;
+use Illuminate\Validation\ValidationException;
 use Filament\Pages\Page;
 use Filament\Panel;
 use Illuminate\Support\Str;
@@ -70,6 +73,44 @@ class RevisarConvocatoria extends Page
     public function getTitle(): string
     {
         return 'Revisar Convocatoria';
+    }
+
+    public string $observaciones = '';
+
+    public function aprobar(): mixed
+    {
+        return $this->decidir('APROBAR', 'Convocatoria publicada', 'Ya es visible para docentes y directivos.');
+    }
+
+    public function solicitarCorrecciones(): mixed
+    {
+        return $this->decidir('SOLICITAR_CORRECCIONES', 'Correcciones solicitadas', 'Quien la subió recibirá tus observaciones.');
+    }
+
+    public function rechazar(): mixed
+    {
+        return $this->decidir('RECHAZAR', 'Convocatoria rechazada', 'Quedó descartada y no se publicará.');
+    }
+
+    private function decidir(string $accion, string $titulo, string $cuerpo): mixed
+    {
+        $this->validate(['observaciones' => ['nullable', 'string', 'max:5000']]);
+
+        try {
+            DecisionDirectivoConvocatoria::decidir($this->convocatoria, auth()->user(), $accion, $this->observaciones);
+        } catch (ValidationException $e) {
+            Notification::make()
+                ->title('No se pudo registrar la decisión')
+                ->body(collect($e->errors())->flatten()->first())
+                ->warning()
+                ->send();
+
+            return null;
+        }
+
+        Notification::make()->title($titulo)->body($cuerpo)->success()->send();
+
+        return redirect(ConvocatoriasPorRevisar::getUrl());
     }
 
     protected function getViewData(): array
@@ -293,6 +334,8 @@ class RevisarConvocatoria extends Page
         ];
 
         return [
+            'rechazoDisponible' => DecisionDirectivoConvocatoria::rechazoDisponible(),
+
             'fechaDetectada' =>
                 $fechaDetectada,
 
