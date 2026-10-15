@@ -84,3 +84,37 @@ class FaseFuentesOficialesTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+LISTADO_WORDPRESS = b"""
+<html><body>
+<a href="https://ciencia.yucatan.gob.mx/convocatorias/">Convocatorias</a>
+<a href="https://ciencia.yucatan.gob.mx/convocatorias/fondo-investigacion-2026/">Fondo 2026</a>
+<a href="https://ciencia.yucatan.gob.mx/convocatorias/fondo-investigacion-2026/">Fondo 2026 (repetido)</a>
+<a href="https://ciencia.yucatan.gob.mx/tag/convocatorias/">Etiqueta</a>
+<a href="https://ciencia.yucatan.gob.mx/convocatoria-abierta/">Sección</a>
+<a href="https://ciencia.yucatan.gob.mx/convocatoria-abierta/proyectos-siidetey/">Proyectos</a>
+<a href="https://ciencia.yucatan.gob.mx/wp-content/uploads/bases.pdf">PDF</a>
+<a href="https://www.facebook.com/sharer/sharer.php?u=https://ciencia.yucatan.gob.mx/convocatorias/x">Compartir</a>
+<a href="https://ciencia.yucatan.gob.mx/contacto/">Contacto</a>
+</body></html>
+"""
+
+
+class ListadoGenericoTest(unittest.TestCase):
+    def test_toma_paginas_de_convocatoria_del_mismo_sitio(self):
+        spider = ConvocatoriasSpider(url="https://ciencia.yucatan.gob.mx/convocatorias/", limite=10)
+        respuesta = HtmlResponse(
+            url="https://ciencia.yucatan.gob.mx/convocatorias/",
+            body=LISTADO_WORDPRESS,
+            encoding="utf-8",
+        )
+        urls = [r.url for r in spider.convocatorias_de_listado(respuesta)]
+
+        self.assertEqual(
+            urls,
+            [
+                "https://ciencia.yucatan.gob.mx/convocatorias/fondo-investigacion-2026/",
+                "https://ciencia.yucatan.gob.mx/convocatoria-abierta/proyectos-siidetey/",
+            ],
+        )

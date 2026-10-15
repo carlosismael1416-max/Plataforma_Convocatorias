@@ -41,6 +41,14 @@ PALABRAS_BLOQUEO = (
     "becas",
     "becario",
     "becaria",
+    # Actividades para estudiantes y eventos (no son financiamiento para
+    # proyectos de investigación de la institución).
+    "feria",
+    "concurso",
+    "expociencias",
+    "olimpiada",
+    "verano de la ciencia",
+    "formacion temprana",
 )
 
 
