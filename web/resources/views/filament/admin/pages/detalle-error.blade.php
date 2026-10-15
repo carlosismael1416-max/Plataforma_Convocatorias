@@ -1279,9 +1279,9 @@
 
                 <div class="visual-note">
                     Resolver o reabrir una incidencia
-                    actualiza directamente PostgreSQL.
-                    El reintento del extractor se
-                    conectará en la Fase 3.
+                    solo cambia su estado en la bitácora.
+                    Los reintentos los hace el ciclo
+                    automático (máximo 3 intentos).
                 </div>
 
             </aside>

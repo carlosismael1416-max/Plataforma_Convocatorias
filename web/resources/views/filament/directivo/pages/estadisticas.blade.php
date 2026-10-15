@@ -675,9 +675,7 @@
             >
 
                 <div class="stat-header">
-                    <div class="stat-icon purple">
-                        C
-                    </div>
+                    <div class="stat-icon purple">{!! \App\Filament\Apariencia\Iconos::svg('libro', 20) !!}</div>
                 </div>
 
                 <div class="stat-value">
@@ -719,9 +717,7 @@
             >
 
                 <div class="stat-header">
-                    <div class="stat-icon green">
-                        ✓
-                    </div>
+                    <div class="stat-icon green">{!! \App\Filament\Apariencia\Iconos::svg('aprobado', 20) !!}</div>
                 </div>
 
                 <div class="stat-value">
@@ -759,9 +755,7 @@
             >
 
                 <div class="stat-header">
-                    <div class="stat-icon yellow">
-                        !
-                    </div>
+                    <div class="stat-icon yellow">{!! \App\Filament\Apariencia\Iconos::svg('alerta', 20) !!}</div>
                 </div>
 
                 <div class="stat-value">
@@ -803,9 +797,7 @@
             >
 
                 <div class="stat-header">
-                    <div class="stat-icon blue">
-                        P
-                    </div>
+                    <div class="stat-icon blue">{!! \App\Filament\Apariencia\Iconos::svg('documento', 20) !!}</div>
                 </div>
 
                 <div class="stat-value">

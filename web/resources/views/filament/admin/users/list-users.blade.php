@@ -210,9 +210,7 @@
         <div class="stats-grid">
 
             <div class="stat-card">
-                <div class="stat-icon icon-all">
-                    U
-                </div>
+                <div class="stat-icon icon-all">{!! \App\Filament\Apariencia\Iconos::svg('usuarios', 20) !!}</div>
 
                 <div class="stat-value">
                     32
@@ -228,9 +226,7 @@
             </div>
 
             <div class="stat-card">
-                <div class="stat-icon icon-docente">
-                    D
-                </div>
+                <div class="stat-icon icon-docente">{!! \App\Filament\Apariencia\Iconos::svg('usuarios', 20) !!}</div>
 
                 <div class="stat-value">
                     24
@@ -246,9 +242,7 @@
             </div>
 
             <div class="stat-card">
-                <div class="stat-icon icon-directivo">
-                    DI
-                </div>
+                <div class="stat-icon icon-directivo">{!! \App\Filament\Apariencia\Iconos::svg('usuarios', 20) !!}</div>
 
                 <div class="stat-value">
                     5
@@ -264,9 +258,7 @@
             </div>
 
             <div class="stat-card">
-                <div class="stat-icon icon-admin">
-                    A
-                </div>
+                <div class="stat-icon icon-admin">{!! \App\Filament\Apariencia\Iconos::svg('escudo', 20) !!}</div>
 
                 <div class="stat-value">
                     3

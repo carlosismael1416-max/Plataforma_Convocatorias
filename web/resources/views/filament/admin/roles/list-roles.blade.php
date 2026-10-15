@@ -316,21 +316,21 @@
 
         <div class="stats">
             <div class="stat">
-                <div class="stat-icon">R</div>
+                <div class="stat-icon">{!! \App\Filament\Apariencia\Iconos::svg('escudo', 20) !!}</div>
                 <div class="stat-value">{{ $totalRoles }}</div>
                 <div class="stat-label">Roles registrados</div>
                 <div class="stat-help">{{ $rolesActivos }} activo(s)</div>
             </div>
 
             <div class="stat">
-                <div class="stat-icon">U</div>
+                <div class="stat-icon">{!! \App\Filament\Apariencia\Iconos::svg('usuarios', 20) !!}</div>
                 <div class="stat-value">{{ $usuariosConRol }}</div>
                 <div class="stat-label">Usuarios asignados</div>
                 <div class="stat-help">Cuentas con un rol asignado</div>
             </div>
 
             <div class="stat">
-                <div class="stat-icon">P</div>
+                <div class="stat-icon">{!! \App\Filament\Apariencia\Iconos::svg('aprobado', 20) !!}</div>
                 <div class="stat-value">{{ $totalPermisos }}</div>
                 <div class="stat-label">Permisos definidos</div>
                 <div class="stat-help">Registrados en el catálogo de permisos</div>

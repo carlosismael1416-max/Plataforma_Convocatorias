@@ -507,9 +507,7 @@
 
             <div class="stat">
 
-                <div class="stat-icon red">
-                    !
-                </div>
+                <div class="stat-icon red">{!! \App\Filament\Apariencia\Iconos::svg('alerta', 20) !!}</div>
 
                 <div class="stat-value">
                     {{ $totalErrores }}
@@ -529,9 +527,7 @@
 
             <div class="stat">
 
-                <div class="stat-icon yellow">
-                    P
-                </div>
+                <div class="stat-icon yellow">{!! \App\Filament\Apariencia\Iconos::svg('reloj', 20) !!}</div>
 
                 <div class="stat-value">
                     {{ $pendientes }}
@@ -550,9 +546,7 @@
 
             <div class="stat">
 
-                <div class="stat-icon green">
-                    ✓
-                </div>
+                <div class="stat-icon green">{!! \App\Filament\Apariencia\Iconos::svg('aprobado', 20) !!}</div>
 
                 <div class="stat-value">
                     {{ $resueltos }}
@@ -571,9 +565,7 @@
 
             <div class="stat">
 
-                <div class="stat-icon blue">
-                    F
-                </div>
+                <div class="stat-icon blue">{!! \App\Filament\Apariencia\Iconos::svg('globo', 20) !!}</div>
 
                 <div class="stat-value">
                     {{ $fuentesRegistradas }}

@@ -641,9 +641,7 @@
 
             <div class="stat-card">
 
-                <div class="stat-icon green">
-                    BOT
-                </div>
+                <div class="stat-icon green">{!! \App\Filament\Apariencia\Iconos::svg('cpu', 20) !!}</div>
 
                 <div class="stat-value">
                     {{ $totalEjecuciones }}
@@ -663,9 +661,7 @@
 
             <div class="stat-card">
 
-                <div class="stat-icon blue">
-                    F
-                </div>
+                <div class="stat-icon blue">{!! \App\Filament\Apariencia\Iconos::svg('globo', 20) !!}</div>
 
                 <div class="stat-value">
                     {{ $totalFuentes }}
@@ -685,9 +681,7 @@
 
             <div class="stat-card">
 
-                <div class="stat-icon yellow">
-                    C
-                </div>
+                <div class="stat-icon yellow">{!! \App\Filament\Apariencia\Iconos::svg('libro', 20) !!}</div>
 
                 <div class="stat-value">
                     {{ $totalDetectadas }}
@@ -707,9 +701,7 @@
 
             <div class="stat-card">
 
-                <div class="stat-icon red">
-                    !
-                </div>
+                <div class="stat-icon red">{!! \App\Filament\Apariencia\Iconos::svg('alerta', 20) !!}</div>
 
                 <div class="stat-value">
                     {{ $erroresPendientes }}

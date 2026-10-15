@@ -117,104 +117,92 @@
 
     <div class="users-summary">
 
-        <div class="user-summary-card">
+        <div class="stat user-summary-card">
 
             <div
-                class="
-                    user-summary-icon
+                class="stat-icon user-summary-icon
                     icon-users
                 "
-            >
-                U
-            </div>
+            >{!! \App\Filament\Apariencia\Iconos::svg('usuarios', 20) !!}</div>
 
-            <div class="user-summary-number">
+            <div class="stat-value user-summary-number">
                 {{ $totalUsuarios }}
             </div>
 
-            <div class="user-summary-title">
+            <div class="stat-label user-summary-title">
                 Usuarios registrados
             </div>
 
-            <div class="user-summary-help">
+            <div class="stat-help user-summary-help">
                 Total de cuentas
             </div>
 
         </div>
 
 
-        <div class="user-summary-card">
+        <div class="stat user-summary-card">
 
             <div
-                class="
-                    user-summary-icon
+                class="stat-icon user-summary-icon
                     icon-docente
                 "
-            >
-                D
-            </div>
+            >{!! \App\Filament\Apariencia\Iconos::svg('usuarios', 20) !!}</div>
 
-            <div class="user-summary-number">
+            <div class="stat-value user-summary-number">
                 {{ $totalDocentes }}
             </div>
 
-            <div class="user-summary-title">
+            <div class="stat-label user-summary-title">
                 Docentes
             </div>
 
-            <div class="user-summary-help">
+            <div class="stat-help user-summary-help">
                 Usuarios con rol Docente
             </div>
 
         </div>
 
 
-        <div class="user-summary-card">
+        <div class="stat user-summary-card">
 
             <div
-                class="
-                    user-summary-icon
+                class="stat-icon user-summary-icon
                     icon-directivo
                 "
-            >
-                DI
-            </div>
+            >{!! \App\Filament\Apariencia\Iconos::svg('usuarios', 20) !!}</div>
 
-            <div class="user-summary-number">
+            <div class="stat-value user-summary-number">
                 {{ $totalDirectivos }}
             </div>
 
-            <div class="user-summary-title">
+            <div class="stat-label user-summary-title">
                 Directivos
             </div>
 
-            <div class="user-summary-help">
+            <div class="stat-help user-summary-help">
                 Usuarios con rol Directivo
             </div>
 
         </div>
 
 
-        <div class="user-summary-card">
+        <div class="stat user-summary-card">
 
             <div
-                class="
-                    user-summary-icon
+                class="stat-icon user-summary-icon
                     icon-admin
                 "
-            >
-                A
-            </div>
+            >{!! \App\Filament\Apariencia\Iconos::svg('escudo', 20) !!}</div>
 
-            <div class="user-summary-number">
+            <div class="stat-value user-summary-number">
                 {{ $totalAdministradores }}
             </div>
 
-            <div class="user-summary-title">
+            <div class="stat-label user-summary-title">
                 Administradores
             </div>
 
-            <div class="user-summary-help">
+            <div class="stat-help user-summary-help">
                 Usuarios administradores
             </div>
 

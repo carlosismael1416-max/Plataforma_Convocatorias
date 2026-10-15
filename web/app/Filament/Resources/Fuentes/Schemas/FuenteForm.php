@@ -62,7 +62,7 @@ class FuenteForm
                 Toggle::make('activa')
                     ->label('Fuente activa')
                     ->helperText(
-                        'Por ahora deja desactivada la fuente hasta configurar el extractor.'
+                        'Solo las fuentes activas se consultan en el ciclo automático.'
                     )
                     ->default(false),
             ]);

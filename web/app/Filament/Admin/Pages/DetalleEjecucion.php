@@ -15,6 +15,11 @@ class DetalleEjecucion extends Page
     protected string $view =
         'filament.admin.pages.detalle-ejecucion';
 
+    // El título ya aparece en el header del panel.
+    protected ?string $heading = '';
+
+    protected static ?string $title = 'Detalle de ejecución';
+
     protected static ?string $slug =
         'detalle-ejecucion/{record}';
 
