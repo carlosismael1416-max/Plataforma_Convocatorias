@@ -150,4 +150,32 @@ class AvisosTest extends TestCase
 
         $this->assertFalse(\App\Models\Convocatoria::query()->where('titulo', 'ZZ-VENCIDA')->exists());
     }
+
+    public function test_el_detalle_muestra_la_verificacion_y_el_ultimo_cambio(): void
+    {
+        $docente = $this->usuarioConRol('DOCENTE');
+        $c = $this->convocatoria(['fecha_cierre' => today()->addDays(10)]);
+
+        \Illuminate\Support\Facades\DB::table('convocatoria_seguimientos')->insert([
+            'convocatoria_id' => $c->id,
+            'texto' => 'texto',
+            'documentos' => '[]',
+            'revisado_en' => now(),
+            'ultimo_cambio_en' => now(),
+            'ultimo_resultado' => 'CAMBIOS',
+            'ultimo_resumen' => 'Documentos nuevos (1): Anexo.',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $this->actingAs($docente)
+            ->get("/docente/detalle-convocatoria/{$c->id}")
+            ->assertOk()
+            ->assertSee('Verificada en el sitio oficial')
+            ->assertSee('Documentos nuevos (1): Anexo.');
+
+        $this->get('/docente/notificaciones')
+            ->assertOk()
+            ->assertSee('Cambios en convocatorias que sigo');
+    }
 }

@@ -171,6 +171,7 @@ class Dashboard extends BaseDashboard
         $errores = (int) ($datos['publicacion']['errores'] ?? 0)
             + (int) ($datos['revalidacion']['errores'] ?? 0)
             + (int) ($datos['fuentes']['errores'] ?? 0)
+            + (int) ($datos['seguimiento']['errores'] ?? 0)
             + (($datos['descubrimiento']['ok'] ?? true) ? 0 : 1);
 
         return [
@@ -181,7 +182,7 @@ class Dashboard extends BaseDashboard
             'atrasado' => $inicio->lt(now()->subHours(7)),
             'cifras' => [
                 ['etiqueta' => 'Evaluados', 'valor' => (int) ($datos['evaluacion']['evaluados'] ?? 0), 'color' => '#1A4B8C'],
-                ['etiqueta' => 'Aprobados', 'valor' => (int) ($datos['evaluacion']['aprobados'] ?? 0), 'color' => '#334155'],
+                ['etiqueta' => 'Cambios avisados', 'valor' => (int) ($datos['seguimiento']['con_cambios'] ?? 0), 'color' => '#334155'],
                 ['etiqueta' => 'A revisión', 'valor' => (int) ($datos['evaluacion']['revision'] ?? 0), 'color' => '#D97706'],
                 ['etiqueta' => 'Publicadas', 'valor' => (int) ($datos['publicacion']['publicados'] ?? 0) + (int) ($datos['revalidacion']['publicadas'] ?? 0), 'color' => '#059669'],
                 ['etiqueta' => 'Fuentes oficiales', 'valor' => (int) ($datos['fuentes']['consultadas'] ?? 0), 'color' => '#64748B'],

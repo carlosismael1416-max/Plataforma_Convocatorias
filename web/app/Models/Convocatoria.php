@@ -228,4 +228,9 @@ public function financiamientos(): \Illuminate\Database\Eloquent\Relations\HasMa
             'subido_por_user_id'
         );
     }
+
+    public function seguimiento(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(ConvocatoriaSeguimiento::class);
+    }
 }

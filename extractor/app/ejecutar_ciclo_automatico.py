@@ -26,6 +26,10 @@ from app.publicar_descubrimientos import (
     revalidar_pendientes,
 )
 
+from app.seguimiento_convocatorias import (
+    seguir_convocatorias,
+)
+
 
 BASE_DIR = (
     Path(__file__)
@@ -539,7 +543,7 @@ def ejecutar_ciclo(
 
         print()
         print(
-            "FASE 1/5: DESCUBRIMIENTO"
+            "FASE 1/6: DESCUBRIMIENTO"
         )
 
         descubrimiento = (
@@ -566,7 +570,7 @@ def ejecutar_ciclo(
 
         print()
         print(
-            "FASE 2/5: "
+            "FASE 2/6: "
             "EVALUACIÓN AUTOMÁTICA"
         )
 
@@ -610,7 +614,7 @@ def ejecutar_ciclo(
 
         print()
         print(
-            "FASE 3/5: "
+            "FASE 3/6: "
             "EXTRACCIÓN Y PUBLICACIÓN"
         )
 
@@ -666,7 +670,7 @@ def ejecutar_ciclo(
 
         print()
         print(
-            "FASE 4/5: "
+            "FASE 4/6: "
             "FUENTES OFICIALES"
         )
 
@@ -680,12 +684,32 @@ def ejecutar_ciclo(
         print("Pospuestas por tiempo:", fuentes["pospuestas"])
 
         # =====================================================
-        # 5. REVALIDAR CONVOCATORIAS PENDIENTES
+        # 5. SEGUIMIENTO DE CONVOCATORIAS PUBLICADAS
         # =====================================================
 
         print()
         print(
-            "FASE 5/5: "
+            "FASE 5/6: "
+            "SEGUIMIENTO DE PUBLICADAS"
+        )
+
+        seguimiento = seguir_convocatorias(
+            terminar_antes_de=
+                terminar_antes_de,
+        )
+
+        print("Revisadas:", seguimiento["revisadas"])
+        print("Con cambios (se avisó):", seguimiento["con_cambios"])
+        print("Primera consulta:", seguimiento["iniciales"])
+        print("Errores:", seguimiento["errores"])
+
+        # =====================================================
+        # 6. REVALIDAR CONVOCATORIAS PENDIENTES
+        # =====================================================
+
+        print()
+        print(
+            "FASE 6/6: "
             "REVALIDACIÓN DE PENDIENTES"
         )
 
@@ -722,6 +746,7 @@ def ejecutar_ciclo(
                 "errores"
             ] > 0
             or fuentes["errores"] > 0
+            or seguimiento["errores"] > 0
         )
 
         resultado = {
@@ -749,6 +774,9 @@ def ejecutar_ciclo(
 
             "fuentes":
                 fuentes,
+
+            "seguimiento":
+                seguimiento,
 
             "revalidacion":
                 revalidacion,

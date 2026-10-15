@@ -863,9 +863,9 @@
                                     'campo' =>
                                         'convocatorias_revision',
                                     'nombre' =>
-                                        'Convocatorias por revisar',
+                                        'Cambios en convocatorias que sigo',
                                     'ayuda' =>
-                                        'Avisar sobre nuevas convocatorias pendientes.',
+                                        'Avisar si cambia la fecha, los documentos o el texto de una convocatoria guardada o con propuesta.',
                                 ],
                                 [
                                     'campo' =>
