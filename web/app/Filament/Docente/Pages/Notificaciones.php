@@ -4,8 +4,10 @@ namespace App\Filament\Docente\Pages;
 
 use App\Models\Convocatoria;
 use App\Models\Notificacion;
+use App\Models\NotificacionPreferencia;
 use App\Models\Propuesta;
 use App\Models\User;
+use App\Services\Avisos;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Illuminate\Database\Eloquent\Builder;
@@ -34,6 +36,31 @@ class Notificaciones extends Page
         'propuestas',
         'fechas',
     ];
+
+    /** Preferencias que el docente puede cambiar y que la plataforma respeta. */
+    public const PREFERENCIAS = [
+        'fechas_proximas',
+        'nuevas_propuestas',
+    ];
+
+    public function mount(): void
+    {
+        Avisos::generarAvisosDeCierre(auth()->user());
+    }
+
+    public function alternarPreferencia(string $campo): void
+    {
+        if (! in_array($campo, self::PREFERENCIAS, true)) {
+            return;
+        }
+
+        // El valor actual sale de Avisos::quiere (respeta los valores por
+        // defecto de la tabla aunque el usuario aún no tenga fila).
+        NotificacionPreferencia::updateOrCreate(
+            ['user_id' => auth()->id()],
+            [$campo => ! Avisos::quiere((int) auth()->id(), $campo)]
+        );
+    }
 
     public static function canAccess(): bool
     {
@@ -352,7 +379,15 @@ class Notificaciones extends Page
                 ->orderByDesc('id')
                 ->get();
 
+        $preferencias = [];
+
+        foreach (self::PREFERENCIAS as $campo) {
+            $preferencias[$campo] = Avisos::quiere((int) auth()->id(), $campo);
+        }
+
         return [
+            'preferencias' => $preferencias,
+
             'notificaciones' =>
                 $notificaciones,
 

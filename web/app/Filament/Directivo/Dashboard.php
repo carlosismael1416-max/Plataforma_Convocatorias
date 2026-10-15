@@ -6,6 +6,7 @@ use App\Filament\Directivo\Pages;
 use App\Models\Convocatoria;
 use App\Models\Propuesta;
 use App\Models\User;
+use App\Services\Avisos;
 use Filament\Pages\Dashboard as BaseDashboard;
 
 class Dashboard extends BaseDashboard
@@ -39,6 +40,8 @@ class Dashboard extends BaseDashboard
 
     protected function getViewData(): array
     {
+        Avisos::generarAvisosDeCierre(auth()->user());
+
         $usuario =
             User::query()
                 ->with('role')

@@ -2,7 +2,6 @@
 
 namespace App\Services;
 
-use App\Models\Notificacion;
 use App\Models\Propuesta;
 use App\Models\PropuestaRevision;
 use App\Models\User;
@@ -18,7 +17,8 @@ use Illuminate\Validation\ValidationException;
  * - Cualquier directivo activo las revisa, incluidas las suyas: aprobar,
  *   devolver con observaciones (vuelve a EDITANDO) o rechazar.
  * - Cada envío y dictamen queda en propuesta_revisiones (historial con las
- *   observaciones) y el autor recibe el dictamen como notificación.
+ *   observaciones) y el autor recibe el dictamen como notificación si su
+ *   preferencia «nuevas_propuestas» está activa (el historial queda siempre).
  */
 class RevisionPropuesta
 {
@@ -116,15 +116,13 @@ class RevisionPropuesta
                 ->pluck('id');
 
             foreach ($directivos as $directivoId) {
-                Notificacion::create([
-                    'user_id' => $directivoId,
+                Avisos::notificar($directivoId, 'nuevas_propuestas', [
                     'propuesta_id' => $actual->id,
                     'convocatoria_id' => $actual->convocatoria_id,
                     'titulo' => 'Propuesta por revisar',
                     'mensaje' => trim($autor->name . ' ' . ($autor->apellidos ?? ''))
                         . ' envió «' . $actual->titulo . '».',
                     'tipo' => 'PROPUESTA_ENVIADA',
-                    'leida' => false,
                 ]);
             }
         });
@@ -196,14 +194,12 @@ class RevisionPropuesta
                 $mensaje .= "\n\nObservaciones: " . $observaciones;
             }
 
-            Notificacion::create([
-                'user_id' => $actual->user_id,
+            Avisos::notificar($actual->user_id, 'nuevas_propuestas', [
                 'propuesta_id' => $actual->id,
                 'convocatoria_id' => $actual->convocatoria_id,
                 'titulo' => $titulo,
                 'mensaje' => $mensaje,
                 'tipo' => $tipo,
-                'leida' => false,
             ]);
         });
 

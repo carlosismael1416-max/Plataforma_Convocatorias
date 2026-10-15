@@ -7,6 +7,7 @@ use App\Models\Convocatoria;
 use App\Models\Propuesta;
 use App\Models\User;
 use App\Models\UsuarioConvocatoria;
+use App\Services\Avisos;
 use Filament\Notifications\Notification;
 use Filament\Pages\Dashboard as BaseDashboard;
 use Illuminate\Database\Eloquent\Builder;
@@ -94,6 +95,8 @@ class Dashboard extends BaseDashboard
         /** @var User $usuario */
         $usuario = auth()->user();
         $hoy = Carbon::today();
+
+        Avisos::generarAvisosDeCierre($usuario);
 
         $seguimientos = UsuarioConvocatoria::query()
             ->where('user_id', $usuario->id)

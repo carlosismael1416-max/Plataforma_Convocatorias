@@ -5,6 +5,7 @@ namespace App\Filament\Directivo\Pages;
 use App\Models\Convocatoria;
 use App\Models\Notificacion;
 use App\Models\NotificacionPreferencia;
+use App\Services\Avisos;
 use App\Models\User;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
@@ -49,6 +50,8 @@ class Notificaciones extends Page
 
     public function mount(): void
     {
+        Avisos::generarAvisosDeCierre(auth()->user());
+
         NotificacionPreferencia::firstOrCreate(
             [
                 'user_id' =>
