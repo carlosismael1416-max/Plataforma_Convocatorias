@@ -181,6 +181,7 @@ class Dashboard extends BaseDashboard
 
         return [
             'estado' => (string) ($datos['estado'] ?? 'DESCONOCIDO'),
+            'mensaje' => $datos['mensaje'] ?? null,
             'inicio' => $inicio,
             'duracion' => $fin ? max(1, (int) round($inicio->diffInSeconds($fin))) : null,
             // El timer corre cada 6 h; con más de 7 h sin ciclo algo falla (o WSL estuvo apagado).
