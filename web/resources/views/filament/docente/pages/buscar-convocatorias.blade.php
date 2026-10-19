@@ -270,8 +270,31 @@
             border-color: #A7F3D0;
             background: #ECFDF5;
             color: #047857;
-            cursor: default;
         }
+
+        .btn-save.saved .txt-quitar { display: none; }
+        .btn-save.saved:hover { border-color: #FECACA; background: #FEF2F2; color: #B91C1C; }
+        .btn-save.saved:hover .txt-guardada { display: none; }
+        .btn-save.saved:hover .txt-quitar { display: inline; }
+
+        .conv-card { cursor: pointer; }
+
+        .btn-fav {
+            margin-left: auto;
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            border: 1px solid #DDE3EE;
+            background: white;
+            color: #94A3B8;
+            font-size: 18px;
+            line-height: 1;
+            cursor: pointer;
+        }
+
+        .btn-fav:hover { border-color: #FCD34D; color: #D97706; }
+        .btn-fav.activa { border-color: #FCD34D; background: #FEF3C7; color: #D97706; }
+        .btn-fav + .btn-save { margin-left: 0; }
 
         .btn-save:disabled {
             opacity: 1;
@@ -615,9 +638,12 @@
                     );
                 @endphp
 
+                @php $urlDetalle = route('filament.' . filament()->getId() . '.pages.detalle-convocatoria', ['record' => $convocatoria->id]); @endphp
+
                 <article
                     class="conv-card"
                     wire:key="convocatoria-{{ $convocatoria->id }}"
+                    x-on:click="if (! $event.target.closest('a, button')) window.location = @js($urlDetalle)"
                 >
 
                     <div class="conv-title">
@@ -770,36 +796,28 @@
 
                         @endif
 
+                        @php $favorita = in_array((int) $convocatoria->id, $favoritasIds, true); @endphp
+
+                        <button type="button" class="btn-fav {{ $favorita ? 'activa' : '' }}"
+                            wire:click="alternarFavorita({{ $convocatoria->id }})" wire:loading.attr="disabled"
+                            title="{{ $favorita ? 'Quitar de favoritas' : 'Marcar como favorita' }}"
+                            aria-label="{{ $favorita ? 'Quitar de favoritas' : 'Marcar como favorita' }}"
+                            aria-pressed="{{ $favorita ? 'true' : 'false' }}">
+                            {{ $favorita ? '★' : '☆' }}
+                        </button>
+
                         @if ($guardada)
-
-                            <button
-                                type="button"
-                                class="btn-save saved"
-                                disabled
-                            >
-                                ✓ Guardada
+                            <button type="button" class="btn-save saved"
+                                wire:click="quitarDeMis({{ $convocatoria->id }})"
+                                wire:confirm="¿Quitar esta convocatoria de Mis convocatorias? También se quita de favoritas."
+                                wire:loading.attr="disabled" title="Quitar de Mis convocatorias">
+                                <span class="txt-guardada">✓ Guardada</span><span class="txt-quitar">✕ Quitar</span>
                             </button>
-
                         @else
-
-                            <button
-                                type="button"
-                                class="btn-save"
-                                wire:click="
-                                    guardarConvocatoria(
-                                        {{ $convocatoria->id }}
-                                    )
-                                "
-                                wire:loading.attr="disabled"
-                                wire:target="
-                                    guardarConvocatoria(
-                                        {{ $convocatoria->id }}
-                                    )
-                                "
-                            >
-                                + Mis Convocatorias
+                            <button type="button" class="btn-save"
+                                wire:click="guardarEnMis({{ $convocatoria->id }})" wire:loading.attr="disabled">
+                                + Mis convocatorias
                             </button>
-
                         @endif
 
                     </div>

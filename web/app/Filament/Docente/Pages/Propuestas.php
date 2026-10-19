@@ -120,6 +120,7 @@ class Propuestas extends Page
                 [
                     'PUBLICADA',
                     'ACTIVA',
+                    'CERRADA',
                 ],
                 true
             )
@@ -129,7 +130,7 @@ class Propuestas extends Page
                     'Convocatoria no disponible'
                 )
                 ->body(
-                    'La convocatoria asociada no está publicada o activa.'
+                    'La convocatoria asociada no está publicada.'
                 )
                 ->warning()
                 ->send();
@@ -224,7 +225,15 @@ class Propuestas extends Page
             'RECHAZADA',
         ];
 
-        if (
+        // Grupos de las tarjetas de estadísticas.
+        $grupos = [
+            'EN_PROCESO' => ['BORRADOR', 'GENERADA', 'EDITANDO'],
+            'ENVIADAS' => ['ENVIADA', 'APROBADA'],
+        ];
+
+        if (isset($grupos[$this->estado])) {
+            $query->whereIn('estado', $grupos[$this->estado]);
+        } elseif (
             in_array(
                 $this->estado,
                 $estadosPermitidos,

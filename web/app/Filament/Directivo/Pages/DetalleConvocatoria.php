@@ -2,17 +2,19 @@
 
 namespace App\Filament\Directivo\Pages;
 
+use App\Filament\Concerns\GestionaMisConvocatorias;
 use App\Models\Convocatoria;
 use App\Models\Propuesta;
 use App\Models\User;
 use App\Models\UsuarioConvocatoria;
-use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Filament\Panel;
 use Illuminate\Support\Str;
 
 class DetalleConvocatoria extends Page
 {
+    use GestionaMisConvocatorias;
+
     protected string $view =
         'filament.directivo.pages.detalle-convocatoria';
 
@@ -34,6 +36,8 @@ class DetalleConvocatoria extends Page
     public bool $disponible = false;
 
     public bool $guardada = false;
+
+    public bool $favorita = false;
 
     public bool $tienePropuesta = false;
 
@@ -72,70 +76,29 @@ class DetalleConvocatoria extends Page
                 ->findOrFail(
                     $record
                 );
-        $this->actualizarSeguimiento();
+        $this->despuesDeCambiarSeguimiento();
     }
 
-    /**
-     * Como el docente, el directivo puede guardar convocatorias publicadas y
-     * vigentes en Mis convocatorias.
-     */
+    /** Compatibilidad con la vista anterior. */
     public function guardarConvocatoria(): void
     {
-        $convocatoria = $this->consultaDisponibles()
-            ->whereKey($this->convocatoria->id)
-            ->first();
-
-        if (! $convocatoria) {
-            Notification::make()
-                ->title('Convocatoria no disponible')
-                ->body('Solo se pueden guardar convocatorias publicadas y vigentes.')
-                ->warning()
-                ->send();
-
-            return;
-        }
-
-        $seguimiento = UsuarioConvocatoria::query()->firstOrNew([
-            'user_id' => auth()->id(),
-            'convocatoria_id' => $convocatoria->id,
-        ]);
-
-        if (! $seguimiento->exists) {
-            $seguimiento->estado_seguimiento = 'GUARDADA';
-            $seguimiento->prioridad = 'MEDIA';
-            $seguimiento->es_favorita = false;
-        }
-
-        $seguimiento->ultima_accion = 'Agregada desde Detalle de Convocatoria';
-        $seguimiento->fecha_ultima_accion = now();
-        $seguimiento->save();
-
-        $this->actualizarSeguimiento();
-
-        Notification::make()
-            ->title('Convocatoria guardada')
-            ->body('Se agregó a Mis convocatorias.')
-            ->success()
-            ->send();
+        $this->guardarEnMis($this->convocatoria->id);
     }
 
-    private function consultaDisponibles()
+    protected function despuesDeCambiarSeguimiento(): void
     {
-        return Convocatoria::query()
-            ->whereIn('estado', ['PUBLICADA', 'ACTIVA'])
-            ->noVencidas();
-    }
-
-    private function actualizarSeguimiento(): void
-    {
-        $this->disponible = $this->consultaDisponibles()
+        $this->disponible = Convocatoria::query()
+            ->visibles()
             ->whereKey($this->convocatoria->id)
             ->exists();
 
-        $this->guardada = UsuarioConvocatoria::query()
+        $seguimiento = UsuarioConvocatoria::query()
             ->where('user_id', auth()->id())
             ->where('convocatoria_id', $this->convocatoria->id)
-            ->exists();
+            ->first();
+
+        $this->guardada = $seguimiento !== null;
+        $this->favorita = (bool) $seguimiento?->es_favorita;
 
         $this->tienePropuesta = Propuesta::query()
             ->where('user_id', auth()->id())

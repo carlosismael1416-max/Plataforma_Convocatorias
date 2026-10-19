@@ -2,6 +2,7 @@
 
 namespace App\Filament\Directivo\Pages;
 
+use App\Filament\Concerns\GestionaMisConvocatorias;
 use App\Models\Categoria;
 use App\Models\Convocatoria;
 use App\Models\Organismo;
@@ -22,6 +23,8 @@ class BuscarConvocatorias extends Page
 
     protected static ?int $navigationSort = 4;
 
+
+    use GestionaMisConvocatorias;
 
     use WithPagination;
 
@@ -447,7 +450,13 @@ class BuscarConvocatorias extends Page
                 . $this->fechaCierre;
         }
 
+        $mias = $this->idsDeMisConvocatorias();
+
         return [
+            'guardadasIds' => $mias['guardadas'],
+
+            'favoritasIds' => $mias['favoritas'],
+
             'convocatorias' =>
                 $convocatorias,
 

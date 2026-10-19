@@ -2,13 +2,12 @@
 
 namespace App\Filament\Docente\Pages;
 
+use App\Filament\Concerns\GestionaMisConvocatorias;
 use App\Models\Categoria;
 use App\Models\Convocatoria;
 use App\Models\Organismo;
 use App\Models\User;
-use App\Models\UsuarioConvocatoria;
 use BackedEnum;
-use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Filament\Support\Icons\Heroicon;
 use Illuminate\Database\Eloquent\Builder;
@@ -16,6 +15,8 @@ use Livewire\WithPagination;
 
 class BuscarConvocatorias extends Page
 {
+    use GestionaMisConvocatorias;
+
     use WithPagination;
 
     protected static string|BackedEnum|null $navigationIcon =
@@ -113,71 +114,10 @@ class BuscarConvocatorias extends Page
         $this->resetPage();
     }
 
-    public function guardarConvocatoria(
-        int $convocatoriaId
-    ): void {
-        $usuario = auth()->user();
-
-        abort_unless(
-            $usuario instanceof User
-                && $usuario->tieneRol('DOCENTE'),
-            403
-        );
-
-        /*
-        |--------------------------------------------------------------------------
-        | Seguridad
-        |--------------------------------------------------------------------------
-        |
-        | Un Docente solamente puede guardar convocatorias que realmente
-        | están disponibles para él.
-        |
-        */
-
-        $convocatoria = Convocatoria::query()
-            ->whereKey($convocatoriaId)
-            ->whereIn(
-                'estado',
-                [
-                    'PUBLICADA',
-                    'ACTIVA',
-                ]
-            )
-            ->firstOrFail();
-
-        $seguimiento = UsuarioConvocatoria::query()
-            ->firstOrNew([
-                'user_id' => $usuario->id,
-                'convocatoria_id' => $convocatoria->id,
-            ]);
-
-        /*
-        |--------------------------------------------------------------------------
-        | No sobrescribir datos personales innecesariamente
-        |--------------------------------------------------------------------------
-        */
-
-        if (! $seguimiento->exists) {
-            $seguimiento->estado_seguimiento = 'GUARDADA';
-            $seguimiento->prioridad = 'MEDIA';
-        }
-
-        $seguimiento->es_favorita = true;
-
-        $seguimiento->ultima_accion =
-            'Agregada desde Buscar Convocatorias';
-
-        $seguimiento->fecha_ultima_accion = now();
-
-        $seguimiento->save();
-
-        Notification::make()
-            ->title('Convocatoria guardada')
-            ->body(
-                'La convocatoria se agregó a Mis Convocatorias.'
-            )
-            ->success()
-            ->send();
+    /** Compatibilidad con la vista anterior. */
+    public function guardarConvocatoria(int $convocatoriaId): void
+    {
+        $this->guardarEnMis($convocatoriaId);
     }
 
     protected function getViewData(): array
@@ -205,17 +145,8 @@ class BuscarConvocatorias extends Page
 
         $totalResultados = (clone $query)->count();
 
-        $usuarioId = auth()->id();
 
-        $guardadasIds = $usuarioId
-            ? UsuarioConvocatoria::query()
-                ->where('user_id', $usuarioId)
-                ->pluck('convocatoria_id')
-                ->map(
-                    fn ($id): int => (int) $id
-                )
-                ->all()
-            : [];
+        $mias = $this->idsDeMisConvocatorias();
 
         return [
             'convocatorias' => $query
@@ -231,7 +162,9 @@ class BuscarConvocatorias extends Page
                 ->orderBy('nombre')
                 ->get(),
 
-            'guardadasIds' => $guardadasIds,
+            'guardadasIds' => $mias['guardadas'],
+
+            'favoritasIds' => $mias['favoritas'],
         ];
     }
 

@@ -2,16 +2,18 @@
 
 namespace App\Filament\Docente\Pages;
 
+use App\Filament\Concerns\GestionaMisConvocatorias;
 use App\Models\Convocatoria;
 use App\Models\Propuesta;
 use App\Models\User;
 use App\Models\UsuarioConvocatoria;
-use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Filament\Panel;
 
 class DetalleConvocatoria extends Page
 {
+    use GestionaMisConvocatorias;
+
     protected static bool $shouldRegisterNavigation = false;
 
     protected static ?string $slug =
@@ -32,6 +34,11 @@ class DetalleConvocatoria extends Page
 
     public bool $guardada = false;
 
+    public bool $favorita = false;
+
+    // Vigente: se puede guardar y preparar propuesta. Si no, es historial.
+    public bool $disponible = false;
+
     public bool $tienePropuesta = false;
 
     public static function getRelativeRouteName(
@@ -51,24 +58,14 @@ class DetalleConvocatoria extends Page
 
     public function mount(int|string $record): void
     {
-        /*
-        |--------------------------------------------------------------------------
-        | Seguridad
-        |--------------------------------------------------------------------------
-        |
-        | El Docente únicamente puede consultar convocatorias que ya hayan
-        | sido publicadas o activadas.
-        |
-        */
-
+        // Vigentes y el historial (cerradas, solo de consulta). Lo que no
+        // pasó el validador es interno del motor.
         $this->convocatoria = Convocatoria::query()
             ->whereKey($record)
-            ->whereIn(
-                'estado',
-                [
-                    'PUBLICADA',
-                    'ACTIVA',
-                ]
+            ->where(
+                fn ($q) => $q
+                    ->whereIn('estado', ['PUBLICADA', 'ACTIVA'])
+                    ->orWhere('estado', 'CERRADA')
             )
             ->with([
                 'categoria',
@@ -83,86 +80,35 @@ class DetalleConvocatoria extends Page
             ])
             ->firstOrFail();
 
+        $this->despuesDeCambiarSeguimiento();
+    }
+
+    /** Compatibilidad con la vista anterior. */
+    public function guardarConvocatoria(): void
+    {
+        $this->guardarEnMis($this->convocatoria->id);
+    }
+
+    protected function despuesDeCambiarSeguimiento(): void
+    {
         $usuarioId = auth()->id();
 
-        $this->guardada = UsuarioConvocatoria::query()
-            ->where('user_id', $usuarioId)
-            ->where(
-                'convocatoria_id',
-                $this->convocatoria->id
-            )
+        $this->disponible = Convocatoria::query()
+            ->visibles()
+            ->whereKey($this->convocatoria->id)
             ->exists();
+
+        $seguimiento = UsuarioConvocatoria::query()
+            ->where('user_id', $usuarioId)
+            ->where('convocatoria_id', $this->convocatoria->id)
+            ->first();
+
+        $this->guardada = $seguimiento !== null;
+        $this->favorita = (bool) $seguimiento?->es_favorita;
 
         $this->tienePropuesta = Propuesta::query()
             ->where('user_id', $usuarioId)
-            ->where(
-                'convocatoria_id',
-                $this->convocatoria->id
-            )
+            ->where('convocatoria_id', $this->convocatoria->id)
             ->exists();
-    }
-
-    public function guardarConvocatoria(): void
-    {
-        $usuario = auth()->user();
-
-        abort_unless(
-            $usuario instanceof User
-                && (bool) $usuario->estado
-                && $usuario->tieneRol('DOCENTE'),
-            403
-        );
-
-        /*
-        |--------------------------------------------------------------------------
-        | Comprobar de nuevo el estado
-        |--------------------------------------------------------------------------
-        |
-        | No confiamos únicamente en el registro cargado durante mount().
-        | Si el estado cambia mientras el usuario está en la página, la acción
-        | tampoco debe permitir guardar una convocatoria no disponible.
-        |
-        */
-
-        $convocatoria = Convocatoria::query()
-            ->whereKey($this->convocatoria->id)
-            ->whereIn(
-                'estado',
-                [
-                    'PUBLICADA',
-                    'ACTIVA',
-                ]
-            )
-            ->firstOrFail();
-
-        $seguimiento = UsuarioConvocatoria::query()
-            ->firstOrNew([
-                'user_id' => $usuario->id,
-                'convocatoria_id' => $convocatoria->id,
-            ]);
-
-        if (! $seguimiento->exists) {
-            $seguimiento->estado_seguimiento = 'GUARDADA';
-            $seguimiento->prioridad = 'MEDIA';
-        }
-
-        $seguimiento->es_favorita = true;
-
-        $seguimiento->ultima_accion =
-            'Agregada desde Detalle de Convocatoria';
-
-        $seguimiento->fecha_ultima_accion = now();
-
-        $seguimiento->save();
-
-        $this->guardada = true;
-
-        Notification::make()
-            ->title('Convocatoria guardada')
-            ->body(
-                'Se agregó correctamente a Mis Convocatorias.'
-            )
-            ->success()
-            ->send();
     }
 }

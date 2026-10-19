@@ -260,6 +260,47 @@
             color: #1A4B8C;
         }
 
+        .mis-tabs {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 14px;
+            padding: 5px;
+            width: fit-content;
+            background: #EEF2F7;
+            border-radius: 12px;
+        }
+
+        .mis-tab {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            border: 0;
+            border-radius: 9px;
+            padding: 9px 16px;
+            background: transparent;
+            color: #475569;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .mis-tab.activa {
+            background: white;
+            color: #1A4B8C;
+            box-shadow: 0 1px 3px rgba(15, 23, 42, .12);
+        }
+
+        .mis-tab-n {
+            padding: 1px 8px;
+            border-radius: 999px;
+            background: #E2E8F0;
+            font-size: 11px;
+        }
+
+        .mis-tab.activa .mis-tab-n {
+            background: #E8EEF8;
+        }
+
         .favorite-button {
             border: 1px solid #FDE68A;
             background: #FEF3C7;
@@ -389,15 +430,15 @@
                 </div>
             </div>
 
-            <div class="mis-stat">
+            <button type="button" class="mis-stat" style="text-align:left; cursor:pointer; font:inherit;" wire:click="cambiarVista('favoritas')">
                 <div class="mis-stat-value">
                     {{ $favoritas }}
                 </div>
 
                 <div class="mis-stat-label">
-                    Favoritas
+                    ★ Favoritas
                 </div>
-            </div>
+            </button>
 
             <div class="mis-stat">
                 <div class="mis-stat-value">
@@ -419,6 +460,17 @@
                 </div>
             </div>
 
+        </div>
+
+        <div class="mis-tabs" role="tablist">
+            <button type="button" role="tab" aria-selected="{{ $vista === 'todas' ? 'true' : 'false' }}"
+                @class(['mis-tab', 'activa' => $vista === 'todas']) wire:click="cambiarVista('todas')">
+                Todas <span class="mis-tab-n">{{ $total }}</span>
+            </button>
+            <button type="button" role="tab" aria-selected="{{ $vista === 'favoritas' ? 'true' : 'false' }}"
+                @class(['mis-tab', 'activa' => $vista === 'favoritas']) wire:click="cambiarVista('favoritas')">
+                ★ Favoritas <span class="mis-tab-n">{{ $favoritas }}</span>
+            </button>
         </div>
 
         <div class="mis-toolbar">

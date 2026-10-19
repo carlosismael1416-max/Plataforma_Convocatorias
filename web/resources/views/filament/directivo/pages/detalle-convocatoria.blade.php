@@ -1175,15 +1175,23 @@
 
                     @if ($disponible)
                         @if ($guardada)
-                            <a href="{{ route('filament.directivo.pages.mis-convocatorias') }}" class="btn">
-                                ✓ En Mis convocatorias
-                            </a>
+                            <button type="button" class="btn" wire:click="quitarDeMis({{ $convocatoria->id }})"
+                                wire:confirm="¿Quitar esta convocatoria de Mis convocatorias? También se quita de favoritas."
+                                wire:loading.attr="disabled" style="background:#ECFDF5; border-color:#A7F3D0; color:#047857;">
+                                ✓ En Mis convocatorias · Quitar
+                            </button>
                         @else
-                            <button type="button" class="btn" wire:click="guardarConvocatoria"
-                                wire:loading.attr="disabled" wire:target="guardarConvocatoria">
+                            <button type="button" class="btn" wire:click="guardarEnMis({{ $convocatoria->id }})"
+                                wire:loading.attr="disabled">
                                 + Guardar en Mis convocatorias
                             </button>
                         @endif
+
+                        <button type="button" class="btn" wire:click="alternarFavorita({{ $convocatoria->id }})"
+                            wire:loading.attr="disabled" aria-pressed="{{ $favorita ? 'true' : 'false' }}"
+                            @if ($favorita) style="background:#FEF3C7; border-color:#FCD34D; color:#B45309;" @endif>
+                            {{ $favorita ? '★ Favorita · Quitar' : '☆ Marcar favorita' }}
+                        </button>
 
                         <a href="{{ route('filament.directivo.pages.generar-propuesta', ['convocatoria' => $convocatoria->id]) }}"
                             class="btn btn-primary">
@@ -1191,15 +1199,8 @@
                         </a>
                     @endif
 
-                    <a
-                        href="{{
-                            route(
-                                'filament.directivo.pages.buscar-convocatorias'
-                            )
-                        }}"
-                        class="btn"
-                    >
-                        Volver a búsqueda
+                    <a href="{{ route('filament.directivo.pages.' . ($disponible ? 'buscar-convocatorias' : 'historial-convocatorias')) }}" class="btn">
+                        {{ $disponible ? 'Volver a búsqueda' : 'Volver al historial' }}
                     </a>
 
                 </div>
