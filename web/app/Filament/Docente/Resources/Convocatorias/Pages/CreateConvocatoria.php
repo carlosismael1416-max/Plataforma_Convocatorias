@@ -3,6 +3,7 @@
 namespace App\Filament\Docente\Resources\Convocatorias\Pages;
 
 use App\Filament\Docente\Resources\Convocatorias\ConvocatoriaResource;
+use App\Filament\Concerns\ImportaDesdeEnlace;
 use App\Models\Convocatoria;
 use App\Models\User;
 use Filament\Actions\Action;
@@ -16,11 +17,13 @@ use Illuminate\Validation\ValidationException;
 
 class CreateConvocatoria extends CreateRecord
 {
+    use ImportaDesdeEnlace;
+
     protected static string $resource = ConvocatoriaResource::class;
 
-    protected static ?string $title = 'Subir convocatoria manual';
+    protected static ?string $title = 'Subir convocatoria';
 
-    protected ?string $subheading = 'Registra una convocatoria que no fue detectada automáticamente.';
+    protected ?string $subheading = 'Pega el enlace y la llenamos por ti, o regístrala a mano.';
 
     protected function getCreateFormAction(): Action
     {
@@ -80,7 +83,9 @@ class CreateConvocatoria extends CreateRecord
             ]);
         }
 
-        $convocatoria = new Convocatoria();
+        // Si el enlace ya era una pendiente interna del motor, se publica esa
+        // en vez de crear un duplicado.
+        $convocatoria = $this->validarImportacion($data) ?? new Convocatoria();
 
         $convocatoria->fill(
             Arr::only($data, $camposPermitidos)

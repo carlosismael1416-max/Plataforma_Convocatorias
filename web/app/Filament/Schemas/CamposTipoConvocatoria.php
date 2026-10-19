@@ -26,6 +26,7 @@ class CamposTipoConvocatoria
                 ->label('Dirigida a / puede ayudar a')
                 ->options(Convocatoria::AUDIENCIAS)
                 ->columns(3)
+                ->columnSpanFull()
                 ->helperText('Marca a quién le sirve: la escuela, docentes e investigadores o estudiantes.'),
         ];
     }

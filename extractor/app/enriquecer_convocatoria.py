@@ -1213,6 +1213,7 @@ def descargar_html_pagina_segura(
 
 def construir_item_pagina_directa(
     contexto: dict,
+    descarga: tuple[str, str] | None = None,
 ) -> dict:
     """
     Fallback cuando el spider general no
@@ -1223,7 +1224,8 @@ def construir_item_pagina_directa(
     desde una convocatoria marco.
     """
 
-    url_final, html = (
+    # descarga: (url_final, html) si quien llama ya bajó la página.
+    url_final, html = descarga or (
         descargar_html_pagina_segura(
             contexto[
                 "url_original"
@@ -1674,16 +1676,18 @@ def seleccionar_objetivo_documental(
 
 def construir_enriquecimiento(
     contexto: dict,
+    item: dict | None = None,
 ) -> dict:
-    resultados = ejecutar_preview(
-        contexto
-    )
-
+    # item: página ya armada (importación desde un enlace, sin fuente
+    # registrada y sin spider).
     try:
-        item = elegir_resultado(
-            resultados,
-            contexto,
-        )
+        if item is None:
+            item = elegir_resultado(
+                ejecutar_preview(
+                    contexto
+                ),
+                contexto,
+            )
 
     except RuntimeError as error:
         if (

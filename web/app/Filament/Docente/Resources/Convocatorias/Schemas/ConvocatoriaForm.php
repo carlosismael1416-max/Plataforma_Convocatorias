@@ -10,6 +10,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Text;
+use Filament\Schemas\Components\View;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 
@@ -21,6 +22,9 @@ class ConvocatoriaForm
             ->columns(['default' => 1, 'xl' => 3])
             ->components([
                 Group::make([
+                    View::make('filament.itsva.importar-enlace')
+                        ->visibleOn('create'),
+
                     Section::make('Información básica')
                         ->icon(Heroicon::OutlinedBuildingOffice2)
                         ->columns(2)
@@ -131,6 +135,7 @@ class ConvocatoriaForm
                         ->icon(Heroicon::OutlinedShieldCheck)
                         ->schema([
                             Text::make('Se publica al momento para todos los docentes y directivos. Puedes corregirla después desde «Subir convocatoria».'),
+                            Text::make('Si la subes desde un enlace y no cumple los criterios automáticos, te avisamos y tú decides si publicarla de todas maneras.'),
                         ]),
                 ])->columnSpan(1),
             ]);
