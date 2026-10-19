@@ -12,7 +12,7 @@ No agregar funciones nuevas hasta que ese ciclo esté demostrado con registros r
 
 - `web/` — Laravel 13 + Filament 5 + Livewire 4, PHP 8.3. Paneles: docente, directivo, admin. (`web/CLAUDE.md` contiene las guías de Laravel Boost.)
 - `extractor/` — Python: Scrapy, FastAPI/Uvicorn (puerto 8001), selectolax, googlenewsdecoder.
-- `database/schema.sql` — esquema PostgreSQL.
+- Esquema de la base: lo crean las migraciones de Laravel (`web/database/migrations`).
 - Automatización: systemd `convocatorias-itsva.service` + `convocatorias-itsva.timer` (00:00, 06:00, 12:00, 18:00; `Persistent=true`). En WSL solo corre mientras WSL está encendido. Copias versionadas de las units en `extractor/systemd/` (la instalada en `/etc/systemd/system/` es la que rige).
 - Pruebas del extractor: `cd extractor && ./.venv/bin/python -m unittest discover -s tests -t .` (90; `test_publicacion_bd.py` usa PostgreSQL en transacción revertida y se omite sin conexión).
 - Pruebas de la web: `cd web && php artisan test` (73, PHPUnit sobre PostgreSQL). La base se fuerza a `convocatorias_itsva_test` y `tests/TestCase.php` aborta si no termina en `_test` (RefreshDatabase la vacía). Requiere crear esa base una vez (ver Problemas conocidos).

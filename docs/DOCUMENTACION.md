@@ -55,7 +55,6 @@ Principios del diseño:
 | `web/` | Aplicación web (Laravel 13, Filament 5, Livewire 4). Tres paneles y el login. |
 | `extractor/` | Motor de búsqueda y extracción (Python 3.12, Scrapy, FastAPI). |
 | `extractor/systemd/` | Copias versionadas de las units de systemd (las instaladas en `/etc/systemd/system/` son las que rigen). |
-| `database/schema.sql` | Esquema SQL de referencia (histórico). **La base real se crea con las migraciones de Laravel.** |
 | `docs/` | Esta documentación y la guía de instalación. |
 | `CLAUDE.md` | Notas técnicas internas y reglas de trabajo del proyecto. |
 
