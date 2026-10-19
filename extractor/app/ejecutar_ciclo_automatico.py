@@ -34,6 +34,10 @@ from app.interruptor_motor import (
     motor_activo,
 )
 
+from app.mantenimiento import (
+    ejecutar_mantenimiento,
+)
+
 
 BASE_DIR = (
     Path(__file__)
@@ -753,6 +757,15 @@ def ejecutar_ciclo(
                 revalidacion[clave],
             )
 
+        # Mantenimiento ligero (nunca tumba el ciclo).
+        mantenimiento = ejecutar_mantenimiento()
+
+        print()
+        print(
+            "Mantenimiento:",
+            mantenimiento,
+        )
+
         fin = (
             datetime.now()
             .astimezone()
@@ -800,6 +813,9 @@ def ejecutar_ciclo(
 
             "seguimiento":
                 seguimiento,
+
+            "mantenimiento":
+                mantenimiento,
 
             "revalidacion":
                 revalidacion,
