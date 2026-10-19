@@ -506,6 +506,8 @@ def ejecutar_ciclo(
     cantidad_google: int,
     max_dominios: int,
     max_publicaciones: int,
+    limite_fuentes: int = 10,
+    max_revalidaciones: int | None = None,
 ) -> dict:
     terminar_antes_de = (
         time.monotonic()
@@ -704,6 +706,7 @@ def ejecutar_ciclo(
         fuentes = ejecutar_fuentes_oficiales(
             terminar_antes_de=
                 terminar_antes_de,
+            limite=limite_fuentes,
         )
 
         print("Fuentes consultadas:", fuentes["consultadas"])
@@ -741,6 +744,11 @@ def ejecutar_ciclo(
         )
 
         revalidacion = revalidar_pendientes(
+            **(
+                {"limite": max_revalidaciones}
+                if max_revalidaciones
+                else {}
+            ),
             terminar_antes_de=
                 terminar_antes_de,
         )
@@ -893,6 +901,20 @@ def main() -> None:
         default=5,
     )
 
+    # Carga inicial: más convocatorias por fuente y más pendientes
+    # validadas en un solo ciclo (el ciclo normal usa 10 y 3).
+    parser.add_argument(
+        "--limite-fuentes",
+        type=int,
+        default=10,
+    )
+
+    parser.add_argument(
+        "--max-revalidaciones",
+        type=int,
+        default=None,
+    )
+
     args = parser.parse_args()
 
     resultado = ejecutar_ciclo(
@@ -918,6 +940,14 @@ def main() -> None:
                 args.max_publicaciones,
                 20,
             ),
+        ),
+
+        limite_fuentes=max(1, min(args.limite_fuentes, 50)),
+
+        max_revalidaciones=(
+            max(1, min(args.max_revalidaciones, 30))
+            if args.max_revalidaciones
+            else None
         ),
     )
 
