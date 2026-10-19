@@ -49,6 +49,27 @@
             @endforeach
         </section>
 
+        {{-- Alerta: el ciclo automático falló o no corre. --}}
+        @if ($motorActivo && ($ciclo === null || $ciclo['estado'] === 'FALLIDO' || $ciclo['atrasado']))
+            <div role="alert" style="display:flex; gap:12px; align-items:flex-start; margin-bottom:16px; padding:14px 18px; border:1px solid #FECACA; border-radius:12px; background:#FEF2F2; color:#991B1B;">
+                <span style="color:#DC2626; flex-shrink:0">{!! $svg('alerta', 20) !!}</span>
+                <div style="font-size:14px; line-height:1.45;">
+                    @if ($ciclo === null)
+                        <strong>No hay reporte del ciclo automático.</strong>
+                        Revisa que el timer esté activo (<code>systemctl list-timers</code>).
+                    @elseif ($ciclo['estado'] === 'FALLIDO')
+                        <strong>El último ciclo automático falló</strong>
+                        ({{ $ciclo['inicio']->locale('es')->isoFormat('D MMM YYYY, HH:mm') }}).
+                        {{ $ciclo['mensaje'] }} El detalle está en la <a href="{{ $urls['bitacora'] }}" style="color:#991B1B; font-weight:700;">bitácora de errores</a>.
+                    @else
+                        <strong>El ciclo automático no corre desde
+                        {{ $ciclo['inicio']->locale('es')->isoFormat('D MMM YYYY, HH:mm') }}.</strong>
+                        Debe ejecutarse cada 6 horas; revisa el timer o que WSL esté encendido.
+                    @endif
+                </div>
+            </div>
+        @endif
+
         @include('filament.itsva.interruptor-motor')
 
         {{-- Motor: último ciclo automático --}}

@@ -10,6 +10,8 @@ Group=carlos_ismael
 WorkingDirectory=/home/carlos_ismael/proyectos/convocatorias-itsva/extractor
 
 ExecStart=/home/carlos_ismael/proyectos/convocatorias-itsva/extractor/.venv/bin/python -m app.ejecutar_ciclo_automatico --cantidad-google 6 --max-dominios 5 --max-publicaciones 5
+# Si el ciclo falla, queda en la bitácora y el dashboard del admin lo muestra.
+ExecStopPost=/home/carlos_ismael/proyectos/convocatorias-itsva/extractor/.venv/bin/python /home/carlos_ismael/proyectos/convocatorias-itsva/extractor/scripts/registrar_fallo_ciclo.py
 
 Environment=PYTHONUNBUFFERED=1
 Environment=PYTHONPATH=/home/carlos_ismael/proyectos/convocatorias-itsva/extractor
