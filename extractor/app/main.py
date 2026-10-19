@@ -1,6 +1,9 @@
+import contextlib
+import io
 import os
 import subprocess
 import sys
+import threading
 from pathlib import Path
 
 import psycopg
@@ -391,6 +394,65 @@ def marcar_fallo_arranque(
                     fuente["url_base"],
                 ),
             )
+
+
+class AnalizarUrlRequest(BaseModel):
+    url: str = Field(
+        min_length=10,
+        max_length=2048,
+        description="Enlace de la convocatoria a analizar",
+    )
+
+
+# Un análisis a la vez: descarga la página y sus PDF (bajo consumo).
+_ANALISIS_EN_CURSO = threading.Lock()
+
+
+@app.post("/convocatorias/analizar-url")
+def analizar_url_endpoint(
+    datos: AnalizarUrlRequest,
+):
+    """
+    «Subir convocatoria desde un enlace»: extrae y valida sin guardar
+    nada; la web muestra el resultado y el usuario decide si publica.
+    """
+
+    from app.importar_desde_url import EnlaceInvalido, analizar_url
+
+    if not motor_activo():
+        raise HTTPException(
+            status_code=409,
+            detail=(
+                "El motor de extracción está apagado. "
+                "Usa la subida manual o pide a un administrador que lo encienda."
+            ),
+        )
+
+    if not _ANALISIS_EN_CURSO.acquire(blocking=False):
+        raise HTTPException(
+            status_code=429,
+            detail="Hay otro enlace en análisis. Intenta de nuevo en un momento.",
+        )
+
+    try:
+        # El enriquecimiento imprime su avance; aquí no hace falta.
+        with contextlib.redirect_stdout(io.StringIO()):
+            return analizar_url(datos.url)
+
+    except EnlaceInvalido as error:
+        raise HTTPException(status_code=422, detail=str(error))
+
+    except psycopg.Error:
+        raise HTTPException(status_code=503, detail="No se pudo consultar PostgreSQL.")
+
+    except Exception as error:
+        raise HTTPException(
+            status_code=502,
+            detail=f"No se pudo extraer la convocatoria: {type(error).__name__}.",
+        )
+
+    finally:
+        _ANALISIS_EN_CURSO.release()
 
 
 @app.get("/health")
