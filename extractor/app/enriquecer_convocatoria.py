@@ -984,6 +984,15 @@ def buscar_categoria(
     return categoria_id
 
 
+# Palabras que comparten muchas dependencias; no identifican a ninguna.
+PALABRAS_GENERICAS_ORGANISMO = {
+    "secretaria", "ciencia", "ciencias", "tecnologia", "innovacion",
+    "humanidades", "nacional", "estatal", "consejo", "instituto",
+    "convocatorias", "gobierno", "estado", "mexico", "federal",
+    "desarrollo", "investigacion", "educacion", "superior",
+}
+
+
 def buscar_organismo_existente(
     fuente_url: str,
     fuente_nombre: str,
@@ -1034,6 +1043,11 @@ def buscar_organismo_existente(
             )
             break
 
+        # Con sitio web en otro dominio no se empareja por nombre: «Secretaría
+        # de Ciencia de Yucatán» no es SECIHTI aunque compartan palabras.
+        if sitio_web and fuente_host:
+            continue
+
         tokens_nombre = {
             token
             for token in re.findall(
@@ -1045,6 +1059,7 @@ def buscar_organismo_existente(
             if len(
                 token
             ) >= 5
+            and token not in PALABRAS_GENERICAS_ORGANISMO
         }
 
         if (

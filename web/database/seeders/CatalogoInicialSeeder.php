@@ -7,7 +7,8 @@ use Illuminate\Support\Facades\DB;
 
 /**
  * Catálogo mínimo para que el motor funcione en una instalación nueva:
- * categoría de investigación, organismo SECIHTI (el enriquecimiento asocia
+ * categoría de investigación, organismos SECIHTI y Secretaría de Ciencia de
+ * Yucatán (el enriquecimiento asocia
  * organismos por el dominio de sitio_web) y las fuentes oficiales.
  * Se puede ejecutar varias veces sin duplicar registros.
  */
@@ -33,6 +34,21 @@ class CatalogoInicialSeeder extends Seeder
                 'nombre' => 'Secretaría de Ciencia, Humanidades, Tecnología e Innovación (SECIHTI)',
                 'descripcion' => 'Dependencia federal de ciencia y tecnología (antes CONAHCYT).',
                 'tipo_organismo' => 'FEDERAL',
+                'pais' => 'México',
+                'estado' => true,
+                'created_at' => $ahora,
+                'updated_at' => $ahora,
+            ],
+        );
+
+        // Organismo estatal de la fuente de Yucatán (sin él, el enriquecimiento
+        // la confundía con SECIHTI por compartir «Secretaría» y «Ciencia»).
+        DB::table('organismos')->updateOrInsert(
+            ['sitio_web' => 'https://ciencia.yucatan.gob.mx'],
+            [
+                'nombre' => 'Secretaría de Ciencia de Yucatán',
+                'descripcion' => 'Dependencia del Gobierno del Estado de Yucatán para ciencia, tecnología e innovación.',
+                'tipo_organismo' => 'ESTATAL',
                 'pais' => 'México',
                 'estado' => true,
                 'created_at' => $ahora,
