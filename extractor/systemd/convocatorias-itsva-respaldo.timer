@@ -1,0 +1,11 @@
+[Unit]
+Description=Respaldo diario de la base de convocatorias ITSVA (03:30)
+
+[Timer]
+OnCalendar=*-*-* 03:30:00
+Persistent=true
+RandomizedDelaySec=300
+Unit=convocatorias-itsva-respaldo.service
+
+[Install]
+WantedBy=timers.target

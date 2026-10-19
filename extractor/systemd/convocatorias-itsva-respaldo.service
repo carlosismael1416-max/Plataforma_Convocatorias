@@ -1,0 +1,12 @@
+[Unit]
+Description=Respaldo diario de la base de convocatorias ITSVA
+After=postgresql.service
+
+[Service]
+Type=oneshot
+User=carlos_ismael
+Group=carlos_ismael
+ExecStart=/home/carlos_ismael/proyectos/convocatorias-itsva/extractor/scripts/respaldar_bd.sh
+Nice=10
+IOSchedulingClass=idle
+MemoryMax=256M
