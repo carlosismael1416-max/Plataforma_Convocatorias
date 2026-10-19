@@ -262,11 +262,11 @@ journalctl -u convocatorias-itsva.service -f          # ver el avance (Ctrl+C pa
 ```bash
 # Web (usa convocatorias_itsva_test; necesita DB_PASSWORD correcto en web/.env)
 cd ~/proyectos/convocatorias-itsva/web
-php artisan test                 # 73 pruebas
+php artisan test                 # 89 pruebas
 
 # Extractor
 cd ~/proyectos/convocatorias-itsva/extractor
-./.venv/bin/python -m unittest discover -s tests -t .   # 100 pruebas
+./.venv/bin/python -m unittest discover -s tests -t .   # 114 pruebas
 ```
 
 ---

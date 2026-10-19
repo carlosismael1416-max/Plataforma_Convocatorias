@@ -96,12 +96,13 @@ Hay un solo login en `/login`. Según el rol, el usuario entra a su panel; las r
 | Página | Para qué sirve |
 |---|---|
 | Dashboard | Banner, estadísticas (enlazan a su sección), convocatorias recomendadas, próximos cierres, propuestas recientes. |
-| Buscar convocatorias | Convocatorias **vigentes** (publicadas y no vencidas), con filtros. |
-| Detalle de convocatoria | Información, requisitos, financiamiento, archivos y fechas; última verificación en el sitio oficial. Botones «Guardar» y «Generar propuesta». |
-| Mis convocatorias | Convocatorias guardadas y su seguimiento. |
-| Subir convocatoria | Registro manual. **Se publica al momento** (no si ya venció). Su autor puede corregirla. |
+| Buscar convocatorias | Convocatorias **vigentes** (publicadas y no vencidas), con filtros por **tipo** y **a quién va dirigida**. Cada tarjeta lleva sus marcas, ☆ favorita y guardar/quitar; toda la tarjeta abre el detalle. |
+| Detalle de convocatoria | Información, requisitos, financiamiento, archivos y fechas; última verificación en el sitio oficial. Botones «Guardar / Quitar de Mis convocatorias», «☆ Favorita» y «Generar propuesta». Una convocatoria cerrada se abre solo de consulta. |
+| Mis convocatorias | Convocatorias guardadas y su seguimiento; pestañas **Todas / Favoritas**. |
+| Historial | Convocatorias que ya cerraron (solo consulta), con filtros por tipo, organismo y año. También en directivo y admin. |
+| Subir convocatoria | **Desde un enlace:** se pega la URL, el motor extrae y valida, y el formulario se llena; si no cumple los criterios se avisa con los motivos y el usuario elige «Publicar de todas maneras» o «No publicar». **A mano:** el mismo formulario. Se publica al momento (no si ya venció); un enlace que ya está en la plataforma no se duplica. Su autor puede corregirla. |
 | Calendario | Cierres y eventos personales. |
-| Propuestas | Propuestas propias. |
+| Propuestas | Propuestas propias en tarjetas (toda la fila abre el editor), con búsqueda, filtro por estado y los totales como filtros. |
 | Flujo de propuesta | Generar → Editor → Objetivos → Requisitos → Presupuesto → Cotizaciones → Cronograma → Entregables → Vista previa (PDF/Excel y **Enviar a revisión**). |
 | Notificaciones | Avisos y preferencias (fechas de cierre, cambios en convocatorias que sigo, cambios en propuestas). |
 | Perfil | Datos de la cuenta (desde el menú del avatar). |
@@ -136,7 +137,11 @@ Tiene **todas las páginas de trabajo del docente** (mismas clases, el rol exigi
 Es **el mismo en los tres paneles**:
 
 - `Convocatoria::visibles()` → estado `PUBLICADA` o `ACTIVA` **y** fecha de cierre vacía o igual/posterior a hoy.
-- `Convocatoria::historial()` → `CERRADA` o publicada cuya fecha de cierre ya pasó.
+- `Convocatoria::historial()` → `CERRADA` o publicada cuya fecha de cierre ya pasó, sin las de tipo `NO_APLICA`.
+
+### Tipos y audiencia (desde el 18-oct-2026)
+
+Además de financiamiento a proyectos se publican **becas, premios, concursos, eventos y formación**, cada una marcada con su tipo (`convocatorias.tipo`) y a quién va dirigida o a quién puede ayudar (`dirigido_a`: institución, docentes e investigadores, estudiantes). Las reglas están en `extractor/app/tipo_convocatoria.py` (título y ruta deciden el tipo; objetivo y descripción, la audiencia). `NO_APLICA` es interno: anuncios de resultados, vacantes/plazas, no elegibles para ITSVA y programas que excluyen a mexicanos; nunca se muestra. Las convocatorias anteriores sin tipo cuentan como financiamiento.
 - `PENDIENTE_REVISION` es un estado **interno del motor**: el validador no la aprobó (datos incompletos, vencida, no elegible…) y el ciclo la vuelve a validar sola. No se muestra a docentes ni directivos.
 
 Estados de convocatoria usados: `PENDIENTE_REVISION`, `PUBLICADA`, `CERRADA` (y `DESCARTADA`, `ACTIVA` como alias histórico de `PUBLICADA`).
@@ -178,7 +183,9 @@ cd extractor
 | `app/descubrimiento/elegibilidad.py` | ¿Puede participar ITSVA? Excluye otros estados, extranjeros sin apertura, vacantes. Ante la duda, elegible. |
 | `app/evaluar_descubrimientos.py` | Evaluador (umbral 80). |
 | `app/publicar_descubrimientos.py` | Extracción persistente, publicación, revalidación y cierre de vencidas. |
-| `app/validar_convocatoria.py` | Validador final (umbral 70). Bloquea premios, resultados, eventos, becas, ferias, concursos, programas para estudiantes, no elegibles y vencidas, por título, ruta de la URL **y por el objetivo/descripción** (p. ej. «otorgar apoyos a estudiantes»). El seguimiento retira (`PENDIENTE_REVISION`) las publicadas del motor que hoy quedarían bloqueadas. |
+| `app/validar_convocatoria.py` | Validador final (umbral 70). Marca tipo y audiencia y los guarda. Bloquea resultados, vacantes, no elegibles, programas que excluyen a mexicanos y vencidas o sin fecha. El seguimiento retira (`PENDIENTE_REVISION`) las publicadas del motor que hoy quedarían bloqueadas. |
+| `app/tipo_convocatoria.py` | Tipo y a quién va dirigida (reglas puras). |
+| `app/importar_desde_url.py` | «Subir desde un enlace»: extrae y valida una URL sin guardar. |
 | `app/mantenimiento.py` | Limpieza periódica al final del ciclo. |
 | `app/enriquecer_convocatoria.py` | Completa descripción, objetivo, fecha de cierre, categoría, organismo, montos, fechas de publicación y apertura, requisitos y restricciones (desde la página y sus PDF). Solo llena campos vacíos. |
 | `app/enriquecer_datos_extra.py` | Reglas puras de montos, fechas, requisitos y descripción. |
@@ -188,7 +195,7 @@ cd extractor
 | `app/interruptor_motor.py` | Lee el interruptor `ajustes_sistema.motor_activo`. |
 | `app/seguridad_red.py` | Sesión HTTP segura (bloqueo de IP privadas y redirecciones inseguras). |
 | `app/descubrimiento/codificacion.py` | Decodificación correcta de páginas sin charset declarado. |
-| `app/main.py` | API FastAPI (`/health`, `/db-check`, `POST /scraping/ejecutar`). |
+| `app/main.py` | API FastAPI (`/health`, `/db-check`, `POST /scraping/ejecutar`, `POST /convocatorias/analizar-url`). |
 
 ### 6.3 Fuentes oficiales configuradas
 
@@ -261,7 +268,7 @@ php artisan migrate                               # aplicar migraciones (pedir c
 php artisan migrate --pretend                     # ver el SQL sin aplicarlo
 php artisan db:seed                               # roles, permisos y catálogo inicial
 php artisan itsva:crear-admin correo@itsva.edu.mx # crear/reactivar el administrador (pide contraseña)
-php artisan test                                  # 73 pruebas (base convocatorias_itsva_test)
+php artisan test                                  # 89 pruebas (base convocatorias_itsva_test)
 php tests/Verificacion/todas_las_paginas.php      # recorre las rutas GET de los 3 paneles (revierte datos)
 php artisan route:list --path=admin               # rutas de un panel
 php artisan view:clear && php artisan optimize:clear
@@ -269,7 +276,9 @@ php artisan view:clear && php artisan optimize:clear
 
 ### Extractor (`cd extractor`)
 ```bash
-./.venv/bin/python -m unittest discover -s tests -t .                    # 100 pruebas
+./.venv/bin/python -m unittest discover -s tests -t .                    # 114 pruebas
+./.venv/bin/python -m app.importar_desde_url <url>                      # analizar un enlace (no guarda)
+./.venv/bin/python -m scripts.clasificar_tipos [--aplicar] [--todas]     # tipo y audiencia de las existentes
 ./.venv/bin/python -m app.ejecutar_ciclo_automatico                      # un ciclo completo a mano
 ./.venv/bin/python -m app.ejecutar_scraping --fuente-id 2 --limite 10    # vista previa de una fuente (no guarda)
 ./.venv/bin/python -m app.ejecutar_fuente --fuente-id 2 --limite 10 --guardar
@@ -299,8 +308,8 @@ curl -s http://127.0.0.1:8001/health ; curl -s http://127.0.0.1:8001/db-check
 
 | Conjunto | Cantidad | Cómo |
 |---|---|---|
-| Web (PHPUnit) | 73 | `cd web && php artisan test`. Usa la base `convocatorias_itsva_test`; `tests/TestCase.php` aborta si el nombre no termina en `_test` (la vacía en cada prueba). |
-| Extractor (unittest) | 100 | `cd extractor && ./.venv/bin/python -m unittest discover -s tests -t .` |
+| Web (PHPUnit) | 89 | `cd web && php artisan test`. Usa la base `convocatorias_itsva_test`; `tests/TestCase.php` aborta si el nombre no termina en `_test` (la vacía en cada prueba). |
+| Extractor (unittest) | 114 | `cd extractor && ./.venv/bin/python -m unittest discover -s tests -t .` |
 | Verificaciones contra la base real | 5 scripts | `cd web && php tests/Verificacion/<script>.php` (revierten sus datos): `todas_las_paginas`, `permisos_por_rol`, `docente_no_ve_vencidas`, `propuesta_id_bloqueado`, `convocatoria_dependencias`. |
 
 ---
@@ -333,7 +342,8 @@ curl -s http://127.0.0.1:8001/health ; curl -s http://127.0.0.1:8001/db-check
 ## 14. Problemas conocidos y pendientes
 
 - **Pocas convocatorias vigentes:** depende de las fuentes oficiales; hoy SECIHTI y la Secretaría de Ciencia de Yucatán. Agregar más fuentes (Admin → Fuentes web) amplía la cobertura.
-- **Becas:** hoy se bloquean; se agregarán las becas en las que ITSVA pueda participar.
+- **Fechas en imágenes o PDF escaneados:** varias convocatorias de Yucatán no traen fecha de cierre en texto; quedan pendientes hasta que se suban a mano (o desde un enlace completando la fecha).
+- **Búsqueda en noticias:** el clasificador del descubrimiento sigue descartando eventos y premios en notas de prensa (solo traían ruido de otros estados); becas y eventos entran por las fuentes oficiales.
 - **Correo:** pendiente configurar SMTP (`MAIL_MAILER=log`).
 - **WSL:** el ciclo solo corre mientras WSL está encendido (`Persistent=true` recupera el ciclo perdido al encender).
 - **Zona horaria:** la aplicación guarda en UTC; las vistas que lo requieren muestran hora de Yucatán (`America/Merida`).
