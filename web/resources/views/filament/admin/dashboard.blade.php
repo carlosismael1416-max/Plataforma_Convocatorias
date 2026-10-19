@@ -150,7 +150,7 @@
                                         @php
                                             [$claseEstado, $textoEstado] = $estadoEjecucion[$e['estado']] ?? ['borrador', $e['estado']];
                                         @endphp
-                                        <tr>
+                                        <tr data-href="{{ $e['url'] }}" tabindex="0">
                                             <td class="dd-mono" style="color: #1A4B8C; font-weight: 600">#{{ $e['id'] }}</td>
                                             <td>{{ $e['inicio'] }}</td>
                                             <td><span class="dd-badge dd-badge-{{ $claseEstado }}">{{ $textoEstado }}</span></td>
