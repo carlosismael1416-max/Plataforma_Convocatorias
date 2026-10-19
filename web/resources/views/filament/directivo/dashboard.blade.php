@@ -80,7 +80,7 @@
                                     </thead>
                                     <tbody>
                                         @foreach ($propuestasPendientes as $p)
-                                            <tr>
+                                            <tr data-href="{{ $p['url'] }}" tabindex="0">
                                                 <td>
                                                     <p class="dd-tabla-titulo">{{ $p['titulo'] }}</p>
                                                     <p class="dd-tabla-sub">{{ \Illuminate\Support\Str::limit($p['convocatoria'], 60) }}</p>
@@ -133,7 +133,7 @@
                                     </thead>
                                     <tbody>
                                         @foreach ($recientes as $c)
-                                            <tr>
+                                            <tr data-href="{{ $c['url'] }}" tabindex="0">
                                                 <td>
                                                     <p class="dd-tabla-titulo">{{ $c['titulo'] }}</p>
                                                     <p class="dd-tabla-sub">{{ \Illuminate\Support\Str::limit($c['organismo'], 60) }}</p>

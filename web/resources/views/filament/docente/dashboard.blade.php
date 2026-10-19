@@ -70,7 +70,7 @@
                 @else
                     <div class="dd-tarjetas">
                         @foreach ($recomendadas as $c)
-                            <article class="dd-card dd-conv" wire:key="conv-{{ $c['id'] }}">
+                            <article class="dd-card dd-conv" wire:key="conv-{{ $c['id'] }}" data-href="{{ route('filament.' . filament()->getId() . '.pages.detalle-convocatoria', ['record' => $c['id']]) }}">
                                 <div class="dd-conv-cabecera">
                                     <div style="min-width: 0">
                                         <div class="dd-conv-etiquetas">

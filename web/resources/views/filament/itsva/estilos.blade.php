@@ -640,4 +640,42 @@
         color: #CBD5E1;
         cursor: default;
     }
+
+    /* Filas de tablas que llevan al detalle: toda la fila es el enlace. */
+    [data-href] {
+        cursor: pointer;
+    }
+
+    tr[data-href]:hover > td {
+        background: #F5F8FD;
+    }
 </style>
+
+<script>
+    // Clic (o Enter) en una fila con data-href abre su detalle, salvo que el
+    // clic sea sobre un enlace, botón o campo de la propia fila.
+    if (! window.itsvaFilasClicables) {
+        window.itsvaFilasClicables = true;
+
+        const abrir = (evento) => {
+            const fila = evento.target.closest('[data-href]');
+
+            if (! fila || evento.target.closest('a, button, input, select, textarea, label')) {
+                return;
+            }
+
+            if (evento.ctrlKey || evento.metaKey || evento.button === 1) {
+                window.open(fila.dataset.href, '_blank');
+            } else {
+                window.location.href = fila.dataset.href;
+            }
+        };
+
+        document.addEventListener('click', abrir);
+        document.addEventListener('keydown', (evento) => {
+            if (evento.key === 'Enter' && evento.target.matches('[data-href]')) {
+                window.location.href = evento.target.dataset.href;
+            }
+        });
+    }
+</script>

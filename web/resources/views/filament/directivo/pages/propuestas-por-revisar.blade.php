@@ -52,7 +52,7 @@
                     </thead>
                     <tbody>
                         @foreach ($pendientes as $p)
-                            <tr>
+                            <tr data-href="{{ $p['url'] }}" tabindex="0">
                                 <td>
                                     <div class="ppr-titulo">{{ $p['titulo'] }}</div>
                                     <div class="ppr-sub">{{ $p['convocatoria'] }}</div>
@@ -96,7 +96,7 @@
                     </thead>
                     <tbody>
                         @foreach ($dictaminadas as $p)
-                            <tr>
+                            <tr data-href="{{ $p['url'] }}" tabindex="0">
                                 <td>
                                     <div class="ppr-titulo">{{ $p['titulo'] }}</div>
                                     <div class="ppr-sub">{{ $p['convocatoria'] }}</div>
