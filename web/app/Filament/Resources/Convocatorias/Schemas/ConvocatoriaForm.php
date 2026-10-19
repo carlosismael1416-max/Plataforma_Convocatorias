@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Convocatorias\Schemas;
 
+use App\Filament\Schemas\CamposTipoConvocatoria;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -31,6 +32,8 @@ class ConvocatoriaForm
                     ->label('Objetivo')
                     ->rows(4)
                     ->columnSpanFull(),
+
+                ...CamposTipoConvocatoria::campos(),
 
                 Select::make('categoria_id')
                     ->label('Categoría')

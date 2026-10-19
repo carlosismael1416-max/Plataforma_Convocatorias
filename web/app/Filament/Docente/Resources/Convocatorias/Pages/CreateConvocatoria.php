@@ -67,6 +67,8 @@ class CreateConvocatoria extends CreateRecord
             'modalidad',
             'ubicacion',
             'url_original',
+            'tipo',
+            'dirigido_a',
         ];
 
         if (

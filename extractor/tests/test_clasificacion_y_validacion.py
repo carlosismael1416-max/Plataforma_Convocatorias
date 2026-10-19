@@ -255,19 +255,32 @@ class EvaluarConvocatoriaTest(unittest.TestCase):
 
         self.assertFalse(resultado["publicable"])
 
-    def test_resultados_y_eventos_se_bloquean(self):
-        for titulo in (
-            "Secihti informa resultados de Convocatoria "
-            "ECOS Nord 2025",
-            "Convocatoria al Congreso Nacional de Investigación",
-            "Convocatoria de Becas de Posgrado 2026",
+    def test_resultados_se_bloquean(self):
+        resultado = evaluar_convocatoria(
+            self.convocatoria(
+                titulo=(
+                    "Secihti informa resultados de Convocatoria "
+                    "ECOS Nord 2025"
+                )
+            )
+        )
+
+        self.assertFalse(resultado["publicable"])
+        self.assertEqual(resultado["tipo"], "NO_APLICA")
+
+    def test_eventos_y_becas_se_publican_marcados(self):
+        # Desde el 18-oct-2026 se publican con su tipo.
+        for titulo, tipo in (
+            ("Convocatoria al Congreso Nacional de Investigación", "EVENTO"),
+            ("Convocatoria de Becas de Posgrado 2026", "BECA"),
         ):
             with self.subTest(titulo=titulo):
                 resultado = evaluar_convocatoria(
                     self.convocatoria(titulo=titulo)
                 )
 
-                self.assertFalse(resultado["publicable"])
+                self.assertTrue(resultado["publicable"], resultado["bloqueos"])
+                self.assertEqual(resultado["tipo"], tipo)
 
     def test_convocatoria_de_otro_estado_se_bloquea(self):
         resultado = evaluar_convocatoria(
@@ -284,9 +297,10 @@ class EvaluarConvocatoriaTest(unittest.TestCase):
 
         self.assertFalse(resultado["publicable"])
 
-    def test_beca_en_la_ruta_se_bloquea_aunque_el_titulo_no_lo_diga(self):
-        # Caso real (convocatoria 5): apoyo a estudiantes extranjeros
-        # publicado bajo /becas-nacionales/.
+    def test_la_ruta_de_becas_marca_el_tipo(self):
+        # Caso real (convocatoria 5) publicado bajo /becas-nacionales/: la
+        # ruta lo marca como beca; lo que impide publicarlo es que excluye
+        # a mexicanos (ver test_validacion_objetivo).
         resultado = evaluar_convocatoria(
             self.convocatoria(
                 titulo="Convocatoria 2026 Apoyo Complementario SECIHTI-OEA",
@@ -297,20 +311,21 @@ class EvaluarConvocatoriaTest(unittest.TestCase):
             )
         )
 
-        self.assertFalse(resultado["publicable"])
+        self.assertEqual(resultado["tipo"], "BECA")
 
-        # La convocatoria 4 (ruta ciencias-y-humanidades) sigue pasando.
-        self.assertTrue(
-            evaluar_convocatoria(
-                self.convocatoria(
-                    url_original=(
-                        "https://www.secihti.mx/convocatoria/"
-                        "ciencias-y-humanidades/convocatoria-para-el-"
-                        "fortalecimiento-de-revistas-2026"
-                    ),
-                )
-            )["publicable"]
+        # La convocatoria 4 (ruta ciencias-y-humanidades) sigue siendo
+        # financiamiento.
+        resultado = evaluar_convocatoria(
+            self.convocatoria(
+                url_original=(
+                    "https://www.secihti.mx/convocatoria/"
+                    "ciencias-y-humanidades/convocatoria-para-el-"
+                    "fortalecimiento-de-revistas-2026"
+                ),
+            )
         )
+        self.assertTrue(resultado["publicable"])
+        self.assertEqual(resultado["tipo"], "FINANCIAMIENTO")
 
     def test_recursos_no_se_bloquea_como_curso(self):
         resultado = evaluar_convocatoria(

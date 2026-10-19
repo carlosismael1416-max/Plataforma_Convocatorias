@@ -1,14 +1,11 @@
 from __future__ import annotations
 
+import json
 import re
 import unicodedata
 
 from datetime import date
-from urllib.parse import unquote, urlparse
-
-from app.descubrimiento.clasificar_objetivo import (
-    contiene_palabra,
-)
+from urllib.parse import urlparse
 
 from app.descubrimiento.elegibilidad import (
     evaluar_elegibilidad,
@@ -18,59 +15,26 @@ from app.descubrimiento.guardar_descubrimientos import (
     conectar,
 )
 
+from app.tipo_convocatoria import (
+    clasificar_tipo,
+    excluye_mexicanos,
+)
+
 
 UMBRAL_PUBLICACION = 70
 
 
-PALABRAS_BLOQUEO = (
-    "premio",
-    "premios",
-    "ganadores",
-    "ganadoras",
-    "resultado",
-    "resultados",
-    "lista de aceptados",
-    "lista de seleccionados",
-    "congreso",
-    "seminario",
-    "simposio",
-    "curso",
-    "taller",
-    "diplomado",
-    "beca",
-    "becas",
-    "becario",
-    "becaria",
-    # Actividades para estudiantes y eventos (no son financiamiento para
-    # proyectos de investigación de la institución).
-    "feria",
-    "concurso",
-    "expociencias",
-    "olimpiada",
-    "verano de la ciencia",
-    "formacion temprana",
-)
-
-
-# El objetivo y la descripción también delatan becas y apoyos personales a
-# estudiantes aunque el título y la URL no lo digan (lección de la
-# convocatoria «Apoyo Complementario SECIHTI-OEA»). Se buscan sobre texto
-# normalizado (minúsculas y sin acentos).
-PATRONES_OBJETIVO_BLOQUEO = (
-    (r"\b(otorgamiento|otorgar|otorga) de (una |las |los )?(becas?|apoyos? (economicos? |complementarios? )?(a|para) (estudiantes|alumn[oa]s|becari[oa]s))", "beca o apoyo a estudiantes"),
-    (r"\bapoyos? complementarios? (a|para) (estudiantes|alumn[oa]s)", "apoyo complementario a estudiantes"),
-    (r"\bbecas? (para|de) (estudios|posgrado|manutencion|licenciatura|maestria|doctorado|movilidad)", "beca para estudios"),
-    (r"\bdirigid[ao]s? (exclusivamente |unicamente )?a (estudiantes|alumn[oa]s|jovenes estudiantes)", "dirigida a estudiantes"),
-    (r"\bdireccion general de becas\b", "emitida por la Dirección General de Becas"),
-)
+# Desde el 18-oct-2026 becas, premios, concursos, eventos y formación se
+# publican marcados con su tipo y a quién van dirigidos
+# (app/tipo_convocatoria.py). Solo se bloquean los anuncios de resultados,
+# las vacantes/plazas, lo no elegible para ITSVA y los programas que
+# excluyen a mexicanos.
 
 
 def bloqueo_por_objetivo(objetivo: str, descripcion: str) -> str | None:
-    texto = normalizar_texto(objetivo + " " + (descripcion or "")[:1500])
-
-    for patron, motivo in PATRONES_OBJETIVO_BLOQUEO:
-        if re.search(patron, texto):
-            return motivo
+    """Bloqueo duro que solo se ve en el objetivo o la descripción."""
+    if excluye_mexicanos(objetivo, descripcion):
+        return "excluye a participantes mexicanos"
 
     return None
 
@@ -317,12 +281,6 @@ def evaluar_convocatoria(
         or ""
     ).strip()
 
-    titulo_normalizado = (
-        normalizar_texto(
-            titulo
-        )
-    )
-
     # =========================================================
     # TÍTULO
     # =========================================================
@@ -346,17 +304,18 @@ def evaluar_convocatoria(
             "Título insuficiente o inválido."
         )
 
-    for palabra in PALABRAS_BLOQUEO:
-        if contiene_palabra(
-            titulo_normalizado,
-            palabra,
-        ):
-            bloqueos.append(
-                "El título corresponde a una "
-                "categoría no publicable "
-                f"automáticamente: {palabra}."
-            )
-            break
+    clasificacion = clasificar_tipo(
+        titulo,
+        url,
+        objetivo,
+        descripcion,
+    )
+
+    if clasificacion["tipo"] == "NO_APLICA":
+        bloqueos.append(
+            "No es una convocatoria para participar: "
+            f"{clasificacion['motivo']}."
+        )
 
     motivo_objetivo = bloqueo_por_objetivo(
         objetivo,
@@ -365,34 +324,9 @@ def evaluar_convocatoria(
 
     if motivo_objetivo:
         bloqueos.append(
-            "El objetivo describe una categoría no publicable "
-            f"automáticamente: {motivo_objetivo}."
+            "No elegible para ITSVA: "
+            f"{motivo_objetivo}."
         )
-
-    # La ruta también clasifica: /convocatoria/becas-nacionales/...
-    # (caso real: "Apoyo Complementario SECIHTI-OEA", un apoyo a
-    # estudiantes extranjeros sin "beca" en el título).
-    ruta_normalizada = normalizar_texto(
-        re.sub(
-            r"[/_\-]+",
-            " ",
-            unquote(
-                urlparse(url).path
-            ),
-        )
-    )
-
-    for palabra in PALABRAS_BLOQUEO:
-        if contiene_palabra(
-            ruta_normalizada,
-            palabra,
-        ):
-            bloqueos.append(
-                "La URL corresponde a una "
-                "categoría no publicable "
-                f"automáticamente: {palabra}."
-            )
-            break
 
     elegibilidad = evaluar_elegibilidad(
         titulo,
@@ -633,6 +567,19 @@ def evaluar_convocatoria(
         "publicable":
             publicable,
 
+        # Lo que nunca debe mostrarse (resultados, vacantes, no elegible)
+        # queda NO_APLICA; así tampoco entra al historial.
+        "tipo":
+            "NO_APLICA"
+            if any(
+                bloqueo.startswith(("No elegible", "No es una convocatoria"))
+                for bloqueo in bloqueos
+            )
+            else clasificacion["tipo"],
+
+        "dirigido_a":
+            clasificacion["dirigido_a"],
+
         "score":
             score,
 
@@ -645,6 +592,58 @@ def evaluar_convocatoria(
         "bloqueos":
             bloqueos,
     }
+
+
+_COLUMNAS_TIPO: bool | None = None
+
+
+def columnas_tipo_disponibles(conexion) -> bool:
+    """¿Ya existe convocatorias.tipo? (migración 2026_10_18_220000)."""
+    global _COLUMNAS_TIPO
+
+    if _COLUMNAS_TIPO is None:
+        cursor = conexion.cursor()
+        cursor.execute(
+            """
+            SELECT COUNT(*)
+            FROM information_schema.columns
+            WHERE table_name = 'convocatorias'
+              AND column_name IN ('tipo', 'dirigido_a')
+            """
+        )
+        _COLUMNAS_TIPO = int(cursor.fetchone()[0]) == 2
+        cursor.close()
+
+    return _COLUMNAS_TIPO
+
+
+def guardar_clasificacion(
+    conexion,
+    convocatoria_id: int,
+    tipo: str,
+    dirigido_a: list[str],
+) -> None:
+    if not columnas_tipo_disponibles(conexion):
+        return
+
+    cursor = conexion.cursor()
+    cursor.execute(
+        """
+        UPDATE convocatorias
+        SET tipo = %s,
+            dirigido_a = %s::jsonb
+        WHERE id = %s
+          AND (tipo IS DISTINCT FROM %s OR dirigido_a IS DISTINCT FROM %s::jsonb)
+        """,
+        (
+            tipo,
+            json.dumps(dirigido_a),
+            convocatoria_id,
+            tipo,
+            json.dumps(dirigido_a),
+        ),
+    )
+    cursor.close()
 
 
 def validar_convocatoria(
@@ -698,6 +697,15 @@ def validar_convocatoria(
             duplicados=duplicados,
         )
 
+        # Las subidas a mano conservan el tipo que eligió su autor.
+        if convocatoria.get("origen") != "MANUAL":
+            guardar_clasificacion(
+                conexion,
+                convocatoria_id,
+                resultado["tipo"],
+                resultado["dirigido_a"],
+            )
+
         if (
             publicar
             and resultado[
@@ -736,7 +744,8 @@ def validar_convocatoria(
                 )
             )
 
-            conexion.rollback()
+            # Solo se guarda la clasificación (si hubo).
+            conexion.commit()
 
         conexion.close()
 

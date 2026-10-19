@@ -521,6 +521,10 @@
                     }}
                 </div>
 
+                <div style="margin-top: 10px">
+                    @include('filament.itsva.tipo-convocatoria', ['convocatoria' => $convocatoria])
+                </div>
+
             </div>
 
             <span

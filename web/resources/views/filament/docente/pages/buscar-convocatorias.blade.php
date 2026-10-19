@@ -48,9 +48,8 @@
         .search-main {
             display: grid;
             grid-template-columns:
-                minmax(260px, 2fr)
-                minmax(180px, 1fr)
-                minmax(180px, 1fr);
+                minmax(240px, 2fr)
+                repeat(3, minmax(160px, 1fr));
             gap: 12px;
             margin-bottom: 12px;
         }
@@ -428,31 +427,23 @@
                 </div>
 
                 <div class="filter-group">
-
-                    <label>
-                        Categoría
-                    </label>
-
-                    <select
-                        class="itsva-select"
-                        wire:model.live="categoria"
-                    >
-                        <option value="">
-                            Todas las categorías
-                        </option>
-
-                        @foreach ($categorias as $categoriaItem)
-
-                            <option
-                                value="{{ $categoriaItem->id }}"
-                            >
-                                {{ $categoriaItem->nombre }}
-                            </option>
-
+                    <label>Tipo</label>
+                    <select class="itsva-select" wire:model.live="tipo">
+                        <option value="">Todos los tipos</option>
+                        @foreach (\App\Models\Convocatoria::TIPOS as $clave => [$texto, $icono])
+                            <option value="{{ $clave }}">{{ $icono }} {{ $texto }}</option>
                         @endforeach
-
                     </select>
+                </div>
 
+                <div class="filter-group">
+                    <label>Dirigida a</label>
+                    <select class="itsva-select" wire:model.live="dirigido">
+                        <option value="">Cualquiera</option>
+                        @foreach (\App\Models\Convocatoria::AUDIENCIAS as $clave => $texto)
+                            <option value="{{ $clave }}">{{ $texto }}</option>
+                        @endforeach
+                    </select>
                 </div>
 
                 <div class="filter-group">
@@ -679,6 +670,8 @@
 
                     @endif
 
+                    <div style="margin-bottom: 10px">@include('filament.itsva.tipo-convocatoria', ['convocatoria' => $convocatoria])</div>
+
                     <div class="conv-meta">
 
                         @if ($convocatoria->categoria)
@@ -835,6 +828,8 @@
                     @if (
                         trim($this->buscar) !== ''
                         || $this->categoria !== ''
+                        || $this->tipo !== ''
+                        || $this->dirigido !== ''
                         || $this->organismo !== ''
                         || $this->estado !== ''
                         || $this->cierre !== ''

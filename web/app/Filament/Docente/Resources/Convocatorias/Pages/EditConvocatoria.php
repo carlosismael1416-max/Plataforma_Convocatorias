@@ -91,6 +91,8 @@ class EditConvocatoria extends EditRecord
                 'modalidad',
                 'ubicacion',
                 'url_original',
+                'tipo',
+                'dirigido_a',
             ];
 
             $convocatoria->fill(

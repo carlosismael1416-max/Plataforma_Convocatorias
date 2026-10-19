@@ -688,6 +688,10 @@
                                 @endif
                             </div>
 
+                            @if ($convocatoria)
+                                <div style="margin: 8px 0 2px">@include('filament.itsva.tipo-convocatoria', ['convocatoria' => $convocatoria])</div>
+                            @endif
+
                             <div class="badges">
 
                                 <span

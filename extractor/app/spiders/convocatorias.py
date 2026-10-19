@@ -12,12 +12,10 @@ from app.procesar_revision_resultado import (
 from app.analizar_pdf import analizar_pdf_bytes
 from app.resolver_fecha_cierre import resolver_fecha_cierre
 
-# Rutas de SECIHTI que nunca son elegibles para ITSVA (becas individuales,
-# plazas y nombramientos). Se omiten para no descargarlas; el validador las
-# bloquea de todos modos.
+# Rutas de SECIHTI que nunca son convocatorias para ITSVA (plazas y
+# nombramientos). Se omiten para no descargarlas. Las becas sí se procesan
+# desde el 18-oct-2026: se publican marcadas con su tipo.
 RUTAS_NO_ELEGIBLES = (
-    "/convocatoria/becas-al-extranjero/",
-    "/convocatoria/becas-nacionales/",
     "/convocatoria/centros-publicos-de-investigacion/",
     "/convocatoria/investigadoras-e-investigadores-por-mexico/",
     "/convocatoria/catedras-conacyt/",

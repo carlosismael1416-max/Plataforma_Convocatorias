@@ -67,6 +67,16 @@ class ConvocatoriasTable
                         'Sin fecha'
                     ),
 
+                TextColumn::make('tipo')
+                    ->label('Tipo')
+                    ->badge()
+                    ->formatStateUsing(fn (?string $state): string => $state === 'NO_APLICA'
+                        ? 'No aplica'
+                        : (\App\Models\Convocatoria::TIPOS[$state ?? 'FINANCIAMIENTO'][0] ?? (string) $state))
+                    ->color(fn (?string $state): string => $state === 'NO_APLICA' ? 'gray' : 'info')
+                    ->placeholder('Financiamiento')
+                    ->toggleable(),
+
                 TextColumn::make('estado')
                     ->label('Estado')
                     ->badge()
@@ -167,6 +177,13 @@ class ConvocatoriasTable
             ])
 
             ->filters([
+                SelectFilter::make('tipo')
+                    ->label('Tipo')
+                    ->options(collect(\App\Models\Convocatoria::TIPOS)->map(fn (array $t): string => $t[0])->all() + ['NO_APLICA' => 'No aplica (oculta)'])
+                    ->query(fn ($query, array $data) => $data['value'] === 'NO_APLICA'
+                        ? $query->where('tipo', 'NO_APLICA')
+                        : $query->deTipo($data['value'] ?? null)),
+
                 SelectFilter::make('estado')
                     ->label('Estado')
                     ->options([

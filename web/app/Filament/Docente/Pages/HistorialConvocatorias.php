@@ -45,6 +45,8 @@ class HistorialConvocatorias extends Page
 
     public string $anio = '';
 
+    public string $tipo = '';
+
     public string $orden = 'recientes';
 
     public static function canAccess(): bool
@@ -58,14 +60,14 @@ class HistorialConvocatorias extends Page
 
     public function updated(string $propiedad): void
     {
-        if (in_array($propiedad, ['buscar', 'organismo', 'anio', 'orden'], true)) {
+        if (in_array($propiedad, ['buscar', 'organismo', 'anio', 'tipo', 'orden'], true)) {
             $this->resetPage();
         }
     }
 
     public function limpiarFiltros(): void
     {
-        $this->reset(['buscar', 'organismo', 'anio', 'orden']);
+        $this->reset(['buscar', 'organismo', 'anio', 'tipo', 'orden']);
         $this->resetPage();
     }
 
@@ -86,6 +88,8 @@ class HistorialConvocatorias extends Page
                     ->orWhereHas('organismo', fn (Builder $o) => $o->where('nombre', 'ilike', $patron))
             );
         }
+
+        $query->deTipo($this->tipo);
 
         if (ctype_digit($this->organismo)) {
             $query->where('organismo_id', (int) $this->organismo);

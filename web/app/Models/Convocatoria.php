@@ -34,7 +34,41 @@ class Convocatoria extends Model
         'origen',
         'estado',
         'fecha_extraccion',
+        'tipo',
+        'dirigido_a',
     ];
+
+    /** Tipos visibles: etiqueta, icono corto y color (fondo, texto). */
+    public const TIPOS = [
+        'FINANCIAMIENTO' => ['Financiamiento', '💰', '#DBEAFE', '#1D4ED8'],
+        'BECA' => ['Beca', '🎓', '#EDE9FE', '#6D28D9'],
+        'PREMIO' => ['Premio / reconocimiento', '🏆', '#FEF3C7', '#B45309'],
+        'CONCURSO' => ['Concurso', '🥇', '#FCE7F3', '#BE185D'],
+        'EVENTO' => ['Evento', '📅', '#CFFAFE', '#0E7490'],
+        'FORMACION' => ['Formación', '📚', '#D1FAE5', '#047857'],
+    ];
+
+    /** A quién va dirigida o a quién puede ayudar. */
+    public const AUDIENCIAS = [
+        'INSTITUCION' => 'Institución',
+        'DOCENTES' => 'Docentes e investigadores',
+        'ESTUDIANTES' => 'Estudiantes',
+    ];
+
+    /** [etiqueta, icono, fondo, texto] del tipo; las antiguas sin tipo cuentan como financiamiento. */
+    public function infoTipo(): array
+    {
+        return self::TIPOS[$this->tipo ?? 'FINANCIAMIENTO'] ?? self::TIPOS['FINANCIAMIENTO'];
+    }
+
+    /** Etiquetas de a quién va dirigida (vacío si no se sabe). */
+    public function etiquetasDirigidoA(): array
+    {
+        return array_values(array_filter(array_map(
+            fn ($clave) => self::AUDIENCIAS[$clave] ?? null,
+            (array) ($this->dirigido_a ?? [])
+        )));
+    }
 
 	public function usuariosSeguimiento(): HasMany
 {
@@ -56,13 +90,18 @@ class Convocatoria extends Model
     {
         return $query
             ->whereIn('estado', ['PUBLICADA', 'ACTIVA'])
+            ->where(fn (Builder $q) => $q->whereNull('tipo')->orWhere('tipo', '<>', 'NO_APLICA'))
             ->noVencidas();
     }
 
     /** Historial: cerradas o publicadas cuya fecha de cierre ya pasó. */
     public function scopeHistorial(Builder $query): Builder
     {
+        // Resultados, vacantes y no elegibles (tipo NO_APLICA) no son
+        // convocatorias que alguien hubiera podido aprovechar.
         return $query->where(
+            fn (Builder $q) => $q->whereNull('tipo')->orWhere('tipo', '<>', 'NO_APLICA')
+        )->where(
             fn (Builder $q) => $q
                 ->where('estado', 'CERRADA')
                 ->orWhere(
@@ -71,6 +110,27 @@ class Convocatoria extends Model
                         ->whereDate('fecha_cierre', '<', today())
                 )
         );
+    }
+
+    /** Filtra por tipo (FINANCIAMIENTO incluye las antiguas sin tipo) y por audiencia. */
+    public function scopeDeTipo(Builder $query, ?string $tipo): Builder
+    {
+        if (! $tipo || ! isset(self::TIPOS[$tipo])) {
+            return $query;
+        }
+
+        return $tipo === 'FINANCIAMIENTO'
+            ? $query->where(fn (Builder $q) => $q->whereNull('tipo')->orWhere('tipo', 'FINANCIAMIENTO'))
+            : $query->where('tipo', $tipo);
+    }
+
+    public function scopeDirigidaA(Builder $query, ?string $audiencia): Builder
+    {
+        if (! $audiencia || ! isset(self::AUDIENCIAS[$audiencia])) {
+            return $query;
+        }
+
+        return $query->whereJsonContains('dirigido_a', $audiencia);
     }
 
     public function scopeNoVencidas(Builder $query): Builder
@@ -88,6 +148,7 @@ class Convocatoria extends Model
             'fecha_publicacion' => 'date',
             'fecha_inicio' => 'date',
             'fecha_cierre' => 'date',
+            'dirigido_a' => 'array',
             'fecha_extraccion' => 'datetime',
 
             'monto_minimo' => 'decimal:2',

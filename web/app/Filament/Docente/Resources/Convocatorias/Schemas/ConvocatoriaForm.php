@@ -2,6 +2,7 @@
 
 namespace App\Filament\Docente\Resources\Convocatorias\Schemas;
 
+use App\Filament\Schemas\CamposTipoConvocatoria;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -30,6 +31,8 @@ class ConvocatoriaForm
                                 ->required()
                                 ->maxLength(500)
                                 ->columnSpanFull(),
+
+                            ...CamposTipoConvocatoria::campos(),
 
                             Select::make('organismo_id')
                                 ->label('Organismo financiador')
