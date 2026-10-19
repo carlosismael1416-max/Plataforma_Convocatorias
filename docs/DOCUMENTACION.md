@@ -157,6 +157,17 @@ Lo ejecuta systemd cada 6 horas. Plazo máximo 3.300 s. Escribe su reporte en `e
 | 4. Fuentes oficiales | Consulta las fuentes activas sin JavaScript cuya frecuencia ya pasó (24 h). Lo nuevo entra como `PENDIENTE_REVISION`. |
 | 5. Seguimiento | Reconsulta cada ~20 h las convocatorias vigentes con enlace (máx. 5 por ciclo): agrega documentos nuevos, aplica ampliaciones de fecha, avisa adelantos, detecta cambios de texto > 2 % y **avisa a quienes la siguen o tienen propuesta**. Completa datos faltantes con el enriquecimiento. |
 | 6. Revalidación | Cierra vencidas y enriquece + valida las pendientes (máx. 5 por ciclo; las recién guardadas primero). Publica las que pasan el validador. |
+| Mantenimiento | Al final (`app/mantenimiento.py`, nunca rompe el ciclo): borra descubrimientos `DESCARTADO` sin convocatoria de más de 180 días, notificaciones leídas de más de 180 días y temporales de `web/storage/app/tmp` de más de 24 h. |
+
+**Carga inicial** (para llenar la base la primera vez; mismo plazo de 3.300 s y mismo bloqueo, no choca con el timer):
+
+```bash
+cd extractor
+./.venv/bin/python -m app.ejecutar_ciclo_automatico --cantidad-google 12 --max-dominios 8 \
+  --max-publicaciones 10 --limite-fuentes 30 --max-revalidaciones 15
+```
+
+**Si el ciclo falla** (excepción, falta de memoria o tiempo agotado), `ExecStopPost` ejecuta `scripts/registrar_fallo_ciclo.py`: deja el reporte con estado `FALLIDO` y registra el error (con las últimas líneas del journal) en `bitacora_errores`. El dashboard del admin muestra una alerta roja si el último ciclo falló, si lleva más de 7 h sin correr o si no hay reporte.
 
 ### 6.2 Módulos principales
 
@@ -167,7 +178,8 @@ Lo ejecuta systemd cada 6 horas. Plazo máximo 3.300 s. Escribe su reporte en `e
 | `app/descubrimiento/elegibilidad.py` | ¿Puede participar ITSVA? Excluye otros estados, extranjeros sin apertura, vacantes. Ante la duda, elegible. |
 | `app/evaluar_descubrimientos.py` | Evaluador (umbral 80). |
 | `app/publicar_descubrimientos.py` | Extracción persistente, publicación, revalidación y cierre de vencidas. |
-| `app/validar_convocatoria.py` | Validador final (umbral 70). Bloquea premios, resultados, eventos, becas, ferias, concursos, programas para estudiantes, no elegibles y vencidas. |
+| `app/validar_convocatoria.py` | Validador final (umbral 70). Bloquea premios, resultados, eventos, becas, ferias, concursos, programas para estudiantes, no elegibles y vencidas, por título, ruta de la URL **y por el objetivo/descripción** (p. ej. «otorgar apoyos a estudiantes»). El seguimiento retira (`PENDIENTE_REVISION`) las publicadas del motor que hoy quedarían bloqueadas. |
+| `app/mantenimiento.py` | Limpieza periódica al final del ciclo. |
 | `app/enriquecer_convocatoria.py` | Completa descripción, objetivo, fecha de cierre, categoría, organismo, montos, fechas de publicación y apertura, requisitos y restricciones (desde la página y sus PDF). Solo llena campos vacíos. |
 | `app/enriquecer_datos_extra.py` | Reglas puras de montos, fechas, requisitos y descripción. |
 | `app/spiders/convocatorias.py` | Spider Scrapy: reglas propias para SECIHTI y **listado genérico** para cualquier otra fuente. |
@@ -257,7 +269,7 @@ php artisan view:clear && php artisan optimize:clear
 
 ### Extractor (`cd extractor`)
 ```bash
-./.venv/bin/python -m unittest discover -s tests -t .                    # 90 pruebas
+./.venv/bin/python -m unittest discover -s tests -t .                    # 100 pruebas
 ./.venv/bin/python -m app.ejecutar_ciclo_automatico                      # un ciclo completo a mano
 ./.venv/bin/python -m app.ejecutar_scraping --fuente-id 2 --limite 10    # vista previa de una fuente (no guarda)
 ./.venv/bin/python -m app.ejecutar_fuente --fuente-id 2 --limite 10 --guardar
@@ -274,6 +286,13 @@ sudo systemctl restart convocatorias-itsva-api.service           # tras cambiar 
 curl -s http://127.0.0.1:8001/health ; curl -s http://127.0.0.1:8001/db-check
 ```
 
+### Producción, respaldos y logs
+
+- **Producción separada de desarrollo:** los servicios corren desde `~/produccion/convocatorias-itsva`, un clon que solo cambia con `scripts/desplegar.sh` y siempre desde la rama `main`. Cambiar de rama o editar en la carpeta de desarrollo no afecta al motor. El script actualiza el código, instala dependencias solo si cambiaron, comprueba que el extractor importe (si no, no reinicia nada), muestra migraciones pendientes (las aplica solo con `--migrar`), cachea configuración/rutas/vistas y reinicia la API y la web. `--instalar-units` copia las units apuntando a esa carpeta.
+- **Web como servicio:** `convocatorias-itsva-web.service` (`php artisan serve` en 127.0.0.1:8000, 4 workers, `MemoryMax=512M`); no depende de una terminal abierta.
+- **Respaldos:** `convocatorias-itsva-respaldo.timer` (03:30) ejecuta `extractor/scripts/respaldar_bd.sh`: `pg_dump` comprimido en `~/respaldos/convocatorias-itsva/diario/` (se conservan 7) y los domingos en `semanal/` (se conservan 4). Restaurar: `pg_restore --clean --no-owner -d <base> <archivo>.dump`.
+- **Logs:** Laravel usa `LOG_STACK=daily` con 14 días; el journal de systemd conviene limitarlo con `SystemMaxUse=200M` en `/etc/systemd/journald.conf`.
+
 ---
 
 ## 11. Pruebas
@@ -281,7 +300,7 @@ curl -s http://127.0.0.1:8001/health ; curl -s http://127.0.0.1:8001/db-check
 | Conjunto | Cantidad | Cómo |
 |---|---|---|
 | Web (PHPUnit) | 73 | `cd web && php artisan test`. Usa la base `convocatorias_itsva_test`; `tests/TestCase.php` aborta si el nombre no termina en `_test` (la vacía en cada prueba). |
-| Extractor (unittest) | 90 | `cd extractor && ./.venv/bin/python -m unittest discover -s tests -t .` |
+| Extractor (unittest) | 100 | `cd extractor && ./.venv/bin/python -m unittest discover -s tests -t .` |
 | Verificaciones contra la base real | 5 scripts | `cd web && php tests/Verificacion/<script>.php` (revierten sus datos): `todas_las_paginas`, `permisos_por_rol`, `docente_no_ve_vencidas`, `propuesta_id_bloqueado`, `convocatoria_dependencias`. |
 
 ---
