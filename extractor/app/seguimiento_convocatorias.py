@@ -339,6 +339,47 @@ def completar_datos(convocatoria_id: int) -> list[str]:
     )
 
 
+def retirar_no_publicables(conexion) -> list[dict]:
+    """
+    Publicadas por el motor que hoy el validador bloquearía por su objetivo
+    (becas o apoyos a estudiantes): vuelven a PENDIENTE_REVISION, estado
+    interno que nadie ve. Las subidas a mano por el personal no se tocan.
+    """
+
+    from app.validar_convocatoria import bloqueo_por_objetivo
+
+    retiradas = []
+
+    with conexion.cursor() as cursor:
+        cursor.execute(
+            """
+            SELECT id, titulo, COALESCE(objetivo, ''), COALESCE(descripcion, '')
+            FROM convocatorias
+            WHERE estado IN ('PUBLICADA', 'ACTIVA')
+              AND origen = 'SCRAPING'
+            """
+        )
+
+        for convocatoria_id, titulo, objetivo, descripcion in cursor.fetchall():
+            motivo = bloqueo_por_objetivo(objetivo, descripcion)
+
+            if not motivo:
+                continue
+
+            cursor.execute(
+                """
+                UPDATE convocatorias
+                SET estado = 'PENDIENTE_REVISION', updated_at = NOW()
+                WHERE id = %s AND estado IN ('PUBLICADA', 'ACTIVA')
+                """,
+                (convocatoria_id,),
+            )
+            retiradas.append({"id": convocatoria_id, "motivo": motivo})
+            print(f"  [RETIRADA] {convocatoria_id} {titulo[:80]} ({motivo})")
+
+    return retiradas
+
+
 def seguir_convocatorias(*, terminar_antes_de: float, limite: int = MAX_POR_CICLO) -> dict:
     resultado = {
         "revisadas": 0,
@@ -357,6 +398,7 @@ def seguir_convocatorias(*, terminar_antes_de: float, limite: int = MAX_POR_CICL
     conexion.autocommit = True
 
     try:
+        resultado["retiradas"] = retirar_no_publicables(conexion)
         pendientes = convocatorias_a_revisar(conexion, limite)
 
         for conv in pendientes:
