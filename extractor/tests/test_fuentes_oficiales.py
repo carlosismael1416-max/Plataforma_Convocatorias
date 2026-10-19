@@ -28,7 +28,7 @@ class PortadaSecihtiTest(unittest.TestCase):
             encoding="utf-8",
         )
 
-    def test_toma_las_de_portada_y_omite_becas_y_plazas(self):
+    def test_toma_las_de_portada_incluidas_becas_y_omite_plazas(self):
         spider = ConvocatoriasSpider(url="https://www.secihti.mx/convocatorias/", limite=10)
         urls = [r.url for r in spider.convocatorias_de_portada(self.respuesta())]
 
@@ -36,6 +36,7 @@ class PortadaSecihtiTest(unittest.TestCase):
             urls,
             [
                 "https://www.secihti.mx/convocatoria/ciencias-y-humanidades/revistas-acceso-abierto-2026",
+                "https://www.secihti.mx/convocatoria/becas-nacionales/apoyo-complementario-oea",
                 "https://www.secihti.mx/convocatoria/desarrollo-tecnologico-vinculacion-e-innovacion/jovenes",
                 "https://www.secihti.mx/convocatoria/ciencias-y-humanidades/ecos-nord/ecos-2026",
             ],

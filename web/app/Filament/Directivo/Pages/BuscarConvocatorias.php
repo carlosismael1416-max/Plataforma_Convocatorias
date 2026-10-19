@@ -44,6 +44,10 @@ class BuscarConvocatorias extends Page
 
     public string $categoria = '';
 
+    public string $tipo = '';
+
+    public string $dirigido = '';
+
     public string $organismo = '';
 
     public string $estado = '';
@@ -83,6 +87,16 @@ class BuscarConvocatorias extends Page
         $this->resetPage();
     }
 
+    public function updatedTipo(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatedDirigido(): void
+    {
+        $this->resetPage();
+    }
+
     public function updatedCategoria(): void
     {
         $this->resetPage();
@@ -112,6 +126,8 @@ class BuscarConvocatorias extends Page
     {
         $this->buscar = '';
         $this->categoria = '';
+        $this->tipo = '';
+        $this->dirigido = '';
         $this->organismo = '';
         $this->estado = '';
         $this->fechaCierre = '';
@@ -235,6 +251,8 @@ class BuscarConvocatorias extends Page
         | Filtros
         |--------------------------------------------------------------------------
         */
+
+        $query->deTipo($this->tipo)->dirigidaA($this->dirigido);
 
         if (
             $this->categoria

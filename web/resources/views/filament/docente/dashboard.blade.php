@@ -85,6 +85,7 @@
                                         </div>
                                         <h3>{{ $c['titulo'] }}</h3>
                                         <p class="dd-conv-organismo">{{ $c['organismo'] }}</p>
+                                        <div style="margin-top: 8px">@include('filament.itsva.tipo-convocatoria', ['convocatoria' => $c['convocatoria']])</div>
                                     </div>
 
                                     <button

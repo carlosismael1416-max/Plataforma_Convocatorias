@@ -342,8 +342,8 @@ def completar_datos(convocatoria_id: int) -> list[str]:
 def retirar_no_publicables(conexion) -> list[dict]:
     """
     Publicadas por el motor que hoy el validador bloquearía por su objetivo
-    (becas o apoyos a estudiantes): vuelven a PENDIENTE_REVISION, estado
-    interno que nadie ve. Las subidas a mano por el personal no se tocan.
+    (programas que excluyen a mexicanos): vuelven a PENDIENTE_REVISION,
+    estado interno que nadie ve. Las subidas a mano no se tocan.
     """
 
     from app.validar_convocatoria import bloqueo_por_objetivo

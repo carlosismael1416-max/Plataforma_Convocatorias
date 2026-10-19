@@ -33,6 +33,21 @@ class ConvocatoriaInfolist
                         }
                     ),
 
+                TextEntry::make('tipo')
+                    ->label('Tipo')
+                    ->badge()
+                    ->formatStateUsing(fn (?string $state): string => $state === 'NO_APLICA'
+                        ? 'No aplica (no se publica)'
+                        : (\App\Models\Convocatoria::TIPOS[$state ?? 'FINANCIAMIENTO'][0] ?? (string) $state))
+                    ->placeholder('Financiamiento'),
+
+                TextEntry::make('dirigido_a')
+                    ->label('Dirigida a')
+                    ->badge()
+                    ->color('gray')
+                    ->formatStateUsing(fn ($state): string => \App\Models\Convocatoria::AUDIENCIAS[$state] ?? (string) $state)
+                    ->placeholder('Sin especificar'),
+
                 TextEntry::make('origen')
                     ->label('Origen'),
 

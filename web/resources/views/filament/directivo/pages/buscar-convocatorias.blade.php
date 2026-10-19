@@ -614,6 +614,26 @@
         <div class="filters">
 
             <div class="filter-field">
+                <label>Tipo</label>
+                <select class="filter-select" wire:model.live="tipo">
+                    <option value="">Todos los tipos</option>
+                    @foreach (\App\Models\Convocatoria::TIPOS as $clave => [$texto, $icono])
+                        <option value="{{ $clave }}">{{ $icono }} {{ $texto }}</option>
+                    @endforeach
+                </select>
+            </div>
+
+            <div class="filter-field">
+                <label>Dirigida a</label>
+                <select class="filter-select" wire:model.live="dirigido">
+                    <option value="">Cualquiera</option>
+                    @foreach (\App\Models\Convocatoria::AUDIENCIAS as $clave => $texto)
+                        <option value="{{ $clave }}">{{ $texto }}</option>
+                    @endforeach
+                </select>
+            </div>
+
+            <div class="filter-field">
 
                 <label>
                     Área temática
@@ -944,6 +964,8 @@
                                 )
                             }}
                         </div>
+
+                        <div style="margin: 8px 0">@include('filament.itsva.tipo-convocatoria', ['convocatoria' => $convocatoria])</div>
 
                         <div class="result-meta">
 

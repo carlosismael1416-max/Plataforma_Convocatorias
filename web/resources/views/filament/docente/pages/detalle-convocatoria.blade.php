@@ -372,6 +372,8 @@
                             ?? 'Organismo no especificado' }}
                     </div>
 
+                    <div style="margin: 10px 0 4px">@include('filament.itsva.tipo-convocatoria', ['convocatoria' => $convocatoria])</div>
+
                     <div class="detalle-badges">
 
                         @if ($convocatoria->categoria)

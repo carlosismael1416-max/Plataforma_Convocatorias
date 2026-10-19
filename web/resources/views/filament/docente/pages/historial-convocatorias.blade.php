@@ -1,6 +1,6 @@
 <x-filament-panels::page>
 @php
-    $hayFiltros = trim($buscar) !== '' || $organismo !== '' || $anio !== '';
+    $hayFiltros = trim($buscar) !== '' || $organismo !== '' || $anio !== '' || $tipo !== '';
 @endphp
 
 <style>
@@ -57,6 +57,12 @@
                 <option value="{{ $o->id }}">{{ $o->nombre }}</option>
             @endforeach
         </select>
+        <select wire:model.live="tipo" aria-label="Tipo">
+            <option value="">Todos los tipos</option>
+            @foreach (\App\Models\Convocatoria::TIPOS as $clave => [$texto, $icono])
+                <option value="{{ $clave }}">{{ $icono }} {{ $texto }}</option>
+            @endforeach
+        </select>
         <select wire:model.live="anio" aria-label="Año de cierre">
             <option value="">Cualquier año</option>
             @foreach ($anios as $a)
@@ -86,6 +92,7 @@
                 @if ($c->descripcion)
                     <div class="hist-desc">{{ \Illuminate\Support\Str::limit(strip_tags($c->descripcion), 220) }}</div>
                 @endif
+                <div>@include('filament.itsva.tipo-convocatoria', ['convocatoria' => $c])</div>
                 <div class="hist-chips">
                     @if ($c->categoria)
                         <span class="hist-chip">{{ $c->categoria->nombre }}</span>

@@ -230,6 +230,7 @@ class Dashboard extends BaseDashboard
             'titulo' => $c->titulo,
             'organismo' => $c->organismo?->nombre ?? 'Organismo no especificado',
             'categoria' => $c->categoria?->nombre,
+            'convocatoria' => $c,
             'monto' => $c->monto_maximo !== null
                 ? '$' . number_format((float) $c->monto_maximo, 0, '.', ',') . ' ' . ($c->moneda ?: 'MXN')
                 : 'No especificado',
