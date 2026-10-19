@@ -44,6 +44,9 @@ class MisConvocatorias extends Page
 
     public string $disponibilidad = '';
 
+    // 'todas' o 'favoritas' (pestañas).
+    public string $vista = 'todas';
+
     public array $notas = [];
 
     public static function canAccess(): bool
@@ -58,6 +61,10 @@ class MisConvocatorias extends Page
     public function mount(): void
     {
         $usuarioId = auth()->id();
+
+        if (request()->query('vista') === 'favoritas') {
+            $this->vista = 'favoritas';
+        }
 
         if (! $usuarioId) {
             return;
@@ -94,12 +101,20 @@ class MisConvocatorias extends Page
         $this->resetPage();
     }
 
+    public function cambiarVista(string $vista): void
+    {
+        $this->vista = $vista === 'favoritas' ? 'favoritas' : 'todas';
+
+        $this->resetPage();
+    }
+
     public function limpiarFiltros(): void
     {
         $this->buscar = '';
         $this->estado = '';
         $this->prioridad = '';
         $this->disponibilidad = '';
+        $this->vista = 'todas';
 
         $this->resetPage();
     }
@@ -377,6 +392,10 @@ class MisConvocatorias extends Page
             ])
             ->where('user_id', $usuarioId)
             ->whereHas('convocatoria');
+
+        if ($this->vista === 'favoritas') {
+            $query->where('es_favorita', true);
+        }
 
         /*
         |--------------------------------------------------------------------------

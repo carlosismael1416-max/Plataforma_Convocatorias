@@ -17,16 +17,16 @@ class AparienciaTest extends TestCase
     {
         return [
             'docente' => ['DOCENTE', '/docente', [
-                'Dashboard', 'Buscar convocatorias', 'Mis convocatorias',
+                'Dashboard', 'Buscar convocatorias', 'Mis convocatorias', 'Historial',
                 'Subir convocatoria', 'Calendario', 'Propuestas', 'Notificaciones',
             ]],
             'directivo' => ['DIRECTIVO', '/directivo', [
-                'Dashboard', 'Propuestas por revisar', 'Buscar convocatorias', 'Mis convocatorias', 'Subir convocatoria',
-                'Calendario', 'Propuestas', 'Estadísticas', 'Reportes', 'Notificaciones',
+                'Dashboard', 'Propuestas por revisar', 'Buscar convocatorias', 'Mis convocatorias', 'Historial',
+                'Subir convocatoria', 'Calendario', 'Propuestas', 'Estadísticas', 'Reportes', 'Notificaciones',
             ]],
             'admin' => ['ADMINISTRADOR', '/admin', [
                 'Dashboard', 'Usuarios', 'Roles y permisos', 'Fuentes web',
-                'Motor de Extracción', 'Descubrimientos', 'Bitácora de Errores', 'Convocatorias',
+                'Motor de Extracción', 'Descubrimientos', 'Bitácora de Errores', 'Convocatorias', 'Historial',
             ]],
         ];
     }
