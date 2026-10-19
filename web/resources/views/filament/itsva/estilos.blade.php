@@ -649,6 +649,66 @@
     tr[data-href]:hover > td {
         background: #F5F8FD;
     }
+
+    /* ---------- Vistas de detalle (infolists de Filament) ---------- */
+
+    /* Secciones: tarjetas con encabezado marcado. */
+    .fi-section {
+        border-radius: 16px !important;
+        border: 1px solid #DDE3EE !important;
+        box-shadow: 0 1px 3px rgba(15, 23, 42, .05) !important;
+        overflow: hidden;
+    }
+
+    .fi-section-header {
+        background: linear-gradient(180deg, #F8FAFC 0%, #FFFFFF 100%);
+        border-bottom: 1px solid #EEF2F7;
+    }
+
+    .fi-section-header-heading {
+        color: #1A2C4E !important;
+        font-weight: 700 !important;
+    }
+
+    .fi-section-header .fi-icon {
+        color: #1A4B8C !important;
+    }
+
+    /* Etiquetas pequeñas en mayúsculas y valores destacados. */
+    .fi-in-entry-label {
+        color: #64748B !important;
+        font-size: 11px !important;
+        font-weight: 700 !important;
+        letter-spacing: .04em;
+        text-transform: uppercase;
+    }
+
+    .fi-in-entry-content .fi-in-text-item {
+        color: #1A2C4E;
+    }
+
+    /* Campos sueltos (sin sección): cada uno en su propia tarjeta. */
+    .fi-page-content > .fi-sc > .fi-grid-col > .fi-sc-component > .fi-in-entry,
+    .fi-resource-view-record-page .fi-sc:not(.fi-section .fi-sc) > .fi-grid-col > .fi-sc-component > .fi-in-entry {
+        height: 100%;
+        padding: 14px 16px;
+        background: #FFFFFF;
+        border: 1px solid #DDE3EE;
+        border-left: 4px solid #1A4B8C;
+        border-radius: 12px;
+        box-shadow: 0 1px 2px rgba(15, 23, 42, .04);
+        transition: box-shadow .15s;
+    }
+
+    .fi-page-content > .fi-sc > .fi-grid-col > .fi-sc-component > .fi-in-entry:hover,
+    .fi-resource-view-record-page .fi-sc:not(.fi-section .fi-sc) > .fi-grid-col > .fi-sc-component > .fi-in-entry:hover {
+        box-shadow: 0 6px 16px rgba(15, 23, 42, .07);
+    }
+
+    .fi-in-placeholder {
+        color: #94A3B8 !important;
+        font-style: italic;
+    }
 </style>
 
 <script>
