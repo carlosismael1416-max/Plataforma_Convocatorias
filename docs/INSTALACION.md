@@ -221,7 +221,8 @@ cd ~/proyectos/convocatorias-itsva/extractor/systemd
 RUTA=/home/TU_USUARIO/proyectos/convocatorias-itsva
 USUARIO=TU_USUARIO
 
-for f in convocatorias-itsva.service convocatorias-itsva.timer convocatorias-itsva-api.service; do
+for f in convocatorias-itsva.service convocatorias-itsva.timer convocatorias-itsva-api.service \
+         convocatorias-itsva-web.service convocatorias-itsva-respaldo.service convocatorias-itsva-respaldo.timer; do
   sed -e "s#/home/carlos_ismael/proyectos/convocatorias-itsva#${RUTA}#g" \
       -e "s#^User=carlos_ismael#User=${USUARIO}#" \
       -e "s#^Group=carlos_ismael#Group=${USUARIO}#" \
@@ -231,7 +232,11 @@ done
 sudo systemctl daemon-reload
 sudo systemctl enable --now convocatorias-itsva-api.service   # API (127.0.0.1:8001)
 sudo systemctl enable --now convocatorias-itsva.timer          # ciclo cada 6 h
+sudo systemctl enable --now convocatorias-itsva-web.service    # web (127.0.0.1:8000)
+sudo systemctl enable --now convocatorias-itsva-respaldo.timer # respaldo diario 03:30
 ```
+
+> Recomendado: en vez de copiar las units a mano, usa la carpeta de producción con `scripts/desplegar.sh --instalar-units` (sección 12). Limita también el journal: `SystemMaxUse=200M` en `/etc/systemd/journald.conf` y `sudo systemctl restart systemd-journald`.
 
 Verifica:
 
@@ -261,7 +266,7 @@ php artisan test                 # 73 pruebas
 
 # Extractor
 cd ~/proyectos/convocatorias-itsva/extractor
-./.venv/bin/python -m unittest discover -s tests -t .   # 90 pruebas
+./.venv/bin/python -m unittest discover -s tests -t .   # 100 pruebas
 ```
 
 ---
@@ -313,16 +318,18 @@ cd ~/proyectos/convocatorias-itsva/extractor
 
 ---
 
-## 12. Actualizar una instalación existente
+## 12. Producción y actualizaciones
+
+Los servicios deben correr desde una copia aparte (`~/produccion/convocatorias-itsva`) que solo cambia con el script de despliegue y siempre desde la rama `main`:
 
 ```bash
 cd ~/proyectos/convocatorias-itsva
-git pull
-cd web && composer install && php artisan migrate --pretend && php artisan migrate && php artisan optimize:clear
-cd ../extractor && ./.venv/bin/pip install -r requirements.txt
-sudo systemctl restart convocatorias-itsva-api.service
+git pull                                   # traer lo último a main
+scripts/desplegar.sh --instalar-units      # la primera vez: crea la copia e instala las units
+scripts/desplegar.sh                       # actualizaciones posteriores
+scripts/desplegar.sh --migrar              # si el script avisa de migraciones pendientes
 ```
 
-Si cambiaron las units en `extractor/systemd/`, vuelve a copiarlas (paso 7) y ejecuta `sudo systemctl daemon-reload`.
+La primera vez copia `web/.env` y `extractor/.env` desde desarrollo; después son propios de producción (ahí conviene `APP_ENV=production` y `APP_DEBUG=false`). Variables: `RAMA` (por defecto `main`) y `PROD_DIR`.
 
 Para la documentación completa del funcionamiento, consulta [DOCUMENTACION.md](DOCUMENTACION.md).
