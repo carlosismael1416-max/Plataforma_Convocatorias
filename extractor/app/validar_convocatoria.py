@@ -52,6 +52,29 @@ PALABRAS_BLOQUEO = (
 )
 
 
+# El objetivo y la descripción también delatan becas y apoyos personales a
+# estudiantes aunque el título y la URL no lo digan (lección de la
+# convocatoria «Apoyo Complementario SECIHTI-OEA»). Se buscan sobre texto
+# normalizado (minúsculas y sin acentos).
+PATRONES_OBJETIVO_BLOQUEO = (
+    (r"\b(otorgamiento|otorgar|otorga) de (una |las |los )?(becas?|apoyos? (economicos? |complementarios? )?(a|para) (estudiantes|alumn[oa]s|becari[oa]s))", "beca o apoyo a estudiantes"),
+    (r"\bapoyos? complementarios? (a|para) (estudiantes|alumn[oa]s)", "apoyo complementario a estudiantes"),
+    (r"\bbecas? (para|de) (estudios|posgrado|manutencion|licenciatura|maestria|doctorado|movilidad)", "beca para estudios"),
+    (r"\bdirigid[ao]s? (exclusivamente |unicamente )?a (estudiantes|alumn[oa]s|jovenes estudiantes)", "dirigida a estudiantes"),
+    (r"\bdireccion general de becas\b", "emitida por la Dirección General de Becas"),
+)
+
+
+def bloqueo_por_objetivo(objetivo: str, descripcion: str) -> str | None:
+    texto = normalizar_texto(objetivo + " " + (descripcion or "")[:1500])
+
+    for patron, motivo in PATRONES_OBJETIVO_BLOQUEO:
+        if re.search(patron, texto):
+            return motivo
+
+    return None
+
+
 def normalizar_texto(
     valor: str | None,
 ) -> str:
@@ -334,6 +357,17 @@ def evaluar_convocatoria(
                 f"automáticamente: {palabra}."
             )
             break
+
+    motivo_objetivo = bloqueo_por_objetivo(
+        objetivo,
+        descripcion,
+    )
+
+    if motivo_objetivo:
+        bloqueos.append(
+            "El objetivo describe una categoría no publicable "
+            f"automáticamente: {motivo_objetivo}."
+        )
 
     # La ruta también clasifica: /convocatoria/becas-nacionales/...
     # (caso real: "Apoyo Complementario SECIHTI-OEA", un apoyo a
