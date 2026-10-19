@@ -12,16 +12,16 @@ class DepartamentoInfolist
     {
         return $schema
             ->components([
-                TextEntry::make('nombre'),
-                TextEntry::make('descripcion')
+                TextEntry::make('nombre')->label('Nombre'),
+                TextEntry::make('descripcion')->label('Descripción')
                     ->placeholder('-')
                     ->columnSpanFull(),
-                IconEntry::make('estado')
+                IconEntry::make('estado')->label('Estado')
                     ->boolean(),
-                TextEntry::make('created_at')
+                TextEntry::make('created_at')->label('Registrado')
                     ->dateTime()
                     ->placeholder('-'),
-                TextEntry::make('updated_at')
+                TextEntry::make('updated_at')->label('Última actualización')
                     ->dateTime()
                     ->placeholder('-'),
             ]);
