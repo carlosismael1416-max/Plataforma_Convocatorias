@@ -92,6 +92,8 @@ class DetalleError extends Page
                 auth()->id(),
         ]);
 
+        \App\Services\RegistroActividad::registrar('BITACORA', 'Marcó como resuelta la incidencia #' . $this->error->id);
+
         $this->cargarError();
 
         Notification::make()
@@ -123,6 +125,8 @@ class DetalleError extends Page
             'user_id_resolucion' =>
                 null,
         ]);
+
+        \App\Services\RegistroActividad::registrar('BITACORA', 'Reabrió la incidencia #' . $this->error->id);
 
         $this->cargarError();
 

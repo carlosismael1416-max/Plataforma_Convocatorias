@@ -268,6 +268,8 @@ class Reportes extends Page
             'total' => $reporte['total'],
         ]);
 
+        \App\Services\RegistroActividad::registrar('REPORTE', 'Generó el reporte de ' . mb_strtolower($this->tipoLabel()) . ' (' . strtoupper($this->formato) . ', ' . $reporte['total'] . ' registros)');
+
         return match (
             $this->formato
         ) {

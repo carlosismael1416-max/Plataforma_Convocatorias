@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\RegistraActividad;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -9,6 +10,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Convocatoria extends Model
 {
+    use RegistraActividad;
+
     protected $table = 'convocatorias';
 
     protected $fillable = [
@@ -318,5 +321,15 @@ public function financiamientos(): \Illuminate\Database\Eloquent\Relations\HasMa
     public function seguimiento(): \Illuminate\Database\Eloquent\Relations\HasOne
     {
         return $this->hasOne(ConvocatoriaSeguimiento::class);
+    }
+
+    protected function accionActividad(): array
+    {
+        return ['CONVOCATORIA', 'la convocatoria'];
+    }
+
+    protected function nombreActividad(): string
+    {
+        return (string) $this->titulo;
     }
 }

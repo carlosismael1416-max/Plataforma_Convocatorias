@@ -1,5 +1,9 @@
 <x-filament-panels::page>
     <style>
+        .ultimo-acceso { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 18px; padding: 12px 14px; border: 1px solid #DDE3EE; border-radius: 12px; background: #F8FAFC; }
+        .ultimo-acceso-titulo { font-size: 14px; font-weight: 700; color: #0F1827; }
+        .ultimo-acceso-ayuda { font-size: 12px; color: #64748B; }
+        .ultimo-acceso strong { font-size: 12px; color: #475569; text-align: right; }
         .admin-profile {
             --text: #0F1827;
             --muted: #64748B;
@@ -621,7 +625,7 @@
 
                 <div class="visual-note">
 
-                    Rol, estado, departamento y permisos
+                    Rol, estado y departamento
                     se administran desde los módulos
                     correspondientes y no pueden
                     modificarse desde esta pantalla.
@@ -763,79 +767,7 @@
                 </section>
 
 
-                <section class="card">
 
-                    <div class="card-header">
-
-                        <div class="card-title">
-                            Accesos del Administrador
-                        </div>
-
-                        <div class="card-description">
-                            Permisos reales asociados
-                            actualmente a tu rol.
-                        </div>
-
-                    </div>
-
-
-                    <div class="card-content">
-
-                        @if ($permisos->isNotEmpty())
-
-                            <div class="permission-grid">
-
-                                @foreach (
-                                    $permisos
-                                    as $permiso
-                                )
-
-                                    <div
-                                        class="permission"
-                                    >
-
-                                        <div
-                                            class="
-                                                permission-icon
-                                            "
-                                        >
-                                            ✓
-                                        </div>
-
-                                        <div
-                                            class="
-                                                permission-name
-                                            "
-                                        >
-                                            {{
-                                                ucfirst(
-                                                    str_replace(
-                                                        '_',
-                                                        ' ',
-                                                        $permiso
-                                                    )
-                                                )
-                                            }}
-                                        </div>
-
-                                    </div>
-
-                                @endforeach
-
-                            </div>
-
-                        @else
-
-                            <div class="empty-state">
-                                Este rol no tiene permisos
-                                registrados.
-                            </div>
-
-                        @endif
-
-                    </div>
-
-                </section>
 
 
                 <section class="card">
@@ -855,6 +787,15 @@
 
 
                     <div class="card-content">
+
+                        <div class="ultimo-acceso">
+                            @php $anterior = session('acceso_anterior'); $anterior = $anterior ? \Illuminate\Support\Carbon::parse($anterior) : null; @endphp
+                            <div>
+                                <div class="ultimo-acceso-titulo">Inicio de sesión anterior</div>
+                                <div class="ultimo-acceso-ayuda">Tu inicio de sesión anterior a este.</div>
+                            </div>
+                            <strong>{{ $anterior ? $anterior->timezone('America/Merida')->locale('es')->isoFormat('D MMM YYYY, HH:mm') . ' (' . $anterior->locale('es')->diffForHumans() . ')' : 'Primer inicio de sesión registrado' }}</strong>
+                        </div>
 
                         <form
                             class="profile-form"
@@ -975,41 +916,7 @@
                 </section>
 
 
-                <section class="card">
-
-                    <div class="card-header">
-
-                        <div class="card-title">
-                            Actividad reciente
-                        </div>
-
-                        <div class="card-description">
-                            Historial de acciones
-                            administrativas de la cuenta.
-                        </div>
-
-                    </div>
-
-
-                    <div class="card-content">
-
-                        <div class="empty-state">
-
-                            Actualmente no existe una
-                            bitácora de actividad de usuario
-                            que permita reconstruir estas
-                            acciones de forma fiable.
-
-                            <br><br>
-
-                            No se muestran actividades
-                            ficticias.
-
-                        </div>
-
-                    </div>
-
-                </section>
+                @include('filament.partials.actividad-reciente', ['historialUrl' => \App\Filament\Admin\Pages\HistorialActividades::getUrl()])
 
             </main>
 

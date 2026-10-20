@@ -220,6 +220,8 @@ class Perfil extends Page
 
         $usuario->save();
 
+        \App\Services\RegistroActividad::registrar('CONTRASENA', 'Cambió su contraseña desde el perfil');
+
         $this->passwordActual = '';
         $this->passwordNueva = '';
         $this->passwordNuevaConfirmacion = '';
@@ -244,15 +246,6 @@ class Perfil extends Page
             'role',
             'departamento',
         ]);
-
-        $permisos =
-            $usuario->role
-                ? $usuario
-                    ->role
-                    ->permisos()
-                    ->orderBy('nombre')
-                    ->pluck('nombre')
-                : collect();
 
         $nombreCompleto =
             trim(
@@ -290,9 +283,6 @@ class Perfil extends Page
         return [
             'usuario' =>
                 $usuario,
-
-            'permisos' =>
-                $permisos,
 
             'nombreCompleto' =>
                 $nombreCompleto,

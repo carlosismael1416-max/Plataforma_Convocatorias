@@ -951,6 +951,8 @@ class CotizacionesPropuesta extends Page
         $propuesta ??=
             $this->propuestaDelUsuario();
 
+        \App\Services\RegistroActividad::registrar('PROPUESTA', 'Actualizó las cotizaciones de la propuesta «' . mb_strimwidth((string) $propuesta->titulo, 0, 160, '…') . '»', $propuesta, agrupar: true);
+
         if (
             in_array(
                 $propuesta->estado,
@@ -965,7 +967,7 @@ class CotizacionesPropuesta extends Page
             $propuesta->estado =
                 'EDITANDO';
 
-            $propuesta->save();
+            \App\Services\RegistroActividad::sinRegistroAutomatico(fn () => $propuesta->save());
         } else {
             $propuesta->touch();
         }

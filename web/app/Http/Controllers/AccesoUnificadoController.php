@@ -71,12 +71,14 @@ class AccesoUnificadoController extends Controller
         // se registra el actual.
         $request->session()->put('acceso_anterior', $usuario->ultimo_acceso?->toIso8601String());
         $usuario->forceFill(['ultimo_acceso' => now()])->saveQuietly();
+        \App\Services\RegistroActividad::registrar('INICIO_SESION', 'Inició sesión', usuarioId: $usuario->id);
 
         return redirect($destino);
     }
 
     public function salir(Request $request): RedirectResponse
     {
+        \App\Services\RegistroActividad::registrar('CIERRE_SESION', 'Cerró sesión');
         Auth::logout();
 
         $request->session()->invalidate();

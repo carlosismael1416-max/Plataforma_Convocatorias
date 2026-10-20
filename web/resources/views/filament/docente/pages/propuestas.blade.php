@@ -78,6 +78,24 @@
         .prop-stats { grid-template-columns: repeat(2, 1fr); }
         .prop-head { flex-direction: column; align-items: flex-start; }
     }
+    .prop-tabs { display: flex; gap: 4px; margin-bottom: 18px; border-bottom: 1px solid #DDE3EE; }
+    .prop-tab { border: 0; background: transparent; padding: 10px 16px; margin-bottom: -1px; border-bottom: 3px solid transparent; color: #64748B; font: inherit; font-size: 14px; font-weight: 700; cursor: pointer; }
+    .prop-tab:hover { color: #1A4B8C; }
+    .prop-tab.activa { color: #1A4B8C; border-bottom-color: #1A4B8C; }
+
+    .mov-ayuda { margin: 0 0 14px; color: #64748B; font-size: 13px; }
+    .mov-lista { overflow: hidden; border: 1px solid #DDE3EE; border-radius: 16px; background: #fff; }
+    .mov-fila { display: grid; grid-template-columns: 38px minmax(0, 1fr) auto; gap: 14px; align-items: center; padding: 13px 18px; border-top: 1px solid #F1F5F9; color: inherit; text-decoration: none; }
+    .mov-fila:first-child { border-top: 0; }
+    a.mov-fila:hover { background: #F8FAFC; }
+    .mov-icono { width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; background: #F1F5F9; font-size: 17px; }
+    .mov-etq { display: inline-flex; padding: 2px 9px; border-radius: 999px; background: #E8EEF8; color: #1A4B8C; font-size: 11px; font-weight: 700; }
+    .mov-quien { margin-left: 6px; color: #64748B; font-size: 12px; }
+    .mov-desc { margin-top: 3px; font-size: 14px; font-weight: 600; line-height: 1.4; word-break: break-word; }
+    .mov-detalle { margin-top: 4px; padding: 8px 10px; border-radius: 8px; background: #FFFBEB; color: #92400E; font-size: 12px; line-height: 1.45; white-space: pre-line; }
+    .mov-fecha { text-align: right; font-size: 12px; font-weight: 600; white-space: nowrap; }
+    .mov-fecha span { display: block; color: #94A3B8; font-weight: 400; }
+    @media (max-width: 640px) { .mov-fila { grid-template-columns: 1fr; } .mov-icono { display: none; } .mov-fecha { text-align: left; } }
 </style>
 
 <div class="prop-page">
@@ -88,6 +106,44 @@
         </div>
         <a href="{{ route('filament.' . $panel . '.pages.generar-propuesta') }}" class="prop-new">+ Nueva propuesta</a>
     </div>
+
+    <div class="prop-tabs" role="tablist">
+        <button type="button" role="tab" wire:click="$set('vista', 'propuestas')" @class(['prop-tab', 'activa' => $vista !== 'movimientos']) aria-selected="{{ $vista !== 'movimientos' ? 'true' : 'false' }}">Mis propuestas</button>
+        <button type="button" role="tab" wire:click="$set('vista', 'movimientos')" @class(['prop-tab', 'activa' => $vista === 'movimientos']) aria-selected="{{ $vista === 'movimientos' ? 'true' : 'false' }}">Historial de movimientos</button>
+    </div>
+
+    @if ($vista === 'movimientos')
+        <p class="mov-ayuda">Lo que has hecho en tus propuestas (crearlas, editar cada sección, enviarlas) y los dictámenes que recibiste. Las ediciones seguidas de una misma sección se agrupan en una sola fila.</p>
+
+        <div class="mov-lista">
+            @forelse ($movimientos as $mov)
+                @php $url = route('filament.' . $panel . '.pages.vista-previa-propuesta', ['propuesta' => $mov['propuesta_id']]); @endphp
+                <a href="{{ $url }}" class="mov-fila" wire:key="mov-{{ $loop->index }}-{{ $mov['fecha']?->timestamp }}">
+                    <span class="mov-icono" aria-hidden="true">{{ $mov['icono'] }}</span>
+                    <div style="min-width: 0">
+                        <span class="mov-etq">{{ $mov['etiqueta'] }}</span>
+                        @if ($mov['quien'])
+                            <span class="mov-quien">por {{ $mov['quien'] }}</span>
+                        @endif
+                        <div class="mov-desc">{{ $mov['descripcion'] }}</div>
+                        @if (filled($mov['detalle']))
+                            <div class="mov-detalle">{{ $mov['detalle'] }}</div>
+                        @endif
+                    </div>
+                    <div class="mov-fecha">
+                        {{ $mov['fecha']?->locale('es')->diffForHumans() }}
+                        <span>{{ $mov['fecha']?->timezone('America/Merida')->format('d/m/Y H:i') }}</span>
+                    </div>
+                </a>
+            @empty
+                <div class="prop-empty" style="border: 0">
+                    <div class="prop-empty-icon">🕘</div>
+                    <h3>Sin movimientos todavía</h3>
+                    <p>Cuando crees, edites o envíes una propuesta, aparecerá aquí.</p>
+                </div>
+            @endforelse
+        </div>
+    @else
 
     <div class="prop-stats">
         @foreach ([
@@ -201,5 +257,6 @@
     <div style="margin-top: 16px">
         {{ $propuestas->links('pagination.itsva') }}
     </div>
+    @endif
 </div>
 </x-filament-panels::page>

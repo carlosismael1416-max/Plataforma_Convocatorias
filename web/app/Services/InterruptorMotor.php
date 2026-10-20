@@ -40,5 +40,7 @@ class InterruptorMotor
             ['clave' => self::CLAVE],
             ['valor' => $encendido ? '1' : '0', 'actualizado_por' => $usuario->id],
         );
+
+        RegistroActividad::registrar('MOTOR', $encendido ? 'Encendió el motor de extracción' : 'Apagó el motor de extracción', usuarioId: $usuario->id);
     }
 }

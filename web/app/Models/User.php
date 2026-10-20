@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\RegistraActividad;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -12,6 +13,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class User extends Authenticatable implements FilamentUser
 {
+    use RegistraActividad;
+
     use HasFactory, Notifiable;
 
     protected $fillable = [
@@ -98,5 +101,15 @@ public function propuestas(): HasMany
             Convocatoria::class,
             'subido_por_user_id'
         );
+    }
+
+    protected function accionActividad(): array
+    {
+        return (int) $this->getKey() === (int) auth()->id() ? ['PERFIL', 'su perfil'] : ['USUARIO', 'el usuario'];
+    }
+
+    protected function nombreActividad(): string
+    {
+        return trim($this->name . ' ' . ($this->apellidos ?? ''));
     }
 }

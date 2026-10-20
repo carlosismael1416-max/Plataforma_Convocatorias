@@ -2,12 +2,15 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\RegistraActividad;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Propuesta extends Model
 {
+    use RegistraActividad;
+
     protected $table = 'propuestas';
 
     protected $fillable = [
@@ -84,5 +87,15 @@ class Propuesta extends Model
     public function entregables(): HasMany
     {
         return $this->hasMany(PropuestaEntregable::class);
+    }
+
+    protected function accionActividad(): array
+    {
+        return ['PROPUESTA', 'la propuesta'];
+    }
+
+    protected function nombreActividad(): string
+    {
+        return (string) $this->titulo;
     }
 }

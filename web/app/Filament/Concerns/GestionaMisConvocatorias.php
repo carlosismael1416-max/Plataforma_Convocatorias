@@ -4,6 +4,7 @@ namespace App\Filament\Concerns;
 
 use App\Models\Convocatoria;
 use App\Models\UsuarioConvocatoria;
+use App\Services\RegistroActividad;
 use Filament\Notifications\Notification;
 
 /**
@@ -16,7 +17,9 @@ trait GestionaMisConvocatorias
 {
     public function guardarEnMis(int $convocatoriaId): void
     {
-        $this->seguimientoNuevo($convocatoriaId, 'Agregada a Mis convocatorias');
+        if ($seguimiento = $this->seguimientoNuevo($convocatoriaId, 'Agregada a Mis convocatorias')) {
+            RegistroActividad::registrar('MIS_CONVOCATORIAS', 'Guardó en Mis convocatorias «' . mb_strimwidth((string) $seguimiento->convocatoria?->titulo, 0, 160, '…') . '»', $seguimiento->convocatoria);
+        }
 
         $this->despuesDeCambiarSeguimiento();
 
@@ -35,6 +38,9 @@ trait GestionaMisConvocatorias
             ->where('user_id', auth()->id())
             ->where('convocatoria_id', $convocatoriaId)
             ->delete();
+
+        $convocatoria = Convocatoria::find($convocatoriaId);
+        RegistroActividad::registrar('MIS_CONVOCATORIAS', 'Quitó de Mis convocatorias «' . mb_strimwidth((string) $convocatoria?->titulo, 0, 160, '…') . '»', $convocatoria);
 
         $this->despuesDeCambiarSeguimiento();
 
@@ -69,6 +75,8 @@ trait GestionaMisConvocatorias
         $seguimiento->ultima_accion = $seguimiento->es_favorita ? 'Marcada como favorita' : 'Quitada de favoritas';
         $seguimiento->fecha_ultima_accion = now();
         $seguimiento->save();
+
+        RegistroActividad::registrar('MIS_CONVOCATORIAS', ($seguimiento->es_favorita ? 'Marcó como favorita' : 'Quitó de favoritas') . ' «' . mb_strimwidth((string) $seguimiento->convocatoria?->titulo, 0, 160, '…') . '»', $seguimiento->convocatoria);
 
         $this->despuesDeCambiarSeguimiento();
 

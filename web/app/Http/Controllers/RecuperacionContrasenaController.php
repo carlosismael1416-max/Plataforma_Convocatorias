@@ -73,6 +73,7 @@ class RecuperacionContrasenaController extends Controller
                 ])->save();
 
                 event(new PasswordReset($usuario));
+                \App\Services\RegistroActividad::registrar('CONTRASENA', 'Restableció su contraseña con el enlace del correo', usuarioId: $usuario->id);
             }
         );
 

@@ -258,6 +258,8 @@ class Perfil extends Page
 
         $usuario->save();
 
+        \App\Services\RegistroActividad::registrar('CONTRASENA', 'Cambió su contraseña desde el perfil');
+
         $this->limpiarPassword();
 
         $this->mostrarCambioPassword =
