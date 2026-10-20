@@ -668,11 +668,7 @@
                             <input
                                 class="check"
                                 type="checkbox"
-                                wire:model.live="
-                                    cumplidos.{{
-                                        $requisitoPropuesta->id
-                                    }}
-                                "
+                                wire:model.live="cumplidos.{{ $requisitoPropuesta->id }}"
                                 @disabled(! $editable)
                             >
 
@@ -752,11 +748,7 @@
                             <textarea
                                 class="textarea"
                                 maxlength="5000"
-                                wire:model="
-                                    observaciones.{{
-                                        $requisitoPropuesta->id
-                                    }}
-                                "
+                                wire:model="observaciones.{{ $requisitoPropuesta->id }}"
                                 placeholder="Añade comentarios sobre el cumplimiento del requisito..."
                                 @disabled(! $editable)
                             ></textarea>
@@ -820,13 +812,7 @@
                                             <button
                                                 type="button"
                                                 class="mini-btn"
-                                                wire:click="
-                                                    descargarEvidencia(
-                                                        {{
-                                                            $evidencia->id
-                                                        }}
-                                                    )
-                                                "
+                                                wire:click="descargarEvidencia( {{ $evidencia->id }} )"
                                             >
                                                 Descargar
                                             </button>
@@ -858,16 +844,8 @@
                                                     mini-btn
                                                     mini-danger
                                                 "
-                                                wire:click="
-                                                    eliminarEvidencia(
-                                                        {{
-                                                            $evidencia->id
-                                                        }}
-                                                    )
-                                                "
-                                                wire:confirm="
-                                                    ¿Eliminar esta evidencia?
-                                                "
+                                                wire:click="eliminarEvidencia( {{ $evidencia->id }} )"
+                                                wire:confirm="¿Eliminar esta evidencia?"
                                             >
                                                 Eliminar
                                             </button>
@@ -896,14 +874,7 @@
                                         mini-btn
                                         add-evidence
                                     "
-                                    wire:click="
-                                        abrirEvidencia(
-                                            {{
-                                                $requisitoPropuesta
-                                                    ->id
-                                            }}
-                                        )
-                                    "
+                                    wire:click="abrirEvidencia( {{ $requisitoPropuesta ->id }} )"
                                 >
                                     + Agregar evidencia
                                 </button>
@@ -935,13 +906,9 @@
                     <button
                         type="button"
                         class="btn btn-primary"
-                        wire:click="
-                            continuarAPresupuesto
-                        "
+                        wire:click="continuarAPresupuesto"
                         wire:loading.attr="disabled"
-                        wire:target="
-                            continuarAPresupuesto
-                        "
+                        wire:target="continuarAPresupuesto"
                     >
                         Continuar a Presupuesto →
                     </button>
@@ -1205,9 +1172,7 @@
 
         <div
             class="modal-backdrop"
-            wire:click.self="
-                cerrarEvidencia
-            "
+            wire:click.self="cerrarEvidencia"
         >
 
             <div class="modal-card">
@@ -1231,9 +1196,7 @@
                         type="text"
                         class="input"
                         maxlength="255"
-                        wire:model="
-                            evidenciaNombre
-                        "
+                        wire:model="evidenciaNombre"
                     >
 
                     @error('evidenciaNombre')
@@ -1253,9 +1216,7 @@
                     <textarea
                         class="textarea"
                         maxlength="5000"
-                        wire:model="
-                            evidenciaDescripcion
-                        "
+                        wire:model="evidenciaDescripcion"
                     ></textarea>
 
                     @error('evidenciaDescripcion')
@@ -1275,9 +1236,7 @@
                     <input
                         type="file"
                         class="input"
-                        wire:model="
-                            archivoEvidencia
-                        "
+                        wire:model="archivoEvidencia"
                         accept="
                             .pdf,.doc,.docx,
                             .xls,.xlsx,
@@ -1287,9 +1246,7 @@
 
                     <div
                         wire:loading
-                        wire:target="
-                            archivoEvidencia
-                        "
+                        wire:target="archivoEvidencia"
                         style="
                             margin-top:5px;
                             font-size:12px;
@@ -1316,9 +1273,7 @@
                     <input
                         type="url"
                         class="input"
-                        wire:model="
-                            evidenciaUrl
-                        "
+                        wire:model="evidenciaUrl"
                         placeholder="https://..."
                     >
 
@@ -1335,9 +1290,7 @@
                     <button
                         type="button"
                         class="btn"
-                        wire:click="
-                            cerrarEvidencia
-                        "
+                        wire:click="cerrarEvidencia"
                     >
                         Cancelar
                     </button>
@@ -1348,15 +1301,9 @@
                             btn
                             btn-primary
                         "
-                        wire:click="
-                            guardarEvidencia
-                        "
-                        wire:loading.attr="
-                            disabled
-                        "
-                        wire:target="
-                            guardarEvidencia
-                        "
+                        wire:click="guardarEvidencia"
+                        wire:loading.attr="disabled"
+                        wire:target="guardarEvidencia"
                     >
                         Guardar evidencia
                     </button>

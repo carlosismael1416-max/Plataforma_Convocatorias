@@ -654,9 +654,7 @@
 
                         <form
                             class="profile-form"
-                            wire:submit="
-                                guardarPerfil
-                            "
+                            wire:submit="guardarPerfil"
                         >
 
                             <div class="form-group">
@@ -750,12 +748,8 @@
                                         button
                                         primary
                                     "
-                                    wire:loading.attr="
-                                        disabled
-                                    "
-                                    wire:target="
-                                        guardarPerfil
-                                    "
+                                    wire:loading.attr="disabled"
+                                    wire:target="guardarPerfil"
                                 >
                                     Guardar cambios
                                 </button>
@@ -864,9 +858,7 @@
 
                         <form
                             class="profile-form"
-                            wire:submit="
-                                cambiarPassword
-                            "
+                            wire:submit="cambiarPassword"
                         >
 
                             <div
@@ -885,9 +877,7 @@
                                 <input
                                     type="password"
                                     class="form-input"
-                                    wire:model="
-                                        passwordActual
-                                    "
+                                    wire:model="passwordActual"
                                     autocomplete="
                                         current-password
                                     "
@@ -915,9 +905,7 @@
                                 <input
                                     type="password"
                                     class="form-input"
-                                    wire:model="
-                                        passwordNueva
-                                    "
+                                    wire:model="passwordNueva"
                                     autocomplete="
                                         new-password
                                     "
@@ -945,9 +933,7 @@
                                 <input
                                     type="password"
                                     class="form-input"
-                                    wire:model="
-                                        passwordNuevaConfirmacion
-                                    "
+                                    wire:model="passwordNuevaConfirmacion"
                                     autocomplete="
                                         new-password
                                     "
@@ -974,12 +960,8 @@
                                         button
                                         primary
                                     "
-                                    wire:loading.attr="
-                                        disabled
-                                    "
-                                    wire:target="
-                                        cambiarPassword
-                                    "
+                                    wire:loading.attr="disabled"
+                                    wire:target="cambiarPassword"
                                 >
                                     Cambiar contraseña
                                 </button>

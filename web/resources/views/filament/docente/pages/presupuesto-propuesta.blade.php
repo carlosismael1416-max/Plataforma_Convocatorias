@@ -703,11 +703,7 @@
                                                 <button
                                                     type="button"
                                                     class="mini-btn"
-                                                    wire:click="
-                                                        irACotizaciones(
-                                                            {{ $item->id }}
-                                                        )
-                                                    "
+                                                    wire:click="irACotizaciones( {{ $item->id }} )"
                                                 >
                                                     Cotización
                                                 </button>
@@ -717,11 +713,7 @@
                                                     <button
                                                         type="button"
                                                         class="mini-btn"
-                                                        wire:click="
-                                                            editarConcepto(
-                                                                {{ $item->id }}
-                                                            )
-                                                        "
+                                                        wire:click="editarConcepto( {{ $item->id }} )"
                                                     >
                                                         Editar
                                                     </button>
@@ -732,14 +724,8 @@
                                                             mini-btn
                                                             mini-danger
                                                         "
-                                                        wire:click="
-                                                            eliminarConcepto(
-                                                                {{ $item->id }}
-                                                            )
-                                                        "
-                                                        wire:confirm="
-                                                            ¿Eliminar este concepto del presupuesto?
-                                                        "
+                                                        wire:click="eliminarConcepto( {{ $item->id }} )"
+                                                        wire:confirm="¿Eliminar este concepto del presupuesto?"
                                                     >
                                                         Eliminar
                                                     </button>
@@ -859,9 +845,7 @@
                                     type="number"
                                     min="0.01"
                                     step="0.01"
-                                    wire:model.live="
-                                        cantidad
-                                    "
+                                    wire:model.live="cantidad"
                                 >
 
                                 @error('cantidad')
@@ -887,9 +871,7 @@
                                     type="number"
                                     min="0.01"
                                     step="0.01"
-                                    wire:model.live="
-                                        precioUnitario
-                                    "
+                                    wire:model.live="precioUnitario"
                                     placeholder="0.00"
                                 >
 
@@ -971,9 +953,7 @@
                                 <button
                                     type="button"
                                     class="btn"
-                                    wire:click="
-                                        cancelarEdicion
-                                    "
+                                    wire:click="cancelarEdicion"
                                 >
                                     Cancelar
                                 </button>
@@ -986,15 +966,9 @@
                                     btn
                                     btn-primary
                                 "
-                                wire:click="
-                                    guardarConcepto
-                                "
-                                wire:loading.attr="
-                                    disabled
-                                "
-                                wire:target="
-                                    guardarConcepto
-                                "
+                                wire:click="guardarConcepto"
+                                wire:loading.attr="disabled"
+                                wire:target="guardarConcepto"
                             >
                                 {{
                                     $itemEditandoId
@@ -1138,9 +1112,7 @@
                     <button
                         type="button"
                         class="btn"
-                        wire:click="
-                            volverARequisitos
-                        "
+                        wire:click="volverARequisitos"
                     >
                         ← Volver a Requisitos
                     </button>
@@ -1151,9 +1123,7 @@
                             btn
                             btn-primary
                         "
-                        wire:click="
-                            continuarACotizaciones
-                        "
+                        wire:click="continuarACotizaciones"
                     >
                         Continuar a Cotizaciones →
                     </button>

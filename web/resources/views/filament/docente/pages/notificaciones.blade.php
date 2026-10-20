@@ -484,15 +484,9 @@
                     notification-btn
                     primary
                 "
-                wire:click="
-                    marcarTodasLeidas
-                "
-                wire:loading.attr="
-                    disabled
-                "
-                wire:target="
-                    marcarTodasLeidas
-                "
+                wire:click="marcarTodasLeidas"
+                wire:loading.attr="disabled"
+                wire:target="marcarTodasLeidas"
                 @disabled($sinLeer === 0)
             >
                 Marcar todo como leído
@@ -595,9 +589,7 @@
 
                 <button
                     type="button"
-                    wire:click="
-                        cambiarFiltro('todas')
-                    "
+                    wire:click="cambiarFiltro('todas')"
                     class="
                         filter-btn
                         {{
@@ -612,9 +604,7 @@
 
                 <button
                     type="button"
-                    wire:click="
-                        cambiarFiltro('sin_leer')
-                    "
+                    wire:click="cambiarFiltro('sin_leer')"
                     class="
                         filter-btn
                         {{
@@ -630,11 +620,7 @@
 
                 <button
                     type="button"
-                    wire:click="
-                        cambiarFiltro(
-                            'convocatorias'
-                        )
-                    "
+                    wire:click="cambiarFiltro( 'convocatorias' )"
                     class="
                         filter-btn
                         {{
@@ -650,11 +636,7 @@
 
                 <button
                     type="button"
-                    wire:click="
-                        cambiarFiltro(
-                            'propuestas'
-                        )
-                    "
+                    wire:click="cambiarFiltro( 'propuestas' )"
                     class="
                         filter-btn
                         {{
@@ -670,9 +652,7 @@
 
                 <button
                     type="button"
-                    wire:click="
-                        cambiarFiltro('fechas')
-                    "
+                    wire:click="cambiarFiltro('fechas')"
                     class="
                         filter-btn
                         {{
@@ -737,11 +717,7 @@
                                 : ''
                         }}
                     "
-                    wire:key="
-                        notificacion-{{
-                            $notificacion->id
-                        }}
-                    "
+                    wire:key="notificacion-{{ $notificacion->id }}"
                 >
 
                     <div
@@ -833,14 +809,7 @@
                                     item-btn
                                     primary
                                 "
-                                wire:click="
-                                    abrirNotificacion(
-                                        {{
-                                            $notificacion
-                                                ->id
-                                        }}
-                                    )
-                                "
+                                wire:click="abrirNotificacion( {{ $notificacion ->id }} )"
                             >
                                 Ver
                             </button>
@@ -854,14 +823,7 @@
                             <button
                                 type="button"
                                 class="item-btn"
-                                wire:click="
-                                    marcarLeida(
-                                        {{
-                                            $notificacion
-                                                ->id
-                                        }}
-                                    )
-                                "
+                                wire:click="marcarLeida( {{ $notificacion ->id }} )"
                             >
                                 Marcar leída
                             </button>
@@ -871,14 +833,7 @@
                             <button
                                 type="button"
                                 class="item-btn"
-                                wire:click="
-                                    marcarNoLeida(
-                                        {{
-                                            $notificacion
-                                                ->id
-                                        }}
-                                    )
-                                "
+                                wire:click="marcarNoLeida( {{ $notificacion ->id }} )"
                             >
                                 No leída
                             </button>

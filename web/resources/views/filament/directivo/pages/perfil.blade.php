@@ -834,9 +834,7 @@
                                         select
                                         editable
                                     "
-                                    wire:model="
-                                        departamentoId
-                                    "
+                                    wire:model="departamentoId"
                                 >
 
                                     <option value="">
@@ -947,9 +945,7 @@
                                 class="
                                     secondary-btn
                                 "
-                                wire:click="
-                                    cancelarEdicion
-                                "
+                                wire:click="cancelarEdicion"
                             >
                                 Cancelar
                             </button>
@@ -957,15 +953,9 @@
                             <button
                                 type="button"
                                 class="primary-btn"
-                                wire:click="
-                                    guardarPerfil
-                                "
-                                wire:loading.attr="
-                                    disabled
-                                "
-                                wire:target="
-                                    guardarPerfil
-                                "
+                                wire:click="guardarPerfil"
+                                wire:loading.attr="disabled"
+                                wire:target="guardarPerfil"
                             >
                                 Guardar cambios
                             </button>
@@ -1191,9 +1181,7 @@
                         <button
                             type="button"
                             class="security-btn"
-                            wire:click="
-                                alternarCambioPassword
-                            "
+                            wire:click="alternarCambioPassword"
                         >
                             {{
                                 $mostrarCambioPassword
@@ -1222,9 +1210,7 @@
                                             editable
                                         "
                                         type="password"
-                                        wire:model="
-                                            contrasenaActual
-                                        "
+                                        wire:model="contrasenaActual"
                                         autocomplete="
                                             current-password
                                         "
@@ -1256,9 +1242,7 @@
                                             editable
                                         "
                                         type="password"
-                                        wire:model="
-                                            nuevaContrasena
-                                        "
+                                        wire:model="nuevaContrasena"
                                         autocomplete="
                                             new-password
                                         "
@@ -1290,9 +1274,7 @@
                                             editable
                                         "
                                         type="password"
-                                        wire:model="
-                                            confirmacionContrasena
-                                        "
+                                        wire:model="confirmacionContrasena"
                                         autocomplete="
                                             new-password
                                         "
@@ -1319,15 +1301,9 @@
                                 <button
                                     type="button"
                                     class="primary-btn"
-                                    wire:click="
-                                        cambiarPassword
-                                    "
-                                    wire:loading.attr="
-                                        disabled
-                                    "
-                                    wire:target="
-                                        cambiarPassword
-                                    "
+                                    wire:click="cambiarPassword"
+                                    wire:loading.attr="disabled"
+                                    wire:target="cambiarPassword"
                                 >
                                     Actualizar contraseña
                                 </button>

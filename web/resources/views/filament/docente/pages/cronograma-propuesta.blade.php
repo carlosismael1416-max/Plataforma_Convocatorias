@@ -851,11 +851,7 @@
                                             <button
                                                 type="button"
                                                 class="mini-btn"
-                                                wire:click="
-                                                    moverArriba(
-                                                        {{ $item->id }}
-                                                    )
-                                                "
+                                                wire:click="moverArriba( {{ $item->id }} )"
                                                 @disabled($loop->first)
                                             >
                                                 ↑
@@ -864,11 +860,7 @@
                                             <button
                                                 type="button"
                                                 class="mini-btn"
-                                                wire:click="
-                                                    moverAbajo(
-                                                        {{ $item->id }}
-                                                    )
-                                                "
+                                                wire:click="moverAbajo( {{ $item->id }} )"
                                                 @disabled($loop->last)
                                             >
                                                 ↓
@@ -877,11 +869,7 @@
                                             <button
                                                 type="button"
                                                 class="mini-btn"
-                                                wire:click="
-                                                    editarActividad(
-                                                        {{ $item->id }}
-                                                    )
-                                                "
+                                                wire:click="editarActividad( {{ $item->id }} )"
                                             >
                                                 Editar
                                             </button>
@@ -892,14 +880,8 @@
                                                     mini-btn
                                                     mini-danger
                                                 "
-                                                wire:click="
-                                                    eliminarActividad(
-                                                        {{ $item->id }}
-                                                    )
-                                                "
-                                                wire:confirm="
-                                                    ¿Eliminar esta actividad?
-                                                "
+                                                wire:click="eliminarActividad( {{ $item->id }} )"
+                                                wire:confirm="¿Eliminar esta actividad?"
                                             >
                                                 Eliminar
                                             </button>
@@ -1057,9 +1039,7 @@
                                 <input
                                     class="input"
                                     type="date"
-                                    wire:model="
-                                        fechaInicio
-                                    "
+                                    wire:model="fechaInicio"
                                 >
 
                                 @error('fechaInicio')
@@ -1079,9 +1059,7 @@
                                 <input
                                     class="input"
                                     type="date"
-                                    wire:model="
-                                        fechaFin
-                                    "
+                                    wire:model="fechaFin"
                                 >
 
                                 @error('fechaFin')
@@ -1106,9 +1084,7 @@
                                     class="input"
                                     type="text"
                                     maxlength="255"
-                                    wire:model="
-                                        responsable
-                                    "
+                                    wire:model="responsable"
                                     placeholder="Responsable"
                                 >
 
@@ -1162,9 +1138,7 @@
                                     min="0"
                                     max="100"
                                     step="0.01"
-                                    wire:model="
-                                        porcentajeAvance
-                                    "
+                                    wire:model="porcentajeAvance"
                                 >
 
                                 @error('porcentajeAvance')
@@ -1186,9 +1160,7 @@
                             <textarea
                                 class="textarea"
                                 maxlength="5000"
-                                wire:model="
-                                    descripcion
-                                "
+                                wire:model="descripcion"
                                 placeholder="Descripción de la actividad..."
                             ></textarea>
 
@@ -1207,9 +1179,7 @@
                                 <button
                                     type="button"
                                     class="btn"
-                                    wire:click="
-                                        cancelarEdicion
-                                    "
+                                    wire:click="cancelarEdicion"
                                 >
                                     Cancelar
                                 </button>
@@ -1222,15 +1192,9 @@
                                     btn
                                     btn-primary
                                 "
-                                wire:click="
-                                    guardarActividad
-                                "
-                                wire:loading.attr="
-                                    disabled
-                                "
-                                wire:target="
-                                    guardarActividad
-                                "
+                                wire:click="guardarActividad"
+                                wire:loading.attr="disabled"
+                                wire:target="guardarActividad"
                             >
                                 {{
                                     $actividadEditandoId
@@ -1248,9 +1212,7 @@
                         <button
                             type="button"
                             class="btn"
-                            wire:click="
-                                volverACotizaciones
-                            "
+                            wire:click="volverACotizaciones"
                         >
                             ← Volver a Cotizaciones
                         </button>
@@ -1261,9 +1223,7 @@
                                 btn
                                 btn-primary
                             "
-                            wire:click="
-                                continuarAEntregables
-                            "
+                            wire:click="continuarAEntregables"
                         >
                             Continuar a Entregables →
                         </button>
@@ -1281,9 +1241,7 @@
                         <button
                             type="button"
                             class="btn"
-                            wire:click="
-                                volverACotizaciones
-                            "
+                            wire:click="volverACotizaciones"
                         >
                             ← Volver a Cotizaciones
                         </button>
@@ -1294,9 +1252,7 @@
                                 btn
                                 btn-primary
                             "
-                            wire:click="
-                                continuarAEntregables
-                            "
+                            wire:click="continuarAEntregables"
                         >
                             Continuar a Entregables →
                         </button>

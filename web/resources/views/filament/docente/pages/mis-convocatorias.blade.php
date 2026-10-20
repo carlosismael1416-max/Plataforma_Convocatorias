@@ -775,12 +775,7 @@
 
                             <select
                                 class="priority-select"
-                                wire:change="
-                                    actualizarPrioridad(
-                                        {{ $seguimiento->id }},
-                                        $event.target.value
-                                    )
-                                "
+                                wire:change="actualizarPrioridad( {{ $seguimiento->id }}, $event.target.value )"
                             >
                                 <option
                                     value="ALTA"
@@ -823,9 +818,7 @@
 
                             <textarea
                                 class="notes-textarea"
-                                wire:model.defer="
-                                    notas.{{ $seguimiento->id }}
-                                "
+                                wire:model.defer="notas.{{ $seguimiento->id }}"
                                 placeholder="Escribe notas sobre esta convocatoria..."
                             ></textarea>
 
@@ -834,11 +827,7 @@
                                 <button
                                     type="button"
                                     class="save-note"
-                                    wire:click="
-                                        guardarNotas(
-                                            {{ $seguimiento->id }}
-                                        )
-                                    "
+                                    wire:click="guardarNotas( {{ $seguimiento->id }} )"
                                 >
                                     Guardar notas
                                 </button>
@@ -855,11 +844,7 @@
 
                             <button
                                 type="button"
-                                wire:click="
-                                    verDetalle(
-                                        {{ $seguimiento->id }}
-                                    )
-                                "
+                                wire:click="verDetalle( {{ $seguimiento->id }} )"
                                 class="
                                     action-button
                                     secondary-button
@@ -870,11 +855,7 @@
 
                             <button
                                 type="button"
-                                wire:click="
-                                    irAPropuesta(
-                                        {{ $seguimiento->id }}
-                                    )
-                                "
+                                wire:click="irAPropuesta( {{ $seguimiento->id }} )"
                                 class="
                                     action-button
                                     primary-button
@@ -913,11 +894,7 @@
 
                         <button
                             type="button"
-                            wire:click="
-                                cambiarFavorita(
-                                    {{ $seguimiento->id }}
-                                )
-                            "
+                            wire:click="cambiarFavorita( {{ $seguimiento->id }} )"
                             class="
                                 action-button
                                 favorite-button
@@ -930,14 +907,8 @@
 
                         <button
                             type="button"
-                            wire:click="
-                                quitar(
-                                    {{ $seguimiento->id }}
-                                )
-                            "
-                            wire:confirm="
-                                ¿Seguro que deseas quitar esta convocatoria de Mis Convocatorias?
-                            "
+                            wire:click="quitar( {{ $seguimiento->id }} )"
+                            wire:confirm="¿Seguro que deseas quitar esta convocatoria de Mis Convocatorias?"
                             class="
                                 action-button
                                 remove-button

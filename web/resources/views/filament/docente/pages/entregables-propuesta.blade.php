@@ -805,14 +805,7 @@
                                                     <button
                                                         type="button"
                                                         class="mini-btn"
-                                                        wire:click="
-                                                            descargarEvidencia(
-                                                                {{
-                                                                    $evidencia
-                                                                        ->id
-                                                                }}
-                                                            )
-                                                        "
+                                                        wire:click="descargarEvidencia( {{ $evidencia ->id }} )"
                                                     >
                                                         Descargar
                                                     </button>
@@ -847,17 +840,8 @@
                                                             mini-btn
                                                             mini-danger
                                                         "
-                                                        wire:click="
-                                                            eliminarEvidencia(
-                                                                {{
-                                                                    $evidencia
-                                                                        ->id
-                                                                }}
-                                                            )
-                                                        "
-                                                        wire:confirm="
-                                                            ¿Eliminar esta evidencia?
-                                                        "
+                                                        wire:click="eliminarEvidencia( {{ $evidencia ->id }} )"
+                                                        wire:confirm="¿Eliminar esta evidencia?"
                                                     >
                                                         Eliminar
                                                     </button>
@@ -881,11 +865,7 @@
                                     <button
                                         type="button"
                                         class="mini-btn"
-                                        wire:click="
-                                            editarEntregable(
-                                                {{ $item->id }}
-                                            )
-                                        "
+                                        wire:click="editarEntregable( {{ $item->id }} )"
                                     >
                                         Editar
                                     </button>
@@ -896,14 +876,8 @@
                                             mini-btn
                                             mini-danger
                                         "
-                                        wire:click="
-                                            eliminarEntregable(
-                                                {{ $item->id }}
-                                            )
-                                        "
-                                        wire:confirm="
-                                            ¿Eliminar este entregable y sus evidencias?
-                                        "
+                                        wire:click="eliminarEntregable( {{ $item->id }} )"
+                                        wire:confirm="¿Eliminar este entregable y sus evidencias?"
                                     >
                                         Eliminar
                                     </button>
@@ -1011,9 +985,7 @@
 
                                 <select
                                     class="select"
-                                    wire:model="
-                                        cronogramaActividadId
-                                    "
+                                    wire:model="cronogramaActividadId"
                                 >
                                     <option value="">
                                         Sin asociación
@@ -1057,9 +1029,7 @@
                                 <input
                                     type="date"
                                     class="input"
-                                    wire:model="
-                                        fechaLimite
-                                    "
+                                    wire:model="fechaLimite"
                                 >
 
                                 @error('fechaLimite')
@@ -1115,9 +1085,7 @@
                                 <input
                                     type="datetime-local"
                                     class="input"
-                                    wire:model="
-                                        fechaEntrega
-                                    "
+                                    wire:model="fechaEntrega"
                                 >
 
                                 @error('fechaEntrega')
@@ -1144,9 +1112,7 @@
                             <textarea
                                 class="textarea"
                                 maxlength="5000"
-                                wire:model="
-                                    descripcion
-                                "
+                                wire:model="descripcion"
                                 placeholder="Descripción del entregable..."
                             ></textarea>
 
@@ -1172,9 +1138,7 @@
                             <input
                                 type="file"
                                 class="input"
-                                wire:model="
-                                    archivoEvidencia
-                                "
+                                wire:model="archivoEvidencia"
                                 accept="
                                     .pdf,.docx,.xlsx,.zip,
                                     .jpg,.jpeg,.png
@@ -1183,9 +1147,7 @@
 
                             <div
                                 wire:loading
-                                wire:target="
-                                    archivoEvidencia
-                                "
+                                wire:target="archivoEvidencia"
                                 style="
                                     margin-top:6px;
                                     color:#64748B;
@@ -1210,9 +1172,7 @@
                                 <button
                                     type="button"
                                     class="btn"
-                                    wire:click="
-                                        cancelarEdicion
-                                    "
+                                    wire:click="cancelarEdicion"
                                 >
                                     Cancelar
                                 </button>
@@ -1225,15 +1185,9 @@
                                     btn
                                     btn-primary
                                 "
-                                wire:click="
-                                    guardarEntregable
-                                "
-                                wire:loading.attr="
-                                    disabled
-                                "
-                                wire:target="
-                                    guardarEntregable
-                                "
+                                wire:click="guardarEntregable"
+                                wire:loading.attr="disabled"
+                                wire:target="guardarEntregable"
                             >
                                 {{
                                     $entregableEditandoId
@@ -1251,9 +1205,7 @@
                         <button
                             type="button"
                             class="btn"
-                            wire:click="
-                                volverACronograma
-                            "
+                            wire:click="volverACronograma"
                         >
                             ← Volver a Cronograma
                         </button>
@@ -1264,9 +1216,7 @@
                                 btn
                                 btn-primary
                             "
-                            wire:click="
-                                revisarPropuesta
-                            "
+                            wire:click="revisarPropuesta"
                         >
                             Revisar propuesta →
                         </button>
@@ -1284,9 +1234,7 @@
                         <button
                             type="button"
                             class="btn"
-                            wire:click="
-                                volverACronograma
-                            "
+                            wire:click="volverACronograma"
                         >
                             ← Volver a Cronograma
                         </button>
@@ -1297,9 +1245,7 @@
                                 btn
                                 btn-primary
                             "
-                            wire:click="
-                                revisarPropuesta
-                            "
+                            wire:click="revisarPropuesta"
                         >
                             Revisar propuesta →
                         </button>

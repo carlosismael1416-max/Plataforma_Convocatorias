@@ -1158,14 +1158,7 @@
                                                     <button
                                                         type="button"
                                                         class="file-btn"
-                                                        wire:click="
-                                                            descargarEvidencia(
-                                                                {{
-                                                                    $evidencia
-                                                                        ->id
-                                                                }}
-                                                            )
-                                                        "
+                                                        wire:click="descargarEvidencia( {{ $evidencia ->id }} )"
                                                     >
                                                         📎
                                                         {{
@@ -1518,14 +1511,7 @@
                                                     <button
                                                         type="button"
                                                         class="file-btn"
-                                                        wire:click="
-                                                            descargarCotizacion(
-                                                                {{
-                                                                    $cotizacion
-                                                                        ->id
-                                                                }}
-                                                            )
-                                                        "
+                                                        wire:click="descargarCotizacion( {{ $cotizacion ->id }} )"
                                                     >
                                                         Descargar
                                                     </button>
@@ -1844,14 +1830,7 @@
                                                     <button
                                                         type="button"
                                                         class="file-btn"
-                                                        wire:click="
-                                                            descargarEvidencia(
-                                                                {{
-                                                                    $evidencia
-                                                                        ->id
-                                                                }}
-                                                            )
-                                                        "
+                                                        wire:click="descargarEvidencia( {{ $evidencia ->id }} )"
                                                     >
                                                         📎
                                                         {{

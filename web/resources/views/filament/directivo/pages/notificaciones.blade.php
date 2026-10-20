@@ -525,9 +525,7 @@
                     summary-card
                     summary-card-action
                 "
-                wire:click="
-                    establecerFiltro('sin_leer')
-                "
+                wire:click="establecerFiltro('sin_leer')"
             >
                 <div class="summary-label">
                     Sin leer
@@ -596,9 +594,7 @@
                     summary-card
                     summary-card-action
                 "
-                wire:click="
-                    establecerFiltro('hoy')
-                "
+                wire:click="establecerFiltro('hoy')"
             >
                 <div class="summary-label">
                     Actividad hoy
@@ -659,11 +655,7 @@
                                 }}
                             "
                             type="button"
-                            wire:click="
-                                establecerFiltro(
-                                    '{{ $valor }}'
-                                )
-                            "
+                            wire:click="establecerFiltro( '{{ $valor }}' )"
                         >
                             {{ $texto }}
                         </button>
@@ -762,15 +754,7 @@
                                         notification-btn
                                     "
                                     type="button"
-                                    wire:click="
-                                        marcarComoLeida(
-                                            {{
-                                                $notificacion[
-                                                    'id'
-                                                ]
-                                            }}
-                                        )
-                                    "
+                                    wire:click="marcarComoLeida( {{ $notificacion[ 'id' ] }} )"
                                 >
                                     Marcar leída
                                 </button>
@@ -789,15 +773,7 @@
                                         primary
                                     "
                                     type="button"
-                                    wire:click="
-                                        abrirNotificacion(
-                                            {{
-                                                $notificacion[
-                                                    'id'
-                                                ]
-                                            }}
-                                        )
-                                    "
+                                    wire:click="abrirNotificacion( {{ $notificacion[ 'id' ] }} )"
                                 >
                                     Abrir →
                                 </button>
@@ -944,15 +920,7 @@
                                                 : ''
                                         }}
                                     "
-                                    wire:click="
-                                        alternarPreferencia(
-                                            '{{
-                                                $opcion[
-                                                    'campo'
-                                                ]
-                                            }}'
-                                        )
-                                    "
+                                    wire:click="alternarPreferencia( '{{ $opcion[ 'campo' ] }}' )"
                                     aria-label="
                                         Cambiar preferencia
                                     "

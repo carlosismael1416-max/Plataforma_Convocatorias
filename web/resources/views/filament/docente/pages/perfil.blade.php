@@ -855,9 +855,7 @@
                     <button
                         type="button"
                         class="secondary-btn"
-                        wire:click="
-                            abrirCambioPassword
-                        "
+                        wire:click="abrirCambioPassword"
                     >
                         Cambiar contraseña
                     </button>
@@ -905,9 +903,7 @@
                                     autocomplete="
                                         current-password
                                     "
-                                    wire:model="
-                                        passwordActual
-                                    "
+                                    wire:model="passwordActual"
                                 >
 
                                 @error('passwordActual')
@@ -930,9 +926,7 @@
                                     autocomplete="
                                         new-password
                                     "
-                                    wire:model="
-                                        passwordNueva
-                                    "
+                                    wire:model="passwordNueva"
                                 >
 
                                 @error('passwordNueva')
@@ -956,9 +950,7 @@
                                     autocomplete="
                                         new-password
                                     "
-                                    wire:model="
-                                        passwordNuevaConfirmacion
-                                    "
+                                    wire:model="passwordNuevaConfirmacion"
                                 >
 
                                 @error(
@@ -978,9 +970,7 @@
                             <button
                                 type="button"
                                 class="cancel-btn"
-                                wire:click="
-                                    cerrarCambioPassword
-                                "
+                                wire:click="cerrarCambioPassword"
                             >
                                 Cancelar
                             </button>
@@ -988,15 +978,9 @@
                             <button
                                 type="button"
                                 class="save-btn"
-                                wire:click="
-                                    cambiarPassword
-                                "
-                                wire:loading.attr="
-                                    disabled
-                                "
-                                wire:target="
-                                    cambiarPassword
-                                "
+                                wire:click="cambiarPassword"
+                                wire:loading.attr="disabled"
+                                wire:target="cambiarPassword"
                             >
                                 Actualizar contraseña
                             </button>

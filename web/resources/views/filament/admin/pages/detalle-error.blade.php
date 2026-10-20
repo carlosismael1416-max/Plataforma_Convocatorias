@@ -1157,12 +1157,8 @@
                                     action-btn
                                     warning
                                 "
-                                wire:click="
-                                    reabrirIncidencia
-                                "
-                                wire:confirm="
-                                    ¿Deseas reabrir esta incidencia?
-                                "
+                                wire:click="reabrirIncidencia"
+                                wire:confirm="¿Deseas reabrir esta incidencia?"
                             >
                                 Reabrir incidencia
                             </button>
@@ -1175,12 +1171,8 @@
                                     action-btn
                                     primary
                                 "
-                                wire:click="
-                                    marcarComoResuelto
-                                "
-                                wire:confirm="
-                                    ¿Deseas marcar esta incidencia como resuelta?
-                                "
+                                wire:click="marcarComoResuelto"
+                                wire:confirm="¿Deseas marcar esta incidencia como resuelta?"
                             >
                                 Marcar como resuelto
                             </button>

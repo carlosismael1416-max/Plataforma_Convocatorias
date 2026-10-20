@@ -2008,9 +2008,7 @@
                             <button
                                 type="button"
                                 class="action-btn"
-                                wire:click="
-                                    descargarResumen
-                                "
+                                wire:click="descargarResumen"
                             >
                                 Descargar resumen JSON
                             </button>
