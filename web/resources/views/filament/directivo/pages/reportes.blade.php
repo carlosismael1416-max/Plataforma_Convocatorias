@@ -356,6 +356,15 @@
             gap: 16px;
         }
 
+        .reciente { display: flex; gap: 10px; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #EEF2F7; }
+        .reciente:last-child { border-bottom: 0; }
+        .reciente-titulo { color: #0F1827; font-size: 13px; font-weight: 700; }
+        .reciente-formato { margin-left: 4px; padding: 1px 6px; border-radius: 6px; background: #EDE9FE; color: #6D28D9; font-size: 10px; }
+        .reciente-sub { color: #64748B; font-size: 11px; margin-top: 2px; }
+        .reciente-btn { flex-shrink: 0; border: 1px solid #DDD6FE; border-radius: 8px; background: #F5F3FF; color: #6D28D9; padding: 6px 10px; font-size: 12px; font-weight: 700; cursor: pointer; }
+        .reciente-btn:hover { background: #EDE9FE; }
+        .reciente-vacio { margin: 8px 0 0; color: #64748B; font-size: 12px; line-height: 1.5; }
+
         .side-card {
             background: white;
             border: 1px solid var(--border);
@@ -546,6 +555,10 @@
             text-align: left;
             white-space: nowrap;
         }
+
+        /* El título se lee completo; el resto de datos en una línea. */
+        .preview-table td { white-space: nowrap; }
+        .preview-table td:nth-child(2) { white-space: normal; min-width: 280px; color: #0F1827; font-weight: 600; }
 
         .preview-table td {
             padding: 9px 10px;
@@ -1499,12 +1512,31 @@
 
                 </section>
 
-                <div class="info-box">
-                    No se muestran reportes recientes
-                    simulados. El historial de archivos
-                    exportados requeriría persistir cada
-                    generación en una tabla específica.
-                </div>
+                <section class="side-card">
+                    <div class="side-title">Reportes recientes</div>
+
+                    @forelse ($recientes as $r)
+                        <div class="reciente">
+                            <div style="min-width: 0">
+                                <div class="reciente-titulo">
+                                    {{ ['convocatorias' => 'Convocatorias', 'propuestas' => 'Propuestas', 'financiamiento' => 'Financiamiento'][$r->tipo] ?? ucfirst($r->tipo) }}
+                                    <span class="reciente-formato">{{ strtoupper($r->formato) }}</span>
+                                </div>
+                                <div class="reciente-sub">
+                                    {{ $r->total }} registro(s) ·
+                                    {{ $r->filtros['fechaInicio'] ?? '' }} — {{ $r->filtros['fechaFinal'] ?? '' }}
+                                </div>
+                                <div class="reciente-sub">{{ $r->created_at?->locale('es')->diffForHumans() }}</div>
+                            </div>
+                            <button type="button" class="reciente-btn" wire:click="repetirReporte({{ $r->id }})"
+                                wire:loading.attr="disabled" title="Descargar otra vez con los mismos filtros">
+                                ⟳ Generar
+                            </button>
+                        </div>
+                    @empty
+                        <p class="reciente-vacio">Aún no has generado reportes. Los que generes aparecerán aquí para descargarlos de nuevo.</p>
+                    @endforelse
+                </section>
 
             </aside>
 

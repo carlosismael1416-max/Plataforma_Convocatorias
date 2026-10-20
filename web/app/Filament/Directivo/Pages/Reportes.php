@@ -4,6 +4,7 @@ namespace App\Filament\Directivo\Pages;
 
 use App\Models\Categoria;
 use App\Models\Convocatoria;
+use App\Models\ReporteGenerado;
 use App\Models\Organismo;
 use App\Models\Propuesta;
 use App\Models\User;
@@ -211,6 +212,13 @@ class Reportes extends Page
 
             'formatoLabel' =>
                 $this->formatoLabel(),
+
+            'recientes' =>
+                ReporteGenerado::query()
+                    ->where('user_id', auth()->id())
+                    ->latest()
+                    ->limit(6)
+                    ->get(),
         ];
     }
 
@@ -251,6 +259,15 @@ class Reportes extends Page
             return null;
         }
 
+        // Historial: se guarda qué se exportó para poder repetirlo.
+        ReporteGenerado::create([
+            'user_id' => auth()->id(),
+            'tipo' => $this->tipoReporte,
+            'formato' => $this->formato,
+            'filtros' => $this->filtrosActuales(),
+            'total' => $reporte['total'],
+        ]);
+
         return match (
             $this->formato
         ) {
@@ -269,6 +286,35 @@ class Reportes extends Page
                     $reporte
                 ),
         };
+    }
+
+    /** Campos que definen un reporte (para el historial y «Generar de nuevo»). */
+    private const CAMPOS_REPORTE = [
+        'tipoReporte', 'formato', 'fechaInicio', 'fechaFinal', 'categoria', 'organismo', 'estado',
+        'incluirDatosGenerales', 'incluirOrganismos', 'incluirFechas', 'incluirMontos',
+        'incluirRequisitos', 'incluirDocumentos',
+    ];
+
+    private function filtrosActuales(): array
+    {
+        return collect(self::CAMPOS_REPORTE)->mapWithKeys(fn (string $campo) => [$campo => $this->{$campo}])->all();
+    }
+
+    /** Carga los filtros de un reporte anterior del usuario y lo vuelve a generar. */
+    public function repetirReporte(int $reporteId)
+    {
+        $anterior = ReporteGenerado::query()
+            ->whereKey($reporteId)
+            ->where('user_id', auth()->id())
+            ->firstOrFail();
+
+        foreach (self::CAMPOS_REPORTE as $campo) {
+            if (array_key_exists($campo, $anterior->filtros)) {
+                $this->{$campo} = $anterior->filtros[$campo];
+            }
+        }
+
+        return $this->generarReporte();
     }
 
     private function construirReporte(): array
@@ -356,6 +402,11 @@ class Reportes extends Page
                 'grupo' => 'general',
             ],
             [
+                'key' => 'tipo',
+                'label' => 'Tipo',
+                'grupo' => 'general',
+            ],
+            [
                 'key' => 'origen',
                 'label' => 'Origen',
                 'grupo' => 'general',
@@ -429,8 +480,15 @@ class Reportes extends Page
                             ),
 
                         'origen' =>
-                            $c->origen
-                            ?: 'No especificado',
+                            match ($c->origen) {
+                                'SCRAPING' => 'Motor',
+                                'MANUAL' => 'Subida a mano',
+                                default => $c->origen ?: 'No especificado',
+                            },
+                        'tipo' =>
+                            $c->tipo === 'NO_APLICA'
+                                ? 'No aplica'
+                                : (Convocatoria::TIPOS[$c->tipo ?? 'FINANCIAMIENTO'][0] ?? 'Financiamiento'),
 
                         'organismo' =>
                             $c->organismo?->nombre
