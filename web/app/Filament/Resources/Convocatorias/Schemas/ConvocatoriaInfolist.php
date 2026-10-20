@@ -2,121 +2,68 @@
 
 namespace App\Filament\Resources\Convocatorias\Schemas;
 
+use App\Models\Convocatoria;
 use Filament\Infolists\Components\TextEntry;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\View;
 use Filament\Schemas\Schema;
+use Filament\Support\Icons\Heroicon;
 
+/** Detalle de convocatoria del admin: cabecera y secciones. */
 class ConvocatoriaInfolist
 {
     public static function configure(Schema $schema): Schema
     {
         return $schema
-            ->columns(2)
+            ->columns(['default' => 1, 'lg' => 3])
             ->components([
-                TextEntry::make('titulo')
-                    ->label('Título de la convocatoria')
+                View::make('filament.admin.detalle.cabecera-convocatoria')
                     ->columnSpanFull(),
 
-                TextEntry::make('estado')
-                    ->label('Estado')
-                    ->badge()
-                    ->formatStateUsing(
-                        fn (string $state): string => match ($state) {
-                            'BORRADOR' => 'Borrador',
-                            'PENDIENTE_REVISION' => 'Pendiente de revisión',
-                            'REQUIERE_CORRECCIONES' => 'Requiere correcciones',
-                            'PUBLICADA' => 'Publicada',
-                            'ACTIVA' => 'Activa',
-                            'CERRADA' => 'Cerrada',
-                            'DESCARTADA' => 'Descartada',
-                            'ARCHIVADA' => 'Archivada',
-                            default => $state,
-                        }
-                    ),
+                Section::make('Descripción y objetivo')
+                    ->icon(Heroicon::OutlinedDocumentText)
+                    ->columnSpan(['default' => 1, 'lg' => 2])
+                    ->schema([
+                        TextEntry::make('descripcion')->label('Descripción')->placeholder('Sin descripción')->prose(),
+                        TextEntry::make('objetivo')->label('Objetivo')->placeholder('Sin objetivo')->prose(),
+                    ]),
 
-                TextEntry::make('tipo')
-                    ->label('Tipo')
-                    ->badge()
-                    ->formatStateUsing(fn (?string $state): string => $state === 'NO_APLICA'
-                        ? 'No aplica (no se publica)'
-                        : (\App\Models\Convocatoria::TIPOS[$state ?? 'FINANCIAMIENTO'][0] ?? (string) $state))
-                    ->placeholder('Financiamiento'),
+                Section::make('Clasificación')
+                    ->icon(Heroicon::OutlinedTag)
+                    ->columnSpan(1)
+                    ->schema([
+                        TextEntry::make('dirigido_a')
+                            ->label('Dirigida a')
+                            ->badge()
+                            ->color('gray')
+                            ->formatStateUsing(fn ($state): string => Convocatoria::AUDIENCIAS[$state] ?? (string) $state)
+                            ->placeholder('Sin especificar'),
+                        TextEntry::make('categoria.nombre')->label('Categoría')->placeholder('Sin categoría'),
+                        TextEntry::make('fuente.nombre')->label('Fuente web')->placeholder('Registro manual'),
+                        TextEntry::make('subidoPor.name')->label('Subida por')->placeholder('El motor'),
+                    ]),
 
-                TextEntry::make('dirigido_a')
-                    ->label('Dirigida a')
-                    ->badge()
-                    ->color('gray')
-                    ->formatStateUsing(fn ($state): string => \App\Models\Convocatoria::AUDIENCIAS[$state] ?? (string) $state)
-                    ->placeholder('Sin especificar'),
-
-                TextEntry::make('origen')
-                    ->label('Origen'),
-
-                TextEntry::make('subidoPor.name')
-                    ->label('Usuario que la subió')
-                    ->placeholder('Sin usuario asignado'),
-
-                TextEntry::make('categoria.nombre')
-                    ->label('Categoría')
-                    ->placeholder('Sin categoría'),
-
-                TextEntry::make('organismo.nombre')
-                    ->label('Organismo')
-                    ->placeholder('Sin organismo'),
-
-                TextEntry::make('fuente.nombre')
-                    ->label('Fuente web')
-                    ->placeholder('Sin fuente'),
-
-                TextEntry::make('descripcion')
-                    ->label('Descripción')
-                    ->placeholder('Sin descripción')
-                    ->columnSpanFull(),
-
-                TextEntry::make('objetivo')
-                    ->label('Objetivo')
-                    ->placeholder('Sin objetivo')
-                    ->columnSpanFull(),
-
-                TextEntry::make('fecha_publicacion')
-                    ->label('Fecha de publicación')
-                    ->date('d/m/Y')
-                    ->placeholder('Sin fecha'),
-
-                TextEntry::make('fecha_inicio')
-                    ->label('Fecha de inicio')
-                    ->date('d/m/Y')
-                    ->placeholder('Sin fecha'),
-
-                TextEntry::make('fecha_cierre')
-                    ->label('Fecha de cierre')
-                    ->date('d/m/Y')
-                    ->placeholder('Sin fecha'),
-
-                TextEntry::make('moneda')
-                    ->label('Moneda'),
-
-                TextEntry::make('monto_minimo')
-                    ->label('Monto mínimo')
-                    ->placeholder('No especificado'),
-
-                TextEntry::make('monto_maximo')
-                    ->label('Monto máximo')
-                    ->placeholder('No especificado'),
-
-                TextEntry::make('modalidad')
-                    ->label('Modalidad')
-                    ->placeholder('No especificada'),
-
-                TextEntry::make('ubicacion')
-                    ->label('Ubicación')
-                    ->placeholder('No especificada'),
-
-                TextEntry::make('url_original')
-                    ->label('Enlace original')
-                    ->url(fn (?string $state): ?string => $state)
-                    ->openUrlInNewTab()
-                    ->placeholder('Sin enlace')
-                    ->columnSpanFull(),
+                Section::make('Fechas y apoyo económico')
+                    ->icon(Heroicon::OutlinedCalendarDays)
+                    ->columns(['default' => 2, 'md' => 4])
+                    ->columnSpanFull()
+                    ->schema([
+                        TextEntry::make('fecha_publicacion')->label('Publicación')->date('d/m/Y')->placeholder('Sin fecha'),
+                        TextEntry::make('fecha_inicio')->label('Inicio')->date('d/m/Y')->placeholder('Sin fecha'),
+                        TextEntry::make('fecha_cierre')->label('Cierre')->date('d/m/Y')->placeholder('Sin fecha'),
+                        TextEntry::make('fecha_extraccion')->label('Detectada')->dateTime('d/m/Y H:i')->placeholder('—'),
+                        TextEntry::make('monto_minimo')->label('Monto mínimo')->money(fn ($record) => $record->moneda ?: 'MXN')->placeholder('No especificado'),
+                        TextEntry::make('monto_maximo')->label('Monto máximo')->money(fn ($record) => $record->moneda ?: 'MXN')->placeholder('No especificado'),
+                        TextEntry::make('modalidad')->label('Modalidad')->placeholder('No especificada'),
+                        TextEntry::make('ubicacion')->label('Ubicación')->placeholder('No especificada'),
+                        TextEntry::make('url_original')
+                            ->label('Enlace oficial')
+                            ->url(fn ($record) => $record->url_original, shouldOpenInNewTab: true)
+                            ->color('primary')
+                            ->copyable()
+                            ->placeholder('Sin enlace')
+                            ->columnSpanFull(),
+                    ]),
             ]);
     }
 }

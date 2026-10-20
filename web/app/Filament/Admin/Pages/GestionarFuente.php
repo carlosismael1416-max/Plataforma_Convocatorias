@@ -284,4 +284,15 @@ class GestionarFuente extends Page
 
         return $url;
     }
+
+    /** 1440 → «Cada día», 360 → «Cada 6 h», 90 → «Cada 90 min». */
+    public static function frecuenciaLegible(?int $minutos): string
+    {
+        return match (true) {
+            ! $minutos => 'Sin definir',
+            $minutos % 1440 === 0 => 'Cada ' . ($minutos === 1440 ? 'día' : ($minutos / 1440) . ' días'),
+            $minutos % 60 === 0 => 'Cada ' . ($minutos / 60) . ' h',
+            default => "Cada {$minutos} min",
+        };
+    }
 }
