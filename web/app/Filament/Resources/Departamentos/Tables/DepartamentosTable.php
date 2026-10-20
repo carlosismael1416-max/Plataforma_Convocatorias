@@ -2,10 +2,7 @@
 
 namespace App\Filament\Resources\Departamentos\Tables;
 
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -15,17 +12,27 @@ class DepartamentosTable
     public static function configure(Table $table): Table
     {
         return $table
+            ->defaultSort('nombre')
             ->columns([
                 TextColumn::make('nombre')
-                    ->searchable(),
-                IconColumn::make('estado')
-                    ->boolean(),
-                TextColumn::make('created_at')
-                    ->dateTime()
+                    ->label('Departamento')
+                    ->description(fn ($record): ?string => $record->descripcion ? \Illuminate\Support\Str::limit($record->descripcion, 90) : null)
+                    ->weight('semibold')
+                    ->searchable()
                     ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->grow(),
+                TextColumn::make('users_count')
+                    ->label('Usuarios')
+                    ->counts('users')
+                    ->badge()
+                    ->color('gray')
+                    ->sortable(),
+                IconColumn::make('estado')
+                    ->label('Activo')
+                    ->boolean(),
                 TextColumn::make('updated_at')
-                    ->dateTime()
+                    ->label('Actualizado')
+                    ->since()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
@@ -33,13 +40,10 @@ class DepartamentosTable
                 //
             ])
             ->recordActions([
-                ViewAction::make(),
-                EditAction::make(),
+                EditAction::make()->iconButton()->tooltip('Editar'),
+                \Filament\Actions\DeleteAction::make()->iconButton()->tooltip('Eliminar (solo sin usuarios)'),
             ])
-            ->toolbarActions([
-                BulkActionGroup::make([
-                    DeleteBulkAction::make(),
-                ]),
-            ]);
+            ->emptyStateHeading('Aún no hay departamentos')
+            ->emptyStateDescription('Créalos aquí o directamente al registrar un usuario.');
     }
 }

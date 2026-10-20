@@ -13,11 +13,11 @@ class DepartamentoForm
     {
         return $schema
             ->components([
-                TextInput::make('nombre')
+                TextInput::make('nombre')->label('Nombre del departamento')->unique(ignoreRecord: true)
                     ->required(),
-                Textarea::make('descripcion')
+                Textarea::make('descripcion')->label('Descripción')
                     ->columnSpanFull(),
-                Toggle::make('estado')
+                Toggle::make('estado')->label('Activo')->default(true)
                     ->required(),
             ]);
     }

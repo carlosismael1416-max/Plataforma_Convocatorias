@@ -49,6 +49,12 @@ class UserResource extends Resource
             );
     }
 
+    /** Departamentos es una pestaña de Usuarios: también la marca en el menú. */
+    public static function getNavigationItemActiveRoutePattern(): string|array
+    {
+        return ['filament.admin.resources.users.*', 'filament.admin.resources.departamentos.*'];
+    }
+
     public static function canViewAny(): bool
     {
         return static::esAdministradorActivo();
