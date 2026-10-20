@@ -111,6 +111,24 @@ class MisConvocatoriasYHistorialTest extends TestCase
         }
     }
 
+    public function test_el_historial_es_una_pestana_de_buscar_convocatorias(): void
+    {
+        foreach (['DOCENTE' => '/docente', 'DIRECTIVO' => '/directivo'] as $rol => $panel) {
+            $this->actingAs($this->usuarioConRol($rol))
+                ->get($panel . '/buscar-convocatorias')
+                ->assertOk()
+                ->assertSee('Historial (cerradas)')
+                ->assertSee($panel . '/historial-convocatorias', false)
+                ->assertSee('Tipo')
+                ->assertSee('Dirigida a');
+        }
+
+        $this->actingAs($this->usuarioConRol('ADMINISTRADOR'))
+            ->get('/admin/convocatorias')
+            ->assertOk()
+            ->assertSee('/admin/historial-convocatorias', false);
+    }
+
     public function test_mis_propuestas_muestra_el_titulo_de_la_convocatoria_y_no_json(): void
     {
         $docente = $this->comoDocente();

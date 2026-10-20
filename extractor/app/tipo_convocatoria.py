@@ -140,3 +140,27 @@ def clasificar_tipo(
     dirigido_a = [a for a in AUDIENCIAS if a in dirigido_a]
 
     return {"tipo": tipo, "dirigido_a": dirigido_a, "motivo": None}
+
+
+def clasificar_existente(fila: dict) -> tuple[str, list[str], str]:
+    """
+    Tipo, audiencia y motivo de una convocatoria ya guardada (también las
+    que el ciclo cerró sin validar). Lo no elegible para ITSVA queda
+    NO_APLICA; las subidas a mano nunca.
+    """
+    from app.descubrimiento.elegibilidad import evaluar_elegibilidad
+
+    resultado = clasificar_tipo(fila["titulo"], fila["url_original"], fila["objetivo"], fila["descripcion"])
+    tipo, dirigido, motivo = resultado["tipo"], resultado["dirigido_a"], resultado["motivo"] or ""
+
+    if fila["origen"] == "MANUAL":
+        return ("FINANCIAMIENTO" if tipo == "NO_APLICA" else tipo), dirigido, ""
+
+    if tipo != "NO_APLICA":
+        elegibilidad = evaluar_elegibilidad(fila["titulo"] or "", fila["url_original"] or "")
+        if not elegibilidad["elegible"]:
+            return "NO_APLICA", [], f"no elegible: {elegibilidad['motivo']}"
+        if excluye_mexicanos(fila["objetivo"], fila["descripcion"]):
+            return "NO_APLICA", [], "excluye a mexicanos"
+
+    return tipo, dirigido, motivo

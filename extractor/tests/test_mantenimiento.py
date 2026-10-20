@@ -35,13 +35,28 @@ class MantenimientoTest(unittest.TestCase):
         cursor.rowcount = 0
 
         with mock.patch.object(mantenimiento, "conectar", return_value=conexion), \
-             mock.patch.object(mantenimiento, "limpiar_temporales", return_value=0):
+             mock.patch.object(mantenimiento, "limpiar_temporales", return_value=0), \
+             mock.patch.object(mantenimiento, "clasificar_sin_tipo", return_value=0):
             mantenimiento.ejecutar_mantenimiento()
 
         sql = cursor.execute.call_args_list[0].args[0]
         self.assertIn("estado = 'DESCARTADO'", sql)
         self.assertIn("convocatoria_id IS NULL", sql)
-        conexion.commit.assert_called_once()
+        self.assertEqual(conexion.commit.call_count, 2)
+
+    def test_clasifica_las_que_quedaron_sin_tipo(self):
+        conexion = mock.MagicMock()
+        cursor = conexion.cursor.return_value.__enter__.return_value
+        cursor.fetchall.return_value = [
+            (1267, "Convocatoria 2026 Becas para la Repatriación", "https://secihti.mx/convocatoria/becas-nacionales/x", "", "", "SCRAPING"),
+            (3, "Convocatoria 2026 del proceso para ocupar el cargo de titular", "https://secihti.mx/x", "", "", "SCRAPING"),
+        ]
+
+        with mock.patch("app.validar_convocatoria.columnas_tipo_disponibles", return_value=True):
+            self.assertEqual(mantenimiento.clasificar_sin_tipo(conexion), 2)
+
+        tipos = [c.args[1][0] for c in cursor.execute.call_args_list if "UPDATE" in c.args[0]]
+        self.assertEqual(tipos, ["BECA", "NO_APLICA"])
 
 
 if __name__ == "__main__":

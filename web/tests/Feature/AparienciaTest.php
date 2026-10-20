@@ -17,16 +17,16 @@ class AparienciaTest extends TestCase
     {
         return [
             'docente' => ['DOCENTE', '/docente', [
-                'Dashboard', 'Buscar convocatorias', 'Mis convocatorias', 'Historial',
+                'Dashboard', 'Buscar convocatorias', 'Mis convocatorias',
                 'Subir convocatoria', 'Calendario', 'Propuestas', 'Notificaciones',
             ]],
             'directivo' => ['DIRECTIVO', '/directivo', [
-                'Dashboard', 'Propuestas por revisar', 'Buscar convocatorias', 'Mis convocatorias', 'Historial',
+                'Dashboard', 'Propuestas por revisar', 'Buscar convocatorias', 'Mis convocatorias',
                 'Subir convocatoria', 'Calendario', 'Propuestas', 'Estadísticas', 'Reportes', 'Notificaciones',
             ]],
             'admin' => ['ADMINISTRADOR', '/admin', [
                 'Dashboard', 'Usuarios', 'Roles y permisos', 'Fuentes web',
-                'Motor de Extracción', 'Descubrimientos', 'Bitácora de Errores', 'Convocatorias', 'Historial',
+                'Motor de Extracción', 'Descubrimientos', 'Bitácora de Errores', 'Convocatorias',
             ]],
         ];
     }
@@ -101,7 +101,8 @@ class AparienciaTest extends TestCase
 
     public function test_la_paginacion_esta_en_espanol_y_con_el_estilo_propio(): void
     {
-        foreach (range(1, 12) as $i) {
+        // Una más de las que caben en una página (12).
+        foreach (range(1, 13) as $i) {
             $this->convocatoria(['titulo' => "ZZ-PAGINA-{$i}", 'fecha_cierre' => today()->addDays(10)]);
         }
 
