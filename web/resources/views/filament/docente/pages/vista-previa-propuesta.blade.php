@@ -189,6 +189,14 @@
         white-space: pre-line;
     }
 
+    /* Texto con formato del editor (HTML saneado). */
+    .text.rico { white-space: normal; }
+    .text.rico p { margin: 0 0 .5em; }
+    .text.rico p:last-child { margin-bottom: 0; }
+    .text.rico ul, .text.rico ol { margin: 0 0 .5em; padding-left: 1.4em; }
+    .text.rico ul { list-style: disc; }
+    .text.rico ol { list-style: decimal; }
+
     .data-grid {
         display: grid;
         grid-template-columns:
@@ -851,12 +859,7 @@
 
                     </div>
 
-                    <div class="text">
-                        {{
-                            $propuesta->resumen
-                            ?: 'Sin información registrada.'
-                        }}
-                    </div>
+                    <div class="text rico">{!! \App\Support\TextoEnriquecido::mostrar($propuesta->resumen, 'Sin información registrada.') !!}</div>
 
                 </section>
 
@@ -887,12 +890,7 @@
 
                     </div>
 
-                    <div class="text">
-                        {{
-                            $propuesta->justificacion
-                            ?: 'Sin información registrada.'
-                        }}
-                    </div>
+                    <div class="text rico">{!! \App\Support\TextoEnriquecido::mostrar($propuesta->justificacion, 'Sin información registrada.') !!}</div>
 
                 </section>
 
@@ -923,12 +921,7 @@
 
                     </div>
 
-                    <div class="text">
-                        {{
-                            $propuesta->metodologia
-                            ?: 'Sin información registrada.'
-                        }}
-                    </div>
+                    <div class="text rico">{!! \App\Support\TextoEnriquecido::mostrar($propuesta->metodologia, 'Sin información registrada.') !!}</div>
 
                 </section>
 
@@ -959,13 +952,7 @@
 
                     </div>
 
-                    <div class="text">
-                        {{
-                            $propuesta
-                                ->impacto_esperado
-                            ?: 'Sin información registrada.'
-                        }}
-                    </div>
+                    <div class="text rico">{!! \App\Support\TextoEnriquecido::mostrar($propuesta->impacto_esperado, 'Sin información registrada.') !!}</div>
 
                 </section>
 
