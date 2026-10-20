@@ -13,6 +13,7 @@ use App\Models\PropuestaObjetivo;
 use App\Models\PropuestaRequisito;
 use App\Models\User;
 use App\Services\RevisionPropuesta;
+use App\Support\TextoEnriquecido;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Validation\ValidationException;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -352,29 +353,22 @@ class VistaPreviaPropuesta extends Page
 
             $fila([
                 'Resumen',
-                $propuesta->resumen
-                ?? '',
+                TextoEnriquecido::texto($propuesta->resumen),
             ]);
 
             $fila([
                 'Justificación',
-                $propuesta
-                    ->justificacion
-                ?? '',
+                TextoEnriquecido::texto($propuesta->justificacion),
             ]);
 
             $fila([
                 'Metodología',
-                $propuesta
-                    ->metodologia
-                ?? '',
+                TextoEnriquecido::texto($propuesta->metodologia),
             ]);
 
             $fila([
                 'Impacto esperado',
-                $propuesta
-                    ->impacto_esperado
-                ?? '',
+                TextoEnriquecido::texto($propuesta->impacto_esperado),
             ]);
 
             $fila([]);
@@ -1142,7 +1136,7 @@ class VistaPreviaPropuesta extends Page
             ])
                 ->every(
                     fn ($valor): bool =>
-                        filled($valor)
+                        TextoEnriquecido::texto($valor) !== ''
                 );
 
         $objetivosCompletos =

@@ -48,7 +48,7 @@ class RevisionPropuesta
                 $propuesta->justificacion,
                 $propuesta->metodologia,
                 $propuesta->impacto_esperado,
-            ])->every(fn ($valor): bool => filled($valor)),
+            ])->every(fn ($valor): bool => \App\Support\TextoEnriquecido::texto($valor) !== ''),
 
             'Objetivos' => $conTexto($propuesta->objetivos()->where('tipo', 'GENERAL'))->exists()
                 && $conTexto($propuesta->objetivos()->where('tipo', 'ESPECIFICO'))->exists(),

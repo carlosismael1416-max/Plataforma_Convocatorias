@@ -648,17 +648,7 @@
                         Resumen
                     </label>
 
-                    <textarea
-                        class="itsva-textarea"
-                        maxlength="10000"
-                        wire:model.live.debounce.700ms="resumen"
-                        @disabled(! $editable)
-                    ></textarea>
-
-                    <div class="counter">
-                        {{ mb_strlen($resumen) }}
-                        / 10,000 caracteres
-                    </div>
+                    <x-editor-enriquecido campo="resumen" :editable="$editable" placeholder="Resume el problema, la propuesta y el resultado esperado..." />
 
                     @error('resumen')
                         <div class="field-error">
@@ -696,17 +686,7 @@
                         Justificación del proyecto
                     </label>
 
-                    <textarea
-                        class="itsva-textarea"
-                        maxlength="10000"
-                        wire:model.live.debounce.700ms="justificacion"
-                        @disabled(! $editable)
-                    ></textarea>
-
-                    <div class="counter">
-                        {{ mb_strlen($justificacion) }}
-                        / 10,000 caracteres
-                    </div>
+                    <x-editor-enriquecido campo="justificacion" :editable="$editable" placeholder="Explica la necesidad que atiende el proyecto..." />
 
                     @error('justificacion')
                         <div class="field-error">
@@ -744,18 +724,7 @@
                         Metodología propuesta
                     </label>
 
-                    <textarea
-                        class="itsva-textarea"
-                        maxlength="10000"
-                        wire:model.live.debounce.700ms="metodologia"
-                        placeholder="Describe etapas, actividades, técnicas y métodos..."
-                        @disabled(! $editable)
-                    ></textarea>
-
-                    <div class="counter">
-                        {{ mb_strlen($metodologia) }}
-                        / 10,000 caracteres
-                    </div>
+                    <x-editor-enriquecido campo="metodologia" :editable="$editable" placeholder="Describe etapas, actividades, técnicas y métodos..." />
 
                     @error('metodologia')
                         <div class="field-error">
@@ -794,22 +763,7 @@
                         Impacto esperado
                     </label>
 
-                    <textarea
-                        class="itsva-textarea"
-                        maxlength="10000"
-                        wire:model.live.debounce.700ms="impactoEsperado"
-                        placeholder="Describe los principales resultados e impactos..."
-                        @disabled(! $editable)
-                    ></textarea>
-
-                    <div class="counter">
-                        {{
-                            mb_strlen(
-                                $impactoEsperado
-                            )
-                        }}
-                        / 10,000 caracteres
-                    </div>
+                    <x-editor-enriquecido campo="impactoEsperado" :editable="$editable" placeholder="Describe los principales resultados e impactos..." />
 
                     @error('impactoEsperado')
                         <div class="field-error">

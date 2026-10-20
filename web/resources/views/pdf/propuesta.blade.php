@@ -35,6 +35,10 @@
             margin: 0;
         }
 
+        /* Texto con formato del editor (HTML saneado). */
+        .rico p { margin: 0 0 5px; }
+        .rico ul, .rico ol { margin: 0 0 5px; padding-left: 16px; }
+
         .institution {
             color: #64748B;
             font-size: 9px;
@@ -235,45 +239,25 @@
 <div class="section">
     <h2>2. Resumen ejecutivo</h2>
 
-    <p>
-        {{
-            $propuesta->resumen
-            ?: 'Sin información registrada.'
-        }}
-    </p>
+    <div class="rico">{!! \App\Support\TextoEnriquecido::mostrar($propuesta->resumen, 'Sin información registrada.') !!}</div>
 </div>
 
 <div class="section">
     <h2>3. Justificación</h2>
 
-    <p>
-        {{
-            $propuesta->justificacion
-            ?: 'Sin información registrada.'
-        }}
-    </p>
+    <div class="rico">{!! \App\Support\TextoEnriquecido::mostrar($propuesta->justificacion, 'Sin información registrada.') !!}</div>
 </div>
 
 <div class="section">
     <h2>4. Metodología</h2>
 
-    <p>
-        {{
-            $propuesta->metodologia
-            ?: 'Sin información registrada.'
-        }}
-    </p>
+    <div class="rico">{!! \App\Support\TextoEnriquecido::mostrar($propuesta->metodologia, 'Sin información registrada.') !!}</div>
 </div>
 
 <div class="section">
     <h2>5. Impacto esperado</h2>
 
-    <p>
-        {{
-            $propuesta->impacto_esperado
-            ?: 'Sin información registrada.'
-        }}
-    </p>
+    <div class="rico">{!! \App\Support\TextoEnriquecido::mostrar($propuesta->impacto_esperado, 'Sin información registrada.') !!}</div>
 </div>
 
 <div class="section">

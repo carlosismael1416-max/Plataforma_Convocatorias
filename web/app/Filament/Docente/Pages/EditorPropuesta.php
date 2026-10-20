@@ -9,6 +9,7 @@ use App\Models\Propuesta;
 use App\Models\PropuestaRevision;
 use App\Models\User;
 use App\Models\UsuarioConvocatoria;
+use App\Support\TextoEnriquecido;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Livewire\Attributes\Locked;
@@ -177,7 +178,7 @@ class EditorPropuesta extends Page
         $faltan = [];
 
         foreach (self::CAMPOS_PARA_CONTINUAR as $campo => $nombre) {
-            if (mb_strlen(trim((string) $this->{$campo})) < 30) {
+            if (TextoEnriquecido::longitud($this->{$campo}) < 30) {
                 $this->addError($campo, "Escribe {$nombre} (al menos 30 caracteres) antes de continuar.");
                 $faltan[] = $nombre;
             }
@@ -293,7 +294,7 @@ class EditorPropuesta extends Page
         )
             ->filter(
                 fn ($valor): bool =>
-                    filled($valor)
+                    TextoEnriquecido::longitud($valor) > 0
             )
             ->count();
 
@@ -444,25 +445,29 @@ class EditorPropuesta extends Page
             'resumen' => [
                 'nullable',
                 'string',
-                'max:10000',
+                'max:200000',
+                $this->maximoDeTexto(),
             ],
 
             'justificacion' => [
                 'nullable',
                 'string',
-                'max:10000',
+                'max:200000',
+                $this->maximoDeTexto(),
             ],
 
             'metodologia' => [
                 'nullable',
                 'string',
-                'max:10000',
+                'max:200000',
+                $this->maximoDeTexto(),
             ],
 
             'impactoEsperado' => [
                 'nullable',
                 'string',
-                'max:10000',
+                'max:200000',
+                $this->maximoDeTexto(),
             ],
         ]);
 
@@ -601,13 +606,24 @@ class EditorPropuesta extends Page
         return $ultima?->accion === 'DEVOLVER' ? $ultima : null;
     }
 
+    /** HTML saneado del editor con formato, o null si quedó vacío. */
     private function textoONull(
-        string $texto
+        ?string $valor
     ): ?string {
-        $texto = trim($texto);
+        $html = TextoEnriquecido::sanear($valor);
 
-        return $texto !== ''
-            ? $texto
+        return $html !== ''
+            ? $html
             : null;
+    }
+
+    /** El límite de 10,000 caracteres cuenta el texto, no el formato. */
+    private function maximoDeTexto(): \Closure
+    {
+        return function (string $atributo, mixed $valor, \Closure $falla): void {
+            if (TextoEnriquecido::longitud((string) $valor) > 10000) {
+                $falla('El texto no debe pasar de 10,000 caracteres.');
+            }
+        };
     }
 }
