@@ -204,15 +204,23 @@ class VistaPreviaPropuesta extends Page
             . $propuesta->version
             . '.pdf';
 
-        return Pdf::loadView(
+        $pdf = Pdf::loadView(
             'pdf.propuesta',
             $data
         )
             ->setPaper(
                 'a4',
                 'portrait'
-            )
-            ->download($nombre);
+            );
+
+        // Livewire solo admite descargas en stream o archivo: un ->download()
+        // de DomPDF devuelve los bytes en la respuesta y Livewire falla al
+        // convertirla a JSON («Malformed UTF-8 characters»).
+        return response()->streamDownload(
+            fn () => print($pdf->output()),
+            $nombre,
+            ['Content-Type' => 'application/pdf']
+        );
     }
 
     public function exportarExcel(): mixed
