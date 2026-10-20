@@ -20,7 +20,8 @@ class AdminPaginasTest extends TestCase
             ->assertOk()
             ->assertSee('Usuarios asignados')
             ->assertDontSee('se conectará en la fase de funcionalidad')
-            ->assertSee('Editar permisos del rol');
+            ->assertSee('Editar permisos')
+            ->assertSee('Ver detalle');
     }
 
     public function test_el_motor_no_muestra_textos_de_fases_pendientes(): void
