@@ -155,6 +155,32 @@ class SubirDesdeEnlaceTest extends TestCase
             ->assertSet('analisis', null);
     }
 
+    public function test_en_automatica_no_se_publica_sin_analizar_un_enlace(): void
+    {
+        Livewire::test(CreateConvocatoria::class)
+            ->assertSet('modo', 'automatica')
+            ->call('create')
+            ->assertHasErrors(['enlace']);
+
+        $this->assertSame(0, Convocatoria::count());
+    }
+
+    public function test_cambiar_a_manual_conserva_lo_extraido_y_quita_la_confirmacion(): void
+    {
+        Http::fake(['*/convocatorias/analizar-url' => Http::response($this->respuesta(false))]);
+
+        Livewire::test(CreateConvocatoria::class)
+            ->set('enlace', self::URL)
+            ->call('analizarEnlace')
+            ->call('cambiarModo', 'manual')
+            ->assertSet('analisis', null)
+            ->assertSet('data.titulo', 'ZZ-DESDE-ENLACE Convocatoria de proyectos 2026')
+            ->call('create')
+            ->assertHasNoFormErrors();
+
+        $this->assertSame('PUBLICADA', Convocatoria::where('url_original', self::URL)->value('estado'));
+    }
+
     public function test_un_enlace_invalido_se_rechaza_sin_llamar_al_motor(): void
     {
         Http::fake();

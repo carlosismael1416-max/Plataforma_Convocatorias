@@ -100,7 +100,7 @@ Hay un solo login en `/login`. Según el rol, el usuario entra a su panel; las r
 | Detalle de convocatoria | Información, requisitos, financiamiento, archivos y fechas; última verificación en el sitio oficial. Botones «Guardar / Quitar de Mis convocatorias», «☆ Favorita» y «Generar propuesta». Una convocatoria cerrada se abre solo de consulta. |
 | Mis convocatorias | Convocatorias guardadas y su seguimiento; pestañas **Todas / Favoritas**. |
 | Historial | Pestaña «Historial (cerradas)» de Buscar convocatorias: convocatorias que ya cerraron (solo consulta), con filtros por tipo, organismo y año. |
-| Subir convocatoria | **Desde un enlace:** se pega la URL, el motor extrae y valida, y el formulario se llena; si no cumple los criterios se avisa con los motivos y el usuario elige «Publicar de todas maneras» o «No publicar». **A mano:** el mismo formulario. Se publica al momento (no si ya venció); un enlace que ya está en la plataforma no se duplica. Su autor puede corregirla. |
+| Subir convocatoria | Dos secciones con botones arriba. **Automática** (por defecto; `?modo=manual` abre la otra): se pega la URL, el motor extrae y valida, y el formulario se llena; si no cumple los criterios se avisa con los motivos y el usuario elige «Publicar de todas maneras» o «No publicar». **Manual:** el formulario completo. Al pasar de automática a manual se conserva lo ya extraído. En automática no se puede publicar sin analizar un enlace (se valida en el servidor). Se publica al momento (no si ya venció); un enlace que ya está en la plataforma no se duplica. Su autor puede corregirla. |
 | Calendario | Cierres y eventos personales. |
 | Propuestas | Propuestas propias en tarjetas (toda la fila abre el editor), con búsqueda, filtro por estado y los totales como filtros. |
 | Flujo de propuesta | Generar → Editor → Objetivos → Requisitos → Presupuesto → Cotizaciones → Cronograma → Entregables → Vista previa (PDF/Excel y **Enviar a revisión**). |
@@ -308,7 +308,7 @@ curl -s http://127.0.0.1:8001/health ; curl -s http://127.0.0.1:8001/db-check
 
 | Conjunto | Cantidad | Cómo |
 |---|---|---|
-| Web (PHPUnit) | 93 | `cd web && php artisan test`. Usa la base `convocatorias_itsva_test`; `tests/TestCase.php` aborta si el nombre no termina en `_test` (la vacía en cada prueba). |
+| Web (PHPUnit) | 95 | `cd web && php artisan test`. Usa la base `convocatorias_itsva_test`; `tests/TestCase.php` aborta si el nombre no termina en `_test` (la vacía en cada prueba). |
 | Extractor (unittest) | 115 | `cd extractor && ./.venv/bin/python -m unittest discover -s tests -t .` |
 | Verificaciones contra la base real | 5 scripts | `cd web && php tests/Verificacion/<script>.php` (revierten sus datos): `todas_las_paginas`, `permisos_por_rol`, `docente_no_ve_vencidas`, `propuesta_id_bloqueado`, `convocatoria_dependencias`. |
 | Recorrido en navegador | 3 paneles | `tests/Recorrido/preparar.sh` copia la base real a `convocatorias_itsva_test` y levanta una copia de la web en 127.0.0.1:8010 (la base real no se toca). Después `node tests/Recorrido/recorrer.cjs docente\|directivo\|admin` (clic en cada botón: errores 5xx/JS y botones sin efecto) y `node tests/Recorrido/llenar.cjs docente` (lo escrito se guarda tras recargar). Resultados en `tests/Recorrido/salida/`. No correr `php artisan test` mientras tanto (vacía esa base). Requiere Node y el Chromium de Playwright (`PLAYWRIGHT_CORE`, `CHROMIUM`). |

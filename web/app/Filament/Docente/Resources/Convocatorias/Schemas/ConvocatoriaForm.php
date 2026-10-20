@@ -18,6 +18,11 @@ class ConvocatoriaForm
 {
     public static function configure(Schema $schema): Schema
     {
+        // «Subir convocatoria» tiene dos secciones (automática / manual); en
+        // automática el formulario aparece tras analizar el enlace. Editar
+        // no tiene modos: siempre se ve.
+        $mostrar = fn ($livewire): bool => ! method_exists($livewire, 'mostrarFormulario') || $livewire->mostrarFormulario();
+
         return $schema
             ->columns(['default' => 1, 'xl' => 3])
             ->components([
@@ -26,6 +31,7 @@ class ConvocatoriaForm
                         ->visibleOn('create'),
 
                     Section::make('Información básica')
+                        ->visible($mostrar)
                         ->icon(Heroicon::OutlinedBuildingOffice2)
                         ->columns(2)
                         ->schema([
@@ -69,6 +75,7 @@ class ConvocatoriaForm
                         ]),
 
                     Section::make('Descripción y objetivo')
+                        ->visible($mostrar)
                         ->icon(Heroicon::OutlinedDocumentText)
                         ->schema([
                             Textarea::make('descripcion')
@@ -84,6 +91,7 @@ class ConvocatoriaForm
                         ]),
 
                     Section::make('Fechas y apoyo económico')
+                        ->visible($mostrar)
                         ->icon(Heroicon::OutlinedCalendarDays)
                         ->columns(3)
                         ->schema([

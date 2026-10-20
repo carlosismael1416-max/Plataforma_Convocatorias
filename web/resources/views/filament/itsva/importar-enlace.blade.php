@@ -1,16 +1,27 @@
-{{-- «Subir convocatoria» → «Desde un enlace». Se renderiza dentro del
-     formulario de creación (trait App\Filament\Concerns\ImportaDesdeEnlace). --}}
+{{-- «Subir convocatoria»: botones de sección (Automática / Manual) y, en
+     automática, la caja del enlace y el resultado del análisis. Se renderiza
+     dentro del formulario de creación (trait ImportaDesdeEnlace). --}}
 @php
     $pagina = $getLivewire();
     $analisis = $pagina->analisis;
     $validacion = $analisis['validacion'] ?? null;
     $existente = $analisis['existente'] ?? null;
     $panel = filament()->getId();
+    $modo = $pagina->modo;
 @endphp
 
 <div class="imp">
     <style>
         .imp { display: grid; gap: 14px; }
+        .imp-modos { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+        .imp-modo { display: flex; gap: 12px; align-items: center; padding: 14px 16px; border: 2px solid #DDE3EE; border-radius: 14px; background: #fff; color: #1A2C4E; text-align: left; font: inherit; cursor: pointer; transition: border-color .15s, box-shadow .15s; }
+        .imp-modo:hover { border-color: #93C5FD; }
+        .imp-modo.activo { border-color: #1A4B8C; background: #F0F5FC; box-shadow: 0 0 0 3px rgba(26, 75, 140, .12); }
+        .imp-modo strong { display: block; font-size: 15px; }
+        .imp-modo small { display: block; margin-top: 2px; color: #64748B; font-size: 12px; }
+        .imp-modo-icono { width: 40px; height: 40px; flex-shrink: 0; border-radius: 12px; display: flex; align-items: center; justify-content: center; background: #E8EEF8; font-size: 20px; }
+        .imp-modo.activo .imp-modo-icono { background: #1A4B8C; }
+        @media (max-width: 640px) { .imp-modos { grid-template-columns: 1fr; } }
         .imp-caja { position: relative; overflow: hidden; border-radius: 16px; padding: 20px; background: linear-gradient(135deg, #1A4B8C 0%, #2563EB 100%); color: #fff; }
         .imp-caja::after { content: ''; position: absolute; right: -50px; top: -70px; width: 200px; height: 200px; border-radius: 50%; background: rgba(255,255,255,.08); }
         .imp-caja h3 { margin: 0; font-size: 17px; font-weight: 800; }
@@ -38,9 +49,29 @@
         .imp-confirmado { margin-top: 10px; font-size: 13px; font-weight: 700; }
     </style>
 
+    <div class="imp-modos" role="tablist" aria-label="Forma de subir la convocatoria">
+        <button type="button" role="tab" aria-selected="{{ $modo === 'automatica' ? 'true' : 'false' }}"
+            @class(['imp-modo', 'activo' => $modo === 'automatica']) wire:click="cambiarModo('automatica')">
+            <span class="imp-modo-icono">✨</span>
+            <span>
+                <strong>Automática</strong>
+                <small>Pegas el enlace y la llenamos por ti</small>
+            </span>
+        </button>
+        <button type="button" role="tab" aria-selected="{{ $modo === 'manual' ? 'true' : 'false' }}"
+            @class(['imp-modo', 'activo' => $modo === 'manual']) wire:click="cambiarModo('manual')">
+            <span class="imp-modo-icono">✍️</span>
+            <span>
+                <strong>Manual</strong>
+                <small>Llenas el formulario tú mismo</small>
+            </span>
+        </button>
+    </div>
+
+    @if ($modo === 'automatica')
     <section class="imp-caja">
-        <h3>✨ Desde un enlace (automático)</h3>
-        <p>Pega el enlace oficial de la convocatoria: la leemos igual que el motor, llenamos el formulario y te decimos si cumple los criterios. Si prefieres, llena el formulario a mano más abajo.</p>
+        <h3>✨ Pega el enlace de la convocatoria</h3>
+        <p>Pega el enlace oficial de la convocatoria: la leemos igual que el motor, llenamos el formulario y te decimos si cumple los criterios. Después podrás revisarla y corregirla antes de publicar.</p>
 
         <div class="imp-fila">
             <input type="url" wire:model="enlace" wire:keydown.enter.prevent="analizarEnlace"
@@ -109,5 +140,6 @@
                 @endif
             </section>
         @endif
+    @endif
     @endif
 </div>

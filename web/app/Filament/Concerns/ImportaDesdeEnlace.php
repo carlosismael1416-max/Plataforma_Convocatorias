@@ -26,6 +26,38 @@ trait ImportaDesdeEnlace
     /** El usuario aceptó publicar aunque no cumpla los criterios. */
     public bool $publicarIgual = false;
 
+    /** Sección activa: 'automatica' (desde un enlace) o 'manual'. */
+    public string $modo = 'automatica';
+
+    public function mountImportaDesdeEnlace(): void
+    {
+        if (request()->query('modo') === 'manual') {
+            $this->modo = 'manual';
+        }
+    }
+
+    public function cambiarModo(string $modo): void
+    {
+        $this->modo = $modo === 'manual' ? 'manual' : 'automatica';
+
+        // A mano no hay criterios automáticos que confirmar; lo ya llenado
+        // desde un enlace se conserva para terminarlo a mano.
+        if ($this->modo === 'manual') {
+            $this->reset(['analisis', 'publicarIgual']);
+        }
+    }
+
+    /** En automática, el formulario aparece cuando ya se analizó un enlace. */
+    public function mostrarFormulario(): bool
+    {
+        return $this->modo === 'manual' || $this->analisis !== null;
+    }
+
+    protected function getFormActions(): array
+    {
+        return $this->mostrarFormulario() ? parent::getFormActions() : [];
+    }
+
     public function analizarEnlace(): void
     {
         abort_unless(static::canAccess(), 403);
@@ -129,6 +161,12 @@ trait ImportaDesdeEnlace
      */
     protected function validarImportacion(array $data): ?Convocatoria
     {
+        if (! $this->mostrarFormulario()) {
+            throw ValidationException::withMessages([
+                'enlace' => 'Analiza un enlace primero o cambia a la sección «Manual».',
+            ]);
+        }
+
         $existente = $this->convocatoriaConMismoEnlace($data['url_original'] ?? null);
 
         if ($existente && $existente->estado !== 'PENDIENTE_REVISION') {
