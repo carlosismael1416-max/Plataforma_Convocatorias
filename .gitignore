@@ -149,3 +149,33 @@ extractor/descubrimiento_google_vista_previa.json
 extractor/google_news_url_cache.json
 extractor/backups/
 find-skills.txt
+
+
+# ------------------------------------------------------------
+# NO SE SUBEN AL REPOSITORIO (se quedan solo en la máquina local)
+# ------------------------------------------------------------
+
+# Instrucciones locales para asistentes
+CLAUDE.md
+AGENTS.md
+**/CLAUDE.md
+**/AGENTS.md
+
+# Documentación e informes (docs/ y documentos de oficina)
+docs/
+*.docx
+*.doc
+*.pdf
+*.xlsx
+*.pptx
+
+# Pruebas automatizadas y sus resultados (el proyecto no las necesita para funcionar)
+web/tests/
+extractor/tests/
+web/tests/Recorrido/salida/
+
+# Respaldos y volcados de base de datos
+*.dump
+*.sql.gz
+respaldos/
+backups/
