@@ -26,7 +26,7 @@ class AparienciaTest extends TestCase
             ]],
             'admin' => ['ADMINISTRADOR', '/admin', [
                 'Dashboard', 'Usuarios', 'Roles y permisos', 'Fuentes web',
-                'Motor de Extracción', 'Descubrimientos', 'Bitácora de Errores', 'Convocatorias',
+                'Motor de Extracción', 'Bitácora de Errores', 'Convocatorias',
             ]],
         ];
     }

@@ -125,7 +125,7 @@ Tiene **todas las páginas de trabajo del docente** (mismas clases, el rol exigi
 | Usuarios, Roles y permisos | Cuentas, roles (DOCENTE, DIRECTIVO, ADMINISTRADOR, SISTEMA) y permisos (`rol_permisos`). |
 | Fuentes web | Fuentes oficiales que consulta el motor. |
 | Motor de extracción | Estado de la API, **interruptor del motor**, «Ejecutar ciclo» por fuente, ejecuciones. |
-| Descubrimientos | Candidatos encontrados por el buscador (con título legible). |
+| Descubrimientos | Pestaña de **Motor de extracción** (no está en el menú): candidatos que el buscador encontró en internet. No son convocatorias y no se mezclan con ellas. Tarjetas que filtran (Descubiertos, En espera, Convertidos, Descartados, Con error); cada fila muestra título y dominio, estado y decisión del clasificador, evaluación (se aprueba con 80) y enlace a la convocatoria si ya se convirtió. Solo consulta. |
 | Bitácora de errores | Incidencias de los procesos automáticos. |
 | Convocatorias | Gestión completa de **todas** las convocatorias, en cualquier estado (por eso el admin no tiene historial aparte). Las tarjetas de arriba filtran la tabla: Todas, No publicadas, Vigentes, Cerradas. Cada fila muestra título y organismo, tipo y audiencia, estado (con «Vencida» y si vino del motor o se subió a mano) y cierre con tiempo relativo; toda la fila abre el detalle. |
 | Categorías, Organismos, Departamentos, Propuestas | Catálogos. |
@@ -308,7 +308,7 @@ curl -s http://127.0.0.1:8001/health ; curl -s http://127.0.0.1:8001/db-check
 
 | Conjunto | Cantidad | Cómo |
 |---|---|---|
-| Web (PHPUnit) | 92 | `cd web && php artisan test`. Usa la base `convocatorias_itsva_test`; `tests/TestCase.php` aborta si el nombre no termina en `_test` (la vacía en cada prueba). |
+| Web (PHPUnit) | 93 | `cd web && php artisan test`. Usa la base `convocatorias_itsva_test`; `tests/TestCase.php` aborta si el nombre no termina en `_test` (la vacía en cada prueba). |
 | Extractor (unittest) | 115 | `cd extractor && ./.venv/bin/python -m unittest discover -s tests -t .` |
 | Verificaciones contra la base real | 5 scripts | `cd web && php tests/Verificacion/<script>.php` (revierten sus datos): `todas_las_paginas`, `permisos_por_rol`, `docente_no_ve_vencidas`, `propuesta_id_bloqueado`, `convocatoria_dependencias`. |
 | Recorrido en navegador | 3 paneles | `tests/Recorrido/preparar.sh` copia la base real a `convocatorias_itsva_test` y levanta una copia de la web en 127.0.0.1:8010 (la base real no se toca). Después `node tests/Recorrido/recorrer.cjs docente\|directivo\|admin` (clic en cada botón: errores 5xx/JS y botones sin efecto) y `node tests/Recorrido/llenar.cjs docente` (lo escrito se guarda tras recargar). Resultados en `tests/Recorrido/salida/`. No correr `php artisan test` mientras tanto (vacía esa base). Requiere Node y el Chromium de Playwright (`PLAYWRIGHT_CORE`, `CHROMIUM`). |

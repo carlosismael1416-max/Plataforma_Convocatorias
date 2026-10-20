@@ -578,6 +578,8 @@
 
     <div class="extraction-engine">
 
+        @include('filament.itsva.pestanas-motor', ['activa' => 'motor'])
+
         <div class="page-header">
 
             <div>

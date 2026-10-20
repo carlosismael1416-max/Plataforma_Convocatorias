@@ -28,6 +28,10 @@ class DescubrimientoWebResource extends Resource
 
     protected static ?int $navigationSort = 6;
 
+    // Es una pestaña de «Motor de extracción» (registro de trabajo del
+    // buscador), no un elemento del menú.
+    protected static bool $shouldRegisterNavigation = false;
+
     /*
      * Solo lectura: los estados e intentos los maneja el extractor;
      * editarlos a mano rompe el ciclo (regla 3 de CLAUDE.md).
