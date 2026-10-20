@@ -35,6 +35,9 @@ class HistorialConvocatorias extends Page
 
     protected static ?int $navigationSort = 3;
 
+    // Es una sección de «Buscar convocatorias» (pestañas), no un elemento del menú.
+    protected static bool $shouldRegisterNavigation = false;
+
     protected string $view = 'filament.docente.pages.historial-convocatorias';
 
     protected ?string $heading = '';

@@ -18,26 +18,8 @@ import argparse
 import json
 from collections import Counter
 
-from app.descubrimiento.elegibilidad import evaluar_elegibilidad
 from app.descubrimiento.guardar_descubrimientos import conectar
-from app.tipo_convocatoria import clasificar_tipo, excluye_mexicanos
-
-
-def clasificar(fila: dict) -> tuple[str, list[str], str]:
-    resultado = clasificar_tipo(fila["titulo"], fila["url_original"], fila["objetivo"], fila["descripcion"])
-    tipo, dirigido, motivo = resultado["tipo"], resultado["dirigido_a"], resultado["motivo"] or ""
-
-    if fila["origen"] == "MANUAL":
-        return ("FINANCIAMIENTO" if tipo == "NO_APLICA" else tipo), dirigido, ""
-
-    if tipo != "NO_APLICA":
-        elegibilidad = evaluar_elegibilidad(fila["titulo"] or "", fila["url_original"] or "")
-        if not elegibilidad["elegible"]:
-            return "NO_APLICA", [], f"no elegible: {elegibilidad['motivo']}"
-        if excluye_mexicanos(fila["objetivo"], fila["descripcion"]):
-            return "NO_APLICA", [], "excluye a mexicanos"
-
-    return tipo, dirigido, motivo
+from app.tipo_convocatoria import clasificar_existente
 
 
 def main() -> None:
@@ -63,7 +45,7 @@ def main() -> None:
     conteo = Counter()
 
     for fila in filas:
-        tipo, dirigido, motivo = clasificar(fila)
+        tipo, dirigido, motivo = clasificar_existente(fila)
         conteo[tipo] += 1
         print(f"{fila['id']:>5} {fila['estado']:<18} {tipo:<15} {','.join(dirigido) or '-':<32} {(fila['titulo'] or '')[:70]}"
               + (f"  ({motivo})" if motivo else ""))

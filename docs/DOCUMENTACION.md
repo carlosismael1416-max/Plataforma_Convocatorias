@@ -99,7 +99,7 @@ Hay un solo login en `/login`. Según el rol, el usuario entra a su panel; las r
 | Buscar convocatorias | Convocatorias **vigentes** (publicadas y no vencidas), con filtros por **tipo** y **a quién va dirigida**. Cada tarjeta lleva sus marcas, ☆ favorita y guardar/quitar; toda la tarjeta abre el detalle. |
 | Detalle de convocatoria | Información, requisitos, financiamiento, archivos y fechas; última verificación en el sitio oficial. Botones «Guardar / Quitar de Mis convocatorias», «☆ Favorita» y «Generar propuesta». Una convocatoria cerrada se abre solo de consulta. |
 | Mis convocatorias | Convocatorias guardadas y su seguimiento; pestañas **Todas / Favoritas**. |
-| Historial | Convocatorias que ya cerraron (solo consulta), con filtros por tipo, organismo y año. También en directivo y admin. |
+| Historial | Pestaña «Historial (cerradas)» de Buscar convocatorias: convocatorias que ya cerraron (solo consulta), con filtros por tipo, organismo y año. En el admin se abre con el botón «Historial» de Convocatorias. |
 | Subir convocatoria | **Desde un enlace:** se pega la URL, el motor extrae y valida, y el formulario se llena; si no cumple los criterios se avisa con los motivos y el usuario elige «Publicar de todas maneras» o «No publicar». **A mano:** el mismo formulario. Se publica al momento (no si ya venció); un enlace que ya está en la plataforma no se duplica. Su autor puede corregirla. |
 | Calendario | Cierres y eventos personales. |
 | Propuestas | Propuestas propias en tarjetas (toda la fila abre el editor), con búsqueda, filtro por estado y los totales como filtros. |
@@ -162,7 +162,7 @@ Lo ejecuta systemd cada 6 horas. Plazo máximo 3.300 s. Escribe su reporte en `e
 | 4. Fuentes oficiales | Consulta las fuentes activas sin JavaScript cuya frecuencia ya pasó (24 h). Lo nuevo entra como `PENDIENTE_REVISION`. |
 | 5. Seguimiento | Reconsulta cada ~20 h las convocatorias vigentes con enlace (máx. 5 por ciclo): agrega documentos nuevos, aplica ampliaciones de fecha, avisa adelantos, detecta cambios de texto > 2 % y **avisa a quienes la siguen o tienen propuesta**. Completa datos faltantes con el enriquecimiento. |
 | 6. Revalidación | Cierra vencidas y enriquece + valida las pendientes (máx. 5 por ciclo; las recién guardadas primero). Publica las que pasan el validador. |
-| Mantenimiento | Al final (`app/mantenimiento.py`, nunca rompe el ciclo): borra descubrimientos `DESCARTADO` sin convocatoria de más de 180 días, notificaciones leídas de más de 180 días y temporales de `web/storage/app/tmp` de más de 24 h. |
+| Mantenimiento | Al final (`app/mantenimiento.py`, nunca rompe el ciclo): borra descubrimientos `DESCARTADO` sin convocatoria de más de 180 días, notificaciones leídas de más de 180 días y temporales de `web/storage/app/tmp` de más de 24 h; clasifica tipo y audiencia de las convocatorias que quedaron sin tipo (p. ej. pendientes cerradas por vencidas). |
 
 **Carga inicial** (para llenar la base la primera vez; mismo plazo de 3.300 s y mismo bloqueo, no choca con el timer):
 
@@ -308,8 +308,8 @@ curl -s http://127.0.0.1:8001/health ; curl -s http://127.0.0.1:8001/db-check
 
 | Conjunto | Cantidad | Cómo |
 |---|---|---|
-| Web (PHPUnit) | 90 | `cd web && php artisan test`. Usa la base `convocatorias_itsva_test`; `tests/TestCase.php` aborta si el nombre no termina en `_test` (la vacía en cada prueba). |
-| Extractor (unittest) | 114 | `cd extractor && ./.venv/bin/python -m unittest discover -s tests -t .` |
+| Web (PHPUnit) | 91 | `cd web && php artisan test`. Usa la base `convocatorias_itsva_test`; `tests/TestCase.php` aborta si el nombre no termina en `_test` (la vacía en cada prueba). |
+| Extractor (unittest) | 115 | `cd extractor && ./.venv/bin/python -m unittest discover -s tests -t .` |
 | Verificaciones contra la base real | 5 scripts | `cd web && php tests/Verificacion/<script>.php` (revierten sus datos): `todas_las_paginas`, `permisos_por_rol`, `docente_no_ve_vencidas`, `propuesta_id_bloqueado`, `convocatoria_dependencias`. |
 | Recorrido en navegador | 3 paneles | `tests/Recorrido/preparar.sh` copia la base real a `convocatorias_itsva_test` y levanta una copia de la web en 127.0.0.1:8010 (la base real no se toca). Después `node tests/Recorrido/recorrer.cjs docente\|directivo\|admin` (clic en cada botón: errores 5xx/JS y botones sin efecto) y `node tests/Recorrido/llenar.cjs docente` (lo escrito se guarda tras recargar). Resultados en `tests/Recorrido/salida/`. No correr `php artisan test` mientras tanto (vacía esa base). Requiere Node y el Chromium de Playwright (`PLAYWRIGHT_CORE`, `CHROMIUM`). |
 

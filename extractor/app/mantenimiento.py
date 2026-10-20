@@ -11,6 +11,7 @@ Nunca toca convocatorias, propuestas ni registros pendientes.
 from __future__ import annotations
 
 import time
+import json
 from pathlib import Path
 
 from app.descubrimiento.guardar_descubrimientos import conectar
@@ -37,8 +38,46 @@ def limpiar_temporales(carpeta: Path = TMP_WEB, horas: int = HORAS_TEMPORALES) -
     return borrados
 
 
+def clasificar_sin_tipo(conexion, limite: int = 200) -> int:
+    """
+    Tipo y audiencia de las convocatorias que no pasaron por el validador
+    (p. ej. pendientes que el ciclo cerró por vencidas), para que el
+    historial las muestre bien marcadas y oculte las que no aplican.
+    """
+    from app.tipo_convocatoria import clasificar_existente
+    from app.validar_convocatoria import columnas_tipo_disponibles
+
+    if not columnas_tipo_disponibles(conexion):
+        return 0
+
+    with conexion.cursor() as cursor:
+        cursor.execute(
+            """
+            SELECT id, titulo, url_original, COALESCE(objetivo, ''), COALESCE(descripcion, ''), origen
+            FROM convocatorias
+            WHERE tipo IS NULL
+            ORDER BY id
+            LIMIT %s
+            """,
+            (limite,),
+        )
+        filas = cursor.fetchall()
+
+        for id_, titulo, url, objetivo, descripcion, origen in filas:
+            tipo, dirigido, _ = clasificar_existente({
+                "titulo": titulo, "url_original": url, "objetivo": objetivo,
+                "descripcion": descripcion, "origen": origen,
+            })
+            cursor.execute(
+                "UPDATE convocatorias SET tipo = %s, dirigido_a = %s::jsonb WHERE id = %s AND tipo IS NULL",
+                (tipo, json.dumps(dirigido), id_),
+            )
+
+    return len(filas)
+
+
 def ejecutar_mantenimiento() -> dict:
-    resultado = {"descubrimientos": 0, "notificaciones": 0, "temporales": 0, "error": None}
+    resultado = {"descubrimientos": 0, "notificaciones": 0, "temporales": 0, "clasificadas": 0, "error": None}
 
     try:
         conexion = conectar()
@@ -66,6 +105,9 @@ def ejecutar_mantenimiento() -> dict:
                 )
                 resultado["notificaciones"] = cursor.rowcount
 
+            conexion.commit()
+
+            resultado["clasificadas"] = clasificar_sin_tipo(conexion)
             conexion.commit()
         finally:
             conexion.close()

@@ -4,6 +4,8 @@ namespace App\Filament\Resources\Convocatorias\Pages;
 
 use App\Filament\Resources\Convocatorias\ConvocatoriaResource;
 use App\Models\Convocatoria;
+use App\Filament\Admin\Pages\HistorialConvocatorias;
+use Filament\Actions\Action;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
 
@@ -28,6 +30,12 @@ class ListConvocatorias extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
+            Action::make('historial')
+                ->label('Historial (cerradas)')
+                ->icon('heroicon-o-archive-box')
+                ->color('gray')
+                ->url(HistorialConvocatorias::getUrl()),
+
             CreateAction::make()
                 ->label(
                     'Nueva convocatoria'

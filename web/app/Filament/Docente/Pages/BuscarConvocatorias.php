@@ -3,6 +3,7 @@
 namespace App\Filament\Docente\Pages;
 
 use App\Filament\Concerns\GestionaMisConvocatorias;
+use App\Filament\Concerns\RolDelPanel;
 use App\Models\Categoria;
 use App\Models\Convocatoria;
 use App\Models\Organismo;
@@ -15,7 +16,12 @@ use Livewire\WithPagination;
 
 class BuscarConvocatorias extends Page
 {
+    /** Estados que puede abrir el detalle (vigentes e historial); lo demás es interno del motor. */
+    public const ESTADOS_VISIBLES = ['PUBLICADA', 'ACTIVA', 'CERRADA'];
+
     use GestionaMisConvocatorias;
+
+    use RolDelPanel;
 
     use WithPagination;
 
@@ -58,7 +64,16 @@ class BuscarConvocatorias extends Page
 
         return $usuario instanceof User
             && (bool) $usuario->estado
-            && $usuario->tieneRol('DOCENTE');
+            && $usuario->tieneRol(static::rolDelPanel());
+    }
+
+    /** El historial es una sección de esta página: también la marca en el menú. */
+    public static function getNavigationItemActiveRoutePattern(): string|array
+    {
+        return [
+            static::getRouteName(),
+            str_replace('buscar-convocatorias', 'historial-convocatorias', static::getRouteName()),
+        ];
     }
 
     public function mount(): void

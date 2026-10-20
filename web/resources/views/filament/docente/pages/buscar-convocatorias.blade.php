@@ -384,6 +384,8 @@
 
     <div class="itsva-search-page">
 
+        @include('filament.itsva.pestanas-convocatorias', ['activa' => 'vigentes'])
+
         <div class="search-intro">
 
             <div>

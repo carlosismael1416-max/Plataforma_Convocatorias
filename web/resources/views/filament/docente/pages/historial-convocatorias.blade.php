@@ -41,6 +41,8 @@
 </style>
 
 <div class="hist">
+    @include('filament.itsva.pestanas-convocatorias', ['activa' => 'historial'])
+
     <section class="hist-hero">
         <div style="position: relative; z-index: 1">
             <h2>Historial de convocatorias</h2>
