@@ -10,6 +10,8 @@ use App\Filament\Resources\Departamentos\Schemas\DepartamentoForm;
 use App\Filament\Resources\Departamentos\Schemas\DepartamentoInfolist;
 use App\Filament\Resources\Departamentos\Tables\DepartamentosTable;
 use App\Models\Departamento;
+use App\Models\User;
+use Illuminate\Database\Eloquent\Model;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -18,7 +20,50 @@ use Filament\Tables\Table;
 
 class DepartamentoResource extends Resource
 {
+    // Pestaña de «Usuarios» (no está en el menú).
     protected static bool $shouldRegisterNavigation = false;
+
+    protected static ?string $modelLabel = 'departamento';
+
+    protected static ?string $pluralModelLabel = 'departamentos';
+
+    private static function esAdministradorActivo(): bool
+    {
+        $usuario = auth()->user();
+
+        return $usuario instanceof User && (bool) $usuario->estado && $usuario->tieneRol('ADMINISTRADOR');
+    }
+
+    public static function canViewAny(): bool
+    {
+        return static::esAdministradorActivo();
+    }
+
+    public static function canCreate(): bool
+    {
+        return static::esAdministradorActivo();
+    }
+
+    public static function canView(Model $record): bool
+    {
+        return static::esAdministradorActivo();
+    }
+
+    public static function canEdit(Model $record): bool
+    {
+        return static::esAdministradorActivo();
+    }
+
+    /** Solo se elimina si ningún usuario lo tiene asignado. */
+    public static function canDelete(Model $record): bool
+    {
+        return static::esAdministradorActivo() && ! $record->users()->exists();
+    }
+
+    public static function canDeleteAny(): bool
+    {
+        return false;
+    }
 
     protected static ?string $model = Departamento::class;
 

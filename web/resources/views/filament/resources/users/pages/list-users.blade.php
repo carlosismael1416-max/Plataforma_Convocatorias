@@ -114,6 +114,9 @@
         }
     </style>
 
+    @include('filament.itsva.pestanas-usuarios', ['activa' => 'usuarios'])
+
+
 
     <div class="users-summary">
 
