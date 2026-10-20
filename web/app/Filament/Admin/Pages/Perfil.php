@@ -10,6 +10,8 @@ use Illuminate\Validation\Rule;
 
 class Perfil extends Page
 {
+    use \App\Filament\Concerns\GestionaFotoPerfil;
+
     protected string $view =
         'filament.admin.pages.perfil';
 

@@ -444,13 +444,10 @@
             <div class="profile-content">
 
                 <div class="avatar">
-                    {{ $iniciales }}
+                    @if ($usuario->fotoUrl())<img class="avatar-foto" src="{{ $usuario->fotoUrl() }}" alt="Foto de perfil">@else{{ $iniciales }}@endif
                 </div>
 
-                <div class="avatar-help">
-                    La cuenta no dispone actualmente
-                    de un campo para fotografía.
-                </div>
+                @include('filament.partials.foto-perfil', ['usuario' => $usuario, 'alinear' => 'start'])
 
                 <div class="profile-name">
                     {{

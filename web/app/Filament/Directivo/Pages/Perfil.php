@@ -12,6 +12,8 @@ use Illuminate\Validation\Rule;
 
 class Perfil extends Page
 {
+    use \App\Filament\Concerns\GestionaFotoPerfil;
+
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-user-circle';
 
     protected static ?string $navigationLabel = 'Perfil';
