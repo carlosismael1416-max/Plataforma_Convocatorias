@@ -1323,7 +1323,7 @@
                                     security-title
                                 "
                             >
-                                Último acceso
+                                Inicio de sesión anterior
                             </div>
 
                             <div
@@ -1331,8 +1331,8 @@
                                     security-help
                                 "
                             >
-                                Último acceso registrado
-                                para esta cuenta.
+                                Tu inicio de sesión anterior
+                                a este.
                             </div>
 
                         </div>
@@ -1343,14 +1343,12 @@
                                 color:#475569;
                             "
                         >
-                            {{
-                                $usuario
-                                    ->ultimo_acceso
-                                    ?->format(
-                                        'd/m/Y H:i'
-                                    )
-                                ?? 'Sin registro'
-                            }}
+                            @php
+                                $anterior = session('acceso_anterior');
+                            @endphp
+                            {{ $anterior
+                                ? \Illuminate\Support\Carbon::parse($anterior)->timezone('America/Merida')->locale('es')->isoFormat('D MMM YYYY, HH:mm')
+                                : 'Primer inicio de sesión' }}
                         </strong>
 
                     </div>

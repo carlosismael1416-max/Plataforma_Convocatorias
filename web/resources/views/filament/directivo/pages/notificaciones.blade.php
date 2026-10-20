@@ -658,6 +658,8 @@
                 )
 
                     <div
+                        style="cursor: pointer"
+                        x-on:click="if (! $event.target.closest('a, button')) $wire.{{ $notificacion['tiene_destino'] ? 'abrirNotificacion' : 'marcarComoLeida' }}({{ $notificacion['id'] }})"
                         class="
                             notification
                             {{
