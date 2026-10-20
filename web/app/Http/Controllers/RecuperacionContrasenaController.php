@@ -84,7 +84,17 @@ class RecuperacionContrasenaController extends Controller
         }
 
         return redirect()
-            ->route('login')
-            ->with('status', 'Tu contraseña se actualizó. Ya puedes iniciar sesión.');
+            ->route('password.listo')
+            ->with('contrasena_actualizada', true);
+    }
+
+    /** Confirmación tras guardar la nueva contraseña, con botón al login. */
+    public function listo(Request $request): View|RedirectResponse
+    {
+        if (! $request->session()->get('contrasena_actualizada')) {
+            return redirect()->route('login');
+        }
+
+        return view('auth.contrasena-actualizada');
     }
 }

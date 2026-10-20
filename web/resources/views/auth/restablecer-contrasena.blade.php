@@ -36,13 +36,18 @@
 
         <div class="campo">
             <label for="password_confirmation">Confirmar contraseña</label>
-            <input
-                id="password_confirmation"
-                name="password_confirmation"
-                type="password"
-                autocomplete="new-password"
-                required
-            >
+            <div class="con-ojo">
+                <input
+                    id="password_confirmation"
+                    name="password_confirmation"
+                    type="password"
+                    autocomplete="new-password"
+                    required
+                >
+                <button type="button" class="ojo" data-ojo="password_confirmation" aria-label="Mostrar confirmación">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.06 12.35a1 1 0 0 1 0-.7 10.75 10.75 0 0 1 19.88 0 1 1 0 0 1 0 .7 10.75 10.75 0 0 1-19.88 0"/><circle cx="12" cy="12" r="3"/></svg>
+                </button>
+            </div>
         </div>
 
         @if ($errors->any())
