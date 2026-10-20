@@ -64,11 +64,27 @@
         }
 
         .stat {
+            display: block;
+            width: 100%;
+            text-align: left;
+            font: inherit;
+            cursor: pointer;
+            transition: box-shadow .15s, transform .15s, border-color .15s;
             padding: 18px;
             border: 1px solid var(--border);
             border-radius: 14px;
             background: white;
             box-shadow: 0 1px 2px rgba(15, 24, 39, .03);
+        }
+
+        .stat:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 20px rgba(15, 24, 39, .08);
+        }
+
+        .stat.activa {
+            border-color: #059669;
+            box-shadow: 0 0 0 2px rgba(5, 150, 105, .18);
         }
 
         .stat-icon {
@@ -306,7 +322,7 @@
 
         <div class="stats">
 
-            <div class="stat">
+            <button type="button" wire:click="$set('activeTab', 'todas')" @class(['stat', 'activa' => ($this->activeTab ?? 'todas') === 'todas']) aria-pressed="{{ ($this->activeTab ?? 'todas') === 'todas' ? 'true' : 'false' }}">
                 <div class="stat-icon green">{!! \App\Filament\Apariencia\Iconos::svg('libro', 20) !!}</div>
                 <div class="stat-value">{{ $totalConvocatorias }}</div>
                 <div class="stat-label">Convocatorias</div>
@@ -314,28 +330,28 @@
                     {{ $totalScraping }} del bot ·
                     {{ $totalManuales }} manuales
                 </div>
-            </div>
+            </button>
 
-            <div class="stat">
+            <button type="button" wire:click="$set('activeTab', 'no_publicadas')" @class(['stat', 'activa' => ($this->activeTab ?? 'todas') === 'no_publicadas']) aria-pressed="{{ ($this->activeTab ?? 'todas') === 'no_publicadas' ? 'true' : 'false' }}">
                 <div class="stat-icon yellow">{!! \App\Filament\Apariencia\Iconos::svg('portapapeles', 20) !!}</div>
                 <div class="stat-value">{{ $pendientesRevision }}</div>
                 <div class="stat-label">No publicadas (validador)</div>
                 <div class="stat-help">Internas; el motor las revalida solo</div>
-            </div>
+            </button>
 
-            <div class="stat">
+            <button type="button" wire:click="$set('activeTab', 'vigentes')" @class(['stat', 'activa' => ($this->activeTab ?? 'todas') === 'vigentes']) aria-pressed="{{ ($this->activeTab ?? 'todas') === 'vigentes' ? 'true' : 'false' }}">
                 <div class="stat-icon blue">{!! \App\Filament\Apariencia\Iconos::svg('aprobado', 20) !!}</div>
                 <div class="stat-value">{{ $publicadasActivas }}</div>
                 <div class="stat-label">Vigentes</div>
                 <div class="stat-help">Las mismas que ve el docente</div>
-            </div>
+            </button>
 
-            <div class="stat">
+            <button type="button" wire:click="$set('activeTab', 'cerradas')" @class(['stat', 'activa' => ($this->activeTab ?? 'todas') === 'cerradas']) aria-pressed="{{ ($this->activeTab ?? 'todas') === 'cerradas' ? 'true' : 'false' }}">
                 <div class="stat-icon gray">{!! \App\Filament\Apariencia\Iconos::svg('rechazado', 20) !!}</div>
                 <div class="stat-value">{{ $cerradasArchivadas }}</div>
                 <div class="stat-label">Cerradas / archivadas</div>
                 <div class="stat-help">Fuera de vigencia</div>
-            </div>
+            </button>
 
         </div>
 
@@ -405,11 +421,16 @@
             <div class="table-heading">
 
                 <div class="table-title">
-                    Convocatorias registradas
+                    {{ [
+                        'todas' => 'Todas las convocatorias',
+                        'no_publicadas' => 'No publicadas (internas del motor)',
+                        'vigentes' => 'Vigentes',
+                        'cerradas' => 'Cerradas / archivadas',
+                    ][$this->activeTab ?? 'todas'] ?? 'Convocatorias' }}
                 </div>
 
                 <div class="table-description">
-                    Busca y filtra por estado, categoría, organismo, fuente u origen.
+                    Incluye todas, en cualquier estado. Usa las tarjetas de arriba o los filtros para acotar; toda la fila abre el detalle.
                 </div>
 
             </div>

@@ -4,10 +4,10 @@ namespace App\Filament\Resources\Convocatorias\Pages;
 
 use App\Filament\Resources\Convocatorias\ConvocatoriaResource;
 use App\Models\Convocatoria;
-use App\Filament\Admin\Pages\HistorialConvocatorias;
-use Filament\Actions\Action;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
+use Filament\Schemas\Components\Tabs\Tab;
+use Illuminate\Database\Eloquent\Builder;
 
 class ListConvocatorias extends ListRecords
 {
@@ -30,16 +30,27 @@ class ListConvocatorias extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Action::make('historial')
-                ->label('Historial (cerradas)')
-                ->icon('heroicon-o-archive-box')
-                ->color('gray')
-                ->url(HistorialConvocatorias::getUrl()),
-
             CreateAction::make()
                 ->label(
                     'Nueva convocatoria'
                 ),
+        ];
+    }
+
+    /**
+     * Las tarjetas de arriba filtran la tabla (la tabla incluye todas las
+     * convocatorias, en cualquier estado; no hace falta un historial aparte).
+     */
+    public function getTabs(): array
+    {
+        return [
+            'todas' => Tab::make('Todas'),
+            'no_publicadas' => Tab::make('No publicadas')
+                ->modifyQueryUsing(fn (Builder $query) => $query->where('estado', 'PENDIENTE_REVISION')),
+            'vigentes' => Tab::make('Vigentes')
+                ->modifyQueryUsing(fn (Builder $query) => $query->visibles()),
+            'cerradas' => Tab::make('Cerradas')
+                ->modifyQueryUsing(fn (Builder $query) => $query->where(fn (Builder $c) => $c->historial()->orWhere('estado', 'ARCHIVADA'))),
         ];
     }
 

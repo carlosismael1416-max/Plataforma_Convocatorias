@@ -2,9 +2,7 @@
      @include('filament.itsva.pestanas-convocatorias', ['activa' => 'vigentes'|'historial']) --}}
 @php
     $panel = filament()->getId();
-    $urlVigentes = $panel === 'admin'
-        ? \App\Filament\Resources\Convocatorias\ConvocatoriaResource::getUrl('index')
-        : route('filament.' . $panel . '.pages.buscar-convocatorias');
+    $urlVigentes = route('filament.' . $panel . '.pages.buscar-convocatorias');
     $urlHistorial = route('filament.' . $panel . '.pages.historial-convocatorias');
     $vigentes = \App\Models\Convocatoria::query()->visibles()->count();
     $cerradas = \App\Models\Convocatoria::query()->historial()->count();
@@ -19,7 +17,7 @@
         .itsva-pestana.activa .itsva-pestana-n { background: #E8EEF8; }
     </style>
     <a href="{{ $urlVigentes }}" @class(['itsva-pestana', 'activa' => $activa === 'vigentes']) @if ($activa === 'vigentes') aria-current="page" @endif>
-        🔎 {{ $panel === 'admin' ? 'Convocatorias' : 'Vigentes' }} <span class="itsva-pestana-n">{{ $vigentes }}</span>
+        🔎 Vigentes <span class="itsva-pestana-n">{{ $vigentes }}</span>
     </a>
     <a href="{{ $urlHistorial }}" @class(['itsva-pestana', 'activa' => $activa === 'historial']) @if ($activa === 'historial') aria-current="page" @endif>
         🗂️ Historial (cerradas) <span class="itsva-pestana-n">{{ $cerradas }}</span>
