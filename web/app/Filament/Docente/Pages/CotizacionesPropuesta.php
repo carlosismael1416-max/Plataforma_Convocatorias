@@ -2,6 +2,8 @@
 
 namespace App\Filament\Docente\Pages;
 
+use App\Filament\Concerns\AvisaBorradorGuardado;
+
 use App\Filament\Concerns\RolDelPanel;
 use App\Models\Cotizacion;
 use App\Models\PresupuestoItem;
@@ -17,6 +19,8 @@ use Livewire\Attributes\Locked;
 
 class CotizacionesPropuesta extends Page
 {
+    use AvisaBorradorGuardado;
+
     use RolDelPanel;
 
     use WithFileUploads;
@@ -581,6 +585,7 @@ class CotizacionesPropuesta extends Page
                 'Cotizaciones guardadas'
             )
             ->success()
+            ->actions($this->accionesBorrador())
             ->send();
     }
 

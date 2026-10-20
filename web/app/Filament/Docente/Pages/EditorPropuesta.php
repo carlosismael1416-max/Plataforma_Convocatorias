@@ -2,6 +2,8 @@
 
 namespace App\Filament\Docente\Pages;
 
+use App\Filament\Concerns\AvisaBorradorGuardado;
+
 use App\Filament\Concerns\RolDelPanel;
 use App\Models\Propuesta;
 use App\Models\PropuestaRevision;
@@ -13,6 +15,8 @@ use Livewire\Attributes\Locked;
 
 class EditorPropuesta extends Page
 {
+    use AvisaBorradorGuardado;
+
     use RolDelPanel;
 
     protected static bool $shouldRegisterNavigation = false;
@@ -123,6 +127,7 @@ class EditorPropuesta extends Page
                 'Los cambios de la propuesta se guardaron correctamente.'
             )
             ->success()
+            ->actions($this->accionesBorrador())
             ->send();
     }
 
@@ -142,6 +147,12 @@ class EditorPropuesta extends Page
             if (! $propuesta) {
                 return null;
             }
+
+            // El borrador puede ir incompleto; para avanzar, los datos
+            // principales del proyecto deben estar escritos.
+            if (! $this->datosCompletosParaContinuar()) {
+                return null;
+            }
         }
 
         return redirect()->route(
@@ -151,6 +162,36 @@ class EditorPropuesta extends Page
                     $this->propuestaId,
             ]
         );
+    }
+
+    /** Campos que deben estar escritos (30+ caracteres) para pasar a Objetivos. */
+    private const CAMPOS_PARA_CONTINUAR = [
+        'resumen' => 'el resumen ejecutivo',
+        'justificacion' => 'la justificación',
+        'metodologia' => 'la metodología',
+        'impactoEsperado' => 'el impacto esperado',
+    ];
+
+    private function datosCompletosParaContinuar(): bool
+    {
+        $faltan = [];
+
+        foreach (self::CAMPOS_PARA_CONTINUAR as $campo => $nombre) {
+            if (mb_strlen(trim((string) $this->{$campo})) < 30) {
+                $this->addError($campo, "Escribe {$nombre} (al menos 30 caracteres) antes de continuar.");
+                $faltan[] = $nombre;
+            }
+        }
+
+        if ($faltan) {
+            Notification::make()
+                ->title('Faltan datos de la propuesta')
+                ->body('Completa ' . implode(', ', $faltan) . ' antes de continuar. Puedes guardar el borrador mientras tanto.')
+                ->warning()
+                ->send();
+        }
+
+        return $faltan === [];
     }
 
     public function irAVistaPrevia(): mixed

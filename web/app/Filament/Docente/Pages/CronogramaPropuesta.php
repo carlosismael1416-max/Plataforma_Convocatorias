@@ -2,6 +2,8 @@
 
 namespace App\Filament\Docente\Pages;
 
+use App\Filament\Concerns\AvisaBorradorGuardado;
+
 use App\Filament\Concerns\RolDelPanel;
 use App\Models\Cotizacion;
 use App\Models\CronogramaActividad;
@@ -21,6 +23,8 @@ use Livewire\Attributes\Locked;
 
 class CronogramaPropuesta extends Page
 {
+    use AvisaBorradorGuardado;
+
     use RolDelPanel;
 
     protected static bool $shouldRegisterNavigation = false;
@@ -425,6 +429,7 @@ class CronogramaPropuesta extends Page
                 'Cronograma guardado'
             )
             ->success()
+            ->actions($this->accionesBorrador())
             ->send();
     }
 

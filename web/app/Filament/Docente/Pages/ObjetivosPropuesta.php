@@ -2,6 +2,8 @@
 
 namespace App\Filament\Docente\Pages;
 
+use App\Filament\Concerns\AvisaBorradorGuardado;
+
 use App\Filament\Concerns\RolDelPanel;
 use App\Models\Propuesta;
 use App\Models\PropuestaObjetivo;
@@ -14,6 +16,8 @@ use Livewire\Attributes\Locked;
 
 class ObjetivosPropuesta extends Page
 {
+    use AvisaBorradorGuardado;
+
     use RolDelPanel;
 
     protected static bool $shouldRegisterNavigation = false;
@@ -232,6 +236,7 @@ class ObjetivosPropuesta extends Page
                 'Los objetivos de la propuesta se guardaron correctamente.'
             )
             ->success()
+            ->actions($this->accionesBorrador())
             ->send();
     }
 
