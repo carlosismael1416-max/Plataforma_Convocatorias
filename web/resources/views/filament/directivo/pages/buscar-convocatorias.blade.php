@@ -574,36 +574,26 @@
                 class="search-input"
                 placeholder="Buscar por título, organismo, palabra clave, modalidad o área..."
                 wire:model="buscar"
-                wire:keydown.enter="
-                    aplicarBusqueda
-                "
+                wire:keydown.enter="aplicarBusqueda"
             >
 
             <button
                 type="button"
                 class="search-btn"
-                wire:click="
-                    aplicarBusqueda
-                "
+                wire:click="aplicarBusqueda"
                 wire:loading.attr="disabled"
-                wire:target="
-                    aplicarBusqueda
-                "
+                wire:target="aplicarBusqueda"
             >
                 <span
                     wire:loading.remove
-                    wire:target="
-                        aplicarBusqueda
-                    "
+                    wire:target="aplicarBusqueda"
                 >
                     Buscar
                 </span>
 
                 <span
                     wire:loading
-                    wire:target="
-                        aplicarBusqueda
-                    "
+                    wire:target="aplicarBusqueda"
                 >
                     Buscando...
                 </span>
@@ -739,9 +729,7 @@
                 <input
                     class="date-input"
                     type="date"
-                    wire:model.live="
-                        fechaCierre
-                    "
+                    wire:model.live="fechaCierre"
                 >
 
             </div>

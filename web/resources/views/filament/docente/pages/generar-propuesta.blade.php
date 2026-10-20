@@ -631,10 +631,7 @@
                         type="button"
                         class="gp-button"
                         x-show="! enviando"
-                        x-on:click="
-                            enviando = true;
-                            $wire.crearOContinuar();
-                        "
+                        x-on:click="enviando = true; $wire.crearOContinuar();"
                     >
                         {{
                             $propuestaExistente

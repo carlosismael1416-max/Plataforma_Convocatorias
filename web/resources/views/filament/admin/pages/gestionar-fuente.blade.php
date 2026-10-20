@@ -1443,11 +1443,7 @@
                                 }}
                             "
                             wire:click="alternarEstado"
-                            wire:confirm="{{
-                                $fuente->activa
-                                    ? '¿Deseas desactivar esta fuente?'
-                                    : '¿Deseas activar esta fuente?'
-                            }}"
+                            wire:confirm="{{ $fuente->activa ? '¿Deseas desactivar esta fuente?' : '¿Deseas activar esta fuente?' }}"
                         >
                             {{
                                 $fuente->activa

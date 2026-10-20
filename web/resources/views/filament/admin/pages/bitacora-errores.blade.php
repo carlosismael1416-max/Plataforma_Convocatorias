@@ -491,9 +491,7 @@
                 <button
                     type="button"
                     class="context-remove"
-                    wire:click="
-                        quitarFiltroEjecucion
-                    "
+                    wire:click="quitarFiltroEjecucion"
                 >
                     Quitar filtro
                 </button>
@@ -652,9 +650,7 @@
                     class="filter-control"
                     placeholder="Buscar error..."
                     wire:model="buscar"
-                    wire:keydown.enter="
-                        aplicarFiltros
-                    "
+                    wire:keydown.enter="aplicarFiltros"
                 >
 
 
@@ -737,9 +733,7 @@
                         clear-button
                         search-button
                     "
-                    wire:click="
-                        aplicarFiltros
-                    "
+                    wire:click="aplicarFiltros"
                 >
                     Buscar
                 </button>
@@ -747,9 +741,7 @@
                 <button
                     type="button"
                     class="clear-button"
-                    wire:click="
-                        limpiarFiltros
-                    "
+                    wire:click="limpiarFiltros"
                 >
                     Limpiar filtros
                 </button>

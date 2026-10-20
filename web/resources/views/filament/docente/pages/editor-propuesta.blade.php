@@ -532,9 +532,7 @@
                             class="itsva-input"
                             type="text"
                             maxlength="500"
-                            wire:model.live.debounce.700ms="
-                                titulo
-                            "
+                            wire:model.live.debounce.700ms="titulo"
                             @disabled(! $editable)
                         >
 
@@ -653,9 +651,7 @@
                     <textarea
                         class="itsva-textarea"
                         maxlength="10000"
-                        wire:model.live.debounce.700ms="
-                            resumen
-                        "
+                        wire:model.live.debounce.700ms="resumen"
                         @disabled(! $editable)
                     ></textarea>
 
@@ -703,9 +699,7 @@
                     <textarea
                         class="itsva-textarea"
                         maxlength="10000"
-                        wire:model.live.debounce.700ms="
-                            justificacion
-                        "
+                        wire:model.live.debounce.700ms="justificacion"
                         @disabled(! $editable)
                     ></textarea>
 
@@ -753,9 +747,7 @@
                     <textarea
                         class="itsva-textarea"
                         maxlength="10000"
-                        wire:model.live.debounce.700ms="
-                            metodologia
-                        "
+                        wire:model.live.debounce.700ms="metodologia"
                         placeholder="Describe etapas, actividades, técnicas y métodos..."
                         @disabled(! $editable)
                     ></textarea>
@@ -805,9 +797,7 @@
                     <textarea
                         class="itsva-textarea"
                         maxlength="10000"
-                        wire:model.live.debounce.700ms="
-                            impactoEsperado
-                        "
+                        wire:model.live.debounce.700ms="impactoEsperado"
                         placeholder="Describe los principales resultados e impactos..."
                         @disabled(! $editable)
                     ></textarea>
@@ -839,30 +829,20 @@
                                 btn-secondary
                             "
                             type="button"
-                            wire:click="
-                                guardarBorrador
-                            "
-                            wire:loading.attr="
-                                disabled
-                            "
-                            wire:target="
-                                guardarBorrador
-                            "
+                            wire:click="guardarBorrador"
+                            wire:loading.attr="disabled"
+                            wire:target="guardarBorrador"
                         >
                             <span
                                 wire:loading.remove
-                                wire:target="
-                                    guardarBorrador
-                                "
+                                wire:target="guardarBorrador"
                             >
                                 Guardar borrador
                             </span>
 
                             <span
                                 wire:loading
-                                wire:target="
-                                    guardarBorrador
-                                "
+                                wire:target="guardarBorrador"
                             >
                                 Guardando...
                             </span>
@@ -876,15 +856,9 @@
                             btn-primary
                         "
                         type="button"
-                        wire:click="
-                            continuarAObjetivos
-                        "
-                        wire:loading.attr="
-                            disabled
-                        "
-                        wire:target="
-                            continuarAObjetivos
-                        "
+                        wire:click="continuarAObjetivos"
+                        wire:loading.attr="disabled"
+                        wire:target="continuarAObjetivos"
                     >
                         Continuar a Objetivos →
                     </button>

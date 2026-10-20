@@ -622,11 +622,7 @@
                                     type="button"
                                     class="day-add"
                                     title="Agregar evento"
-                                    wire:click="
-                                        abrirNuevoEvento(
-                                            '{{ $fecha }}'
-                                        )
-                                    "
+                                    wire:click="abrirNuevoEvento( '{{ $fecha }}' )"
                                 >
                                     +
                                 </button>
@@ -698,11 +694,7 @@
 
                                 <button
                                     type="button"
-                                    wire:click="
-                                        editarEvento(
-                                            {{ $evento['id'] }}
-                                        )
-                                    "
+                                    wire:click="editarEvento( {{ $evento['id'] }} )"
                                     class="
                                         cal-event
                                         {{ $claseEvento }}
@@ -807,11 +799,7 @@
                                 <button
                                     type="button"
                                     class="tiny-btn"
-                                    wire:click="
-                                        editarEvento(
-                                            {{ $evento['id'] }}
-                                        )
-                                    "
+                                    wire:click="editarEvento( {{ $evento['id'] }} )"
                                 >
                                     Editar
                                 </button>
@@ -822,14 +810,8 @@
                                         tiny-btn
                                         tiny-danger
                                     "
-                                    wire:click="
-                                        eliminarEvento(
-                                            {{ $evento['id'] }}
-                                        )
-                                    "
-                                    wire:confirm="
-                                        ¿Eliminar este evento?
-                                    "
+                                    wire:click="eliminarEvento( {{ $evento['id'] }} )"
+                                    wire:confirm="¿Eliminar este evento?"
                                 >
                                     Eliminar
                                 </button>
@@ -931,9 +913,7 @@
                     <button
                         type="button"
                         class="modal-close"
-                        wire:click="
-                            cerrarNuevoEvento
-                        "
+                        wire:click="cerrarNuevoEvento"
                     >
                         ×
                     </button>
@@ -981,9 +961,7 @@
                             </label>
 
                             <select
-                                wire:model="
-                                    convocatoriaEvento
-                                "
+                                wire:model="convocatoriaEvento"
                             >
                                 <option value="">
                                     Sin convocatoria
@@ -1063,9 +1041,7 @@
 
                                 <input
                                     type="checkbox"
-                                    wire:model.live="
-                                        recordatorioEvento
-                                    "
+                                    wire:model.live="recordatorioEvento"
                                 >
 
                                 <span>
@@ -1128,9 +1104,7 @@
                                 </label>
 
                                 <select
-                                    wire:model="
-                                        minutosRecordatorio
-                                    "
+                                    wire:model="minutosRecordatorio"
                                 >
                                     <option value="">
                                         Sin anticipación
@@ -1170,9 +1144,7 @@
 
                             <textarea
                                 rows="4"
-                                wire:model="
-                                    descripcionEvento
-                                "
+                                wire:model="descripcionEvento"
                                 placeholder="Descripción del evento"
                             ></textarea>
 
@@ -1202,16 +1174,8 @@
                                     cal-btn
                                     tiny-danger
                                 "
-                                wire:click="
-                                    eliminarEvento(
-                                        {{
-                                            $eventoEditandoId
-                                        }}
-                                    )
-                                "
-                                wire:confirm="
-                                    ¿Eliminar este evento?
-                                "
+                                wire:click="eliminarEvento( {{ $eventoEditandoId }} )"
+                                wire:confirm="¿Eliminar este evento?"
                             >
                                 Eliminar
                             </button>
@@ -1225,9 +1189,7 @@
                         <button
                             type="button"
                             class="cal-btn"
-                            wire:click="
-                                cerrarNuevoEvento
-                            "
+                            wire:click="cerrarNuevoEvento"
                         >
                             Cancelar
                         </button>
@@ -1238,10 +1200,7 @@
                             <button
                                 type="button"
                                 x-show="! enviando"
-                                x-on:click="
-                                    enviando = true;
-                                    $wire.guardarEvento();
-                                "
+                                x-on:click="enviando = true; $wire.guardarEvento();"
                                 class="
                                     cal-btn
                                     cal-btn-primary

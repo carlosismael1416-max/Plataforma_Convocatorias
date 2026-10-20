@@ -805,13 +805,7 @@
                                         <button
                                             type="button"
                                             class="mini-btn"
-                                            wire:click="
-                                                descargarCotizacion(
-                                                    {{
-                                                        $cotizacion->id
-                                                    }}
-                                                )
-                                            "
+                                            wire:click="descargarCotizacion( {{ $cotizacion->id }} )"
                                         >
                                             Descargar
                                         </button>
@@ -825,13 +819,7 @@
                                     <button
                                         type="button"
                                         class="mini-btn"
-                                        wire:click="
-                                            editarCotizacion(
-                                                {{
-                                                    $cotizacion->id
-                                                }}
-                                            )
-                                        "
+                                        wire:click="editarCotizacion( {{ $cotizacion->id }} )"
                                     >
                                         Editar
                                     </button>
@@ -842,16 +830,8 @@
                                             mini-btn
                                             mini-danger
                                         "
-                                        wire:click="
-                                            eliminarCotizacion(
-                                                {{
-                                                    $cotizacion->id
-                                                }}
-                                            )
-                                        "
-                                        wire:confirm="
-                                            ¿Eliminar esta cotización?
-                                        "
+                                        wire:click="eliminarCotizacion( {{ $cotizacion->id }} )"
+                                        wire:confirm="¿Eliminar esta cotización?"
                                     >
                                         Eliminar
                                     </button>
@@ -917,9 +897,7 @@
 
                                 <select
                                     class="select"
-                                    wire:model.live="
-                                        presupuestoItemId
-                                    "
+                                    wire:model.live="presupuestoItemId"
                                 >
                                     <option value="">
                                         Seleccionar concepto
@@ -1000,9 +978,7 @@
                                 <input
                                     type="date"
                                     class="input"
-                                    wire:model="
-                                        fechaCotizacion
-                                    "
+                                    wire:model="fechaCotizacion"
                                 >
 
                                 @error('fechaCotizacion')
@@ -1082,9 +1058,7 @@
                             <input
                                 type="file"
                                 class="input"
-                                wire:model="
-                                    archivoCotizacion
-                                "
+                                wire:model="archivoCotizacion"
                                 accept="
                                     .pdf,.jpg,.jpeg,.png
                                 "
@@ -1092,9 +1066,7 @@
 
                             <div
                                 wire:loading
-                                wire:target="
-                                    archivoCotizacion
-                                "
+                                wire:target="archivoCotizacion"
                                 style="
                                     margin-top:6px;
                                     font-size:12px;
@@ -1141,9 +1113,7 @@
                                 <button
                                     type="button"
                                     class="btn"
-                                    wire:click="
-                                        cancelarEdicion
-                                    "
+                                    wire:click="cancelarEdicion"
                                 >
                                     Cancelar
                                 </button>
@@ -1156,15 +1126,9 @@
                                     btn
                                     btn-primary
                                 "
-                                wire:click="
-                                    guardarCotizacion
-                                "
-                                wire:loading.attr="
-                                    disabled
-                                "
-                                wire:target="
-                                    guardarCotizacion
-                                "
+                                wire:click="guardarCotizacion"
+                                wire:loading.attr="disabled"
+                                wire:target="guardarCotizacion"
                             >
                                 {{
                                     $cotizacionEditandoId
@@ -1182,9 +1146,7 @@
                         <button
                             type="button"
                             class="btn"
-                            wire:click="
-                                volverAPresupuesto
-                            "
+                            wire:click="volverAPresupuesto"
                         >
                             ← Volver a Presupuesto
                         </button>
@@ -1195,9 +1157,7 @@
                                 btn
                                 btn-primary
                             "
-                            wire:click="
-                                continuarACronograma
-                            "
+                            wire:click="continuarACronograma"
                         >
                             Continuar a Cronograma →
                         </button>
@@ -1215,9 +1175,7 @@
                         <button
                             type="button"
                             class="btn"
-                            wire:click="
-                                volverAPresupuesto
-                            "
+                            wire:click="volverAPresupuesto"
                         >
                             ← Volver a Presupuesto
                         </button>
@@ -1228,9 +1186,7 @@
                                 btn
                                 btn-primary
                             "
-                            wire:click="
-                                continuarACronograma
-                            "
+                            wire:click="continuarACronograma"
                         >
                             Continuar a Cronograma →
                         </button>

@@ -632,9 +632,7 @@
                     <textarea
                         class="textarea"
                         maxlength="800"
-                        wire:model.live.debounce.700ms="
-                            objetivoGeneral
-                        "
+                        wire:model.live.debounce.700ms="objetivoGeneral"
                         @disabled(! $editable)
                     ></textarea>
 
@@ -684,12 +682,7 @@
 
                     <div
                         class="objective-item"
-                        wire:key="
-                            objetivo-especifico-{{
-                                $objetivo['id']
-                                ?? 'nuevo-'.$indice
-                            }}
-                        "
+                        wire:key="objetivo-especifico-{{ $objetivo['id'] ?? 'nuevo-'.$indice }}"
                     >
 
                         <div class="objective-top">
@@ -712,11 +705,7 @@
                                     <button
                                         type="button"
                                         class="order-btn"
-                                        wire:click="
-                                            subirObjetivo(
-                                                {{ $indice }}
-                                            )
-                                        "
+                                        wire:click="subirObjetivo( {{ $indice }} )"
                                         @disabled(
                                             $indice === 0
                                         )
@@ -730,11 +719,7 @@
                                     <button
                                         type="button"
                                         class="order-btn"
-                                        wire:click="
-                                            bajarObjetivo(
-                                                {{ $indice }}
-                                            )
-                                        "
+                                        wire:click="bajarObjetivo( {{ $indice }} )"
                                         @disabled(
                                             $indice ===
                                             count(
@@ -751,14 +736,8 @@
                                     <button
                                         type="button"
                                         class="remove-btn"
-                                        wire:click="
-                                            eliminarObjetivoEspecifico(
-                                                {{ $indice }}
-                                            )
-                                        "
-                                        wire:confirm="
-                                            ¿Eliminar este objetivo específico?
-                                        "
+                                        wire:click="eliminarObjetivoEspecifico( {{ $indice }} )"
+                                        wire:confirm="¿Eliminar este objetivo específico?"
                                     >
                                         Eliminar
                                     </button>
@@ -774,11 +753,7 @@
                             <textarea
                                 class="textarea"
                                 maxlength="600"
-                                wire:model.live.debounce.700ms="
-                                    objetivosEspecificos.{{
-                                        $indice
-                                    }}.descripcion
-                                "
+                                wire:model.live.debounce.700ms="objetivosEspecificos.{{ $indice }}.descripcion"
                                 @disabled(! $editable)
                             ></textarea>
 
@@ -829,9 +804,7 @@
                     <button
                         type="button"
                         class="add-objective"
-                        wire:click="
-                            agregarObjetivoEspecifico
-                        "
+                        wire:click="agregarObjetivoEspecifico"
                     >
                         + Agregar objetivo específico
                     </button>
@@ -857,15 +830,9 @@
                             btn-itsva
                             btn-primary
                         "
-                        wire:click="
-                            continuarARequisitos
-                        "
-                        wire:loading.attr="
-                            disabled
-                        "
-                        wire:target="
-                            continuarARequisitos
-                        "
+                        wire:click="continuarARequisitos"
+                        wire:loading.attr="disabled"
+                        wire:target="continuarARequisitos"
                     >
                         Continuar a Requisitos →
                     </button>

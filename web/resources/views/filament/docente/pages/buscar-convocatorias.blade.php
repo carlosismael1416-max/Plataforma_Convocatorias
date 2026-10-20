@@ -597,16 +597,7 @@
 
         <div
             wire:loading.delay
-            wire:target="
-                buscar,
-                categoria,
-                organismo,
-                estado,
-                cierre,
-                orden,
-                limpiarFiltros,
-                guardarConvocatoria
-            "
+            wire:target="buscar, categoria, organismo, estado, cierre, orden, limpiarFiltros, guardarConvocatoria"
             style="
                 margin-bottom:12px;
                 color:#2563EB;
