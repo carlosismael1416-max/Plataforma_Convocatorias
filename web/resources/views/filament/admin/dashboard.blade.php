@@ -89,7 +89,7 @@
                                 @if ($ciclo['duracion'])
                                     · {{ $ciclo['duracion'] }} s
                                 @endif
-                                · {{ ucfirst(mb_strtolower($ciclo['estado'])) }}
+                                · {{ $ciclo['etiqueta'] }}
                                 @if ($ciclo['atrasado'])
                                     · atrasado (el ciclo corre cada 6 h)
                                 @endif
@@ -195,7 +195,11 @@
                             <div class="dd-estado-fila">
                                 <span class="dd-punto" style="background: {{ ['ok' => '#10B981', 'aviso' => '#F59E0B', 'mal' => '#EF4444'][$s['estado']] }}"></span>
                                 <span>{{ $s['etiqueta'] }}</span>
-                                <strong class="dd-{{ $s['estado'] }}">{{ $s['texto'] }}</strong>
+                                @if (! empty($s['url']))
+                                    <a href="{{ $s['url'] }}" class="dd-{{ $s['estado'] }}" style="font-weight: 700; text-decoration: none" title="Ver detalle en la bitácora de errores">{{ $s['texto'] }} →</a>
+                                @else
+                                    <strong class="dd-{{ $s['estado'] }}">{{ $s['texto'] }}</strong>
+                                @endif
                             </div>
                         @endforeach
                     </div>

@@ -411,6 +411,11 @@ def seguir_convocatorias(*, terminar_antes_de: float, limite: int = MAX_POR_CICL
             except Exception as error:  # noqa: BLE001 - se registra y se sigue con la siguiente
                 estado = "ERROR"
                 print("Error al seguir la convocatoria", conv["id"], error)
+                # El detalle va a la bitácora (app/bitacora.py) al final del ciclo.
+                resultado["resultados"].append({"id": conv["id"], "estado": "ERROR", "error": f"{type(error).__name__}: {error}"})
+                resultado["revisadas"] += 1
+                resultado["errores"] += 1
+                continue
 
             resultado["revisadas"] += 1
             resultado["con_cambios"] += estado == "CAMBIOS"

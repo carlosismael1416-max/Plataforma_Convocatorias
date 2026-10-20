@@ -176,8 +176,8 @@ def liberar_ejecuciones_vencidas(cursor) -> int:
             'EJECUCION_ABANDONADA',
             %s,
             false,
-            NOW(),
-            NOW()
+            NOW() AT TIME ZONE 'UTC',
+            NOW() AT TIME ZONE 'UTC'
         FROM ejecuciones_scraping es
         LEFT JOIN ejecucion_fuentes ef
             ON ef.ejecucion_scraping_id = es.id
@@ -382,8 +382,8 @@ def marcar_fallo_arranque(
                     %s,
                     %s,
                     false,
-                    NOW(),
-                    NOW()
+                    NOW() AT TIME ZONE 'UTC',
+                    NOW() AT TIME ZONE 'UTC'
                 )
                 """,
                 (
@@ -406,6 +406,18 @@ class AnalizarUrlRequest(BaseModel):
 
 # Un análisis a la vez: descarga la página y sus PDF (bajo consumo).
 _ANALISIS_EN_CURSO = threading.Lock()
+
+
+def _registrar_en_bitacora(tipo: str, mensaje: str, url: str | None = None) -> None:
+    """La bitácora nunca debe convertir un error en otro."""
+    try:
+        from app.bitacora import registrar_incidencia
+
+        with conectar() as conexion:
+            registrar_incidencia(conexion, tipo=tipo, mensaje=mensaje, url=url)
+            conexion.commit()
+    except Exception:  # noqa: BLE001
+        pass
 
 
 @app.post("/convocatorias/analizar-url")
@@ -446,6 +458,7 @@ def analizar_url_endpoint(
         raise HTTPException(status_code=503, detail="No se pudo consultar PostgreSQL.")
 
     except Exception as error:
+        _registrar_en_bitacora("API", f"Analizar enlace: {type(error).__name__}: {error}", url=datos.url)
         raise HTTPException(
             status_code=502,
             detail=f"No se pudo extraer la convocatoria: {type(error).__name__}.",

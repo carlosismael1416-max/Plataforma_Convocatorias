@@ -1,1028 +1,149 @@
 <x-filament-panels::page>
-    <style>
-        .error-log {
-            --text: #0F1827;
-            --muted: #64748B;
-            --primary: #059669;
-            --primary-dark: #047857;
-            --primary-soft: #D1FAE5;
-            --border: #DDE3EE;
-            --warning: #D97706;
-            --danger: #DC2626;
-
-            color: var(--text);
-        }
-
-        .error-log * {
-            box-sizing: border-box;
-        }
-
-        .page-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            gap: 20px;
-            margin-bottom: 22px;
-        }
-
-        .page-title {
-            margin: 0;
-            font-size: 26px;
-            font-weight: 850;
-        }
-
-        .page-subtitle {
-            margin-top: 7px;
-            color: var(--muted);
-            font-size: 14px;
-        }
-
-        .role-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 7px;
-            padding: 7px 11px;
-            border-radius: 999px;
-            background: var(--primary-soft);
-            color: var(--primary-dark);
-            font-size: 12px;
-            font-weight: 850;
-        }
-
-        .role-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: var(--primary);
-        }
-
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(4, minmax(0, 1fr));
-            gap: 14px;
-            margin-bottom: 20px;
-        }
-
-        .stat {
-            padding: 18px;
-            border: 1px solid var(--border);
-            border-radius: 14px;
-            background: white;
-        }
-
-        .stat-icon {
-            width: 38px;
-            height: 38px;
-            margin-bottom: 12px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            font-weight: 900;
-        }
-
-        .red {
-            background: #FEE2E2;
-            color: #B91C1C;
-        }
-
-        .yellow {
-            background: #FEF3C7;
-            color: #B45309;
-        }
-
-        .green {
-            background: #D1FAE5;
-            color: #047857;
-        }
-
-        .blue {
-            background: #DBEAFE;
-            color: #1D4ED8;
-        }
-
-        .stat-value {
-            font-size: 25px;
-            font-weight: 900;
-        }
-
-        .stat-label {
-            margin-top: 3px;
-            color: #475569;
-            font-size: 11px;
-            font-weight: 800;
-        }
-
-        .stat-help {
-            margin-top: 4px;
-            color: #94A3B8;
-            font-size: 12px;
-        }
-
-        .filters-card,
-        .table-card {
-            margin-bottom: 20px;
-            padding: 20px;
-            border: 1px solid var(--border);
-            border-radius: 15px;
-            background: white;
-        }
-
-        .section-title {
-            font-size: 14px;
-            font-weight: 850;
-        }
-
-        .section-description {
-            margin-top: 4px;
-            color: var(--muted);
-            font-size: 12px;
-        }
-
-        .filters {
-            display: grid;
-            grid-template-columns: 1.4fr repeat(3, 1fr);
-            gap: 11px;
-            margin-top: 16px;
-        }
-
-        .field {
-            min-height: 41px;
-            padding: 0 12px;
-            border: 1px solid var(--border);
-            border-radius: 9px;
-            background: #FBFCFE;
-            color: #64748B;
-            display: flex;
-            align-items: center;
-            font-size: 12px;
-        }
-
-        .errors-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 18px;
-        }
-
-        .errors-table th {
-            padding: 11px 12px;
-            background: #F8FAFC;
-            border-bottom: 1px solid var(--border);
-            color: #64748B;
-            font-size: 12px;
-            font-weight: 850;
-            text-align: left;
-        }
-
-        .errors-table td {
-            padding: 14px 12px;
-            border-bottom: 1px solid #EEF2F7;
-            color: #475569;
-            font-size: 12px;
-            vertical-align: middle;
-        }
-
-        .errors-table tr:last-child td {
-            border-bottom: 0;
-        }
-
-        .error-title {
-            color: #334155;
-            font-size: 12px;
-            font-weight: 850;
-        }
-
-        .error-code {
-            display: inline-flex;
-            margin-top: 4px;
-            padding: 3px 6px;
-            border-radius: 5px;
-            background: #F1F5F9;
-            color: #475569;
-            font-family: monospace;
-            font-size: 11px;
-        }
-
-        .badge {
-            display: inline-flex;
-            padding: 5px 8px;
-            border-radius: 999px;
-            font-size: 11px;
-            font-weight: 850;
-            white-space: nowrap;
-        }
-
-        .badge-error {
-            background: #FEE2E2;
-            color: #B91C1C;
-        }
-
-        .badge-warning {
-            background: #FEF3C7;
-            color: #92400E;
-        }
-
-        .badge-open {
-            background: #FEE2E2;
-            color: #B91C1C;
-        }
-
-        .badge-resolved {
-            background: #D1FAE5;
-            color: #047857;
-        }
-
-        .action {
-            color: var(--primary);
-            font-size: 12px;
-            font-weight: 850;
-            text-decoration: none;
-        }
-
-        .source-summary {
-            display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: 12px;
-            margin-bottom: 20px;
-        }
-
-        .source-card {
-            padding: 16px;
-            border: 1px solid var(--border);
-            border-radius: 13px;
-            background: white;
-        }
-
-        .source-name {
-            color: #334155;
-            font-size: 11px;
-            font-weight: 850;
-        }
-
-        .source-count {
-            margin-top: 9px;
-            font-size: 22px;
-            font-weight: 900;
-        }
-
-        .source-meta {
-            margin-top: 3px;
-            color: #94A3B8;
-            font-size: 12px;
-        }
-
-        .notice {
-            padding: 13px;
-            border: 1px solid #A7F3D0;
-            border-radius: 10px;
-            background: #ECFDF5;
-            color: #047857;
-            font-size: 12px;
-            line-height: 1.5;
-        }
-
-        @media (max-width: 1000px) {
-            .stats {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-            .filters {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-            .source-summary {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        @media (max-width: 650px) {
-            .page-header {
-                flex-direction: column;
-            }
-
-            .stats,
-            .filters {
-                grid-template-columns: 1fr;
-            }
-        }
-    
-        .filter-control {
-            width: 100%;
-            min-height: 41px;
-            padding: 0 12px;
-            border: 1px solid var(--border);
-            border-radius: 9px;
-            outline: none;
-            background: #FBFCFE;
-            color: #475569;
-            font-size: 12px;
-        }
-
-        .filter-control:focus {
-            border-color: var(--primary);
-            background: white;
-        }
-
-        .filters-actions {
-            display: flex;
-            justify-content: flex-end;
-            margin-top: 12px;
-        }
-
-        .clear-button {
-            min-height: 35px;
-            padding: 0 12px;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            background: white;
-            color: #64748B;
-            font-size: 12px;
-            font-weight: 850;
-            cursor: pointer;
-        }
-
-        .clear-button:hover {
-            border-color: var(--primary);
-            color: var(--primary);
-        }
-
-        .context-filter {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 14px;
-            margin-bottom: 20px;
-            padding: 13px 15px;
-            border: 1px solid #BFDBFE;
-            border-radius: 10px;
-            background: #EFF6FF;
-            color: #1D4ED8;
-            font-size: 12px;
-        }
-
-        .context-filter strong {
-            font-weight: 900;
-        }
-
-        .context-remove {
-            border: 0;
-            background: transparent;
-            color: #1D4ED8;
-            font-size: 12px;
-            font-weight: 850;
-            cursor: pointer;
-        }
-
-        .clickable-row {
-            cursor: pointer;
-            transition: background .12s ease;
-        }
-
-        .clickable-row:hover td {
-            background: #FAFFFC;
-        }
-
-        .empty-row td {
-            padding: 34px 18px;
-            text-align: center;
-        }
-
-        .empty-title {
-            margin-bottom: 5px;
-            color: #475569;
-            font-size: 11px;
-            font-weight: 850;
-        }
-
-        .empty-text {
-            color: #94A3B8;
-            font-size: 12px;
-            line-height: 1.6;
-        }
-
-        .pagination-wrap {
-            margin-top: 18px;
-        }
-
-        .source-empty {
-            margin-bottom: 20px;
-            padding: 18px;
-            border: 1px dashed #CBD5E1;
-            border-radius: 12px;
-            background: #F8FAFC;
-            color: #64748B;
-            text-align: center;
-            font-size: 12px;
-        }
-
-
-        .filters-actions {
-            gap: 9px;
-        }
-
-        .search-button {
-            min-width: 100px;
-            border-color: var(--primary);
-            background: var(--primary);
-            color: white;
-        }
-
-        .search-button:hover {
-            border-color: var(--primary-dark);
-            background: var(--primary-dark);
-            color: white;
-        }
-\n</style>
-
-    <div class="error-log">
-
-        <div class="page-header">
-
-            <div>
-
-                <h1 class="page-title">
-                    Bitácora de Errores
-                </h1>
-
-                <div class="page-subtitle">
-                    Consulta las incidencias reales
-                    registradas durante la extracción
-                    y procesamiento de información.
-                </div>
-
-            </div>
-
-            <div class="role-badge">
-                <span class="role-dot"></span>
-                Administrador
-            </div>
-
-        </div>
-
-
-        @if ($ejecucion !== null)
-
-            <div class="context-filter">
-
-                <div>
-
-                    Mostrando errores de
-
-                    <strong>
-                        Ejecución #{{ $ejecucion }}
-                    </strong>
-
-                    @if ($ejecucionContexto)
-
-                        ·
-                        {{
-                            $ejecucionContexto
-                                ->fecha_inicio
-                                ?->format(
-                                    'd/m/Y H:i'
-                                )
-                        }}
-
-                    @endif
-
-                </div>
-
-                <button
-                    type="button"
-                    class="context-remove"
-                    wire:click="quitarFiltroEjecucion"
-                >
-                    Quitar filtro
-                </button>
-
-            </div>
-
-        @endif
-
-
-        <div class="stats">
-
-            <div class="stat">
-
-                <div class="stat-icon red">{!! \App\Filament\Apariencia\Iconos::svg('alerta', 20) !!}</div>
-
-                <div class="stat-value">
-                    {{ $totalErrores }}
-                </div>
-
-                <div class="stat-label">
-                    Errores registrados
-                </div>
-
-                <div class="stat-help">
-                    Total almacenado
-                    en la bitácora
-                </div>
-
-            </div>
-
-
-            <div class="stat">
-
-                <div class="stat-icon yellow">{!! \App\Filament\Apariencia\Iconos::svg('reloj', 20) !!}</div>
-
-                <div class="stat-value">
-                    {{ $pendientes }}
-                </div>
-
-                <div class="stat-label">
-                    Pendientes
-                </div>
-
-                <div class="stat-help">
-                    Requieren atención
-                </div>
-
-            </div>
-
-
-            <div class="stat">
-
-                <div class="stat-icon green">{!! \App\Filament\Apariencia\Iconos::svg('aprobado', 20) !!}</div>
-
-                <div class="stat-value">
-                    {{ $resueltos }}
-                </div>
-
-                <div class="stat-label">
-                    Resueltos
-                </div>
-
-                <div class="stat-help">
-                    Incidencias atendidas
-                </div>
-
-            </div>
-
-
-            <div class="stat">
-
-                <div class="stat-icon blue">{!! \App\Filament\Apariencia\Iconos::svg('globo', 20) !!}</div>
-
-                <div class="stat-value">
-                    {{ $fuentesRegistradas }}
-                </div>
-
-                <div class="stat-label">
-                    Fuentes registradas
-                </div>
-
-                <div class="stat-help">
-                    Configuradas
-                    en el sistema
-                </div>
-
-            </div>
-
-        </div>
-
-
-        @if ($topFuentes->isNotEmpty())
-
-            <div class="source-summary">
-
-                @foreach (
-                    $topFuentes
-                    as $item
-                )
-
-                    <div class="source-card">
-
-                        <div class="source-name">
-
-                            {{
-                                $item
-                                    ->fuente
-                                    ?->nombre
-                                ?? 'Fuente eliminada'
-                            }}
-
-                        </div>
-
-                        <div class="source-count">
-
-                            {{ $item->total }}
-
-                        </div>
-
-                        <div class="source-meta">
-                            Errores registrados
-                        </div>
-
-                    </div>
-
-                @endforeach
-
-            </div>
-
-        @else
-
-            <div class="source-empty">
-                No existen fuentes con
-                incidencias registradas.
-            </div>
-
-        @endif
-
-
-        <section class="filters-card">
-
-            <div class="section-title">
-                Buscar y filtrar
-            </div>
-
-            <div class="section-description">
-                Localiza incidencias por mensaje,
-                código, tipo, fuente o estado.
-            </div>
-
-
-            <div class="filters">
-
-                <input
-                    type="search"
-                    class="filter-control"
-                    placeholder="Buscar error..."
-                    wire:model="buscar"
-                    wire:keydown.enter="aplicarFiltros"
-                >
-
-
-                <select
-                    class="filter-control"
-                    wire:model.live="tipo"
-                >
-                    <option value="">
-                        Todos los tipos
-                    </option>
-
-                    @foreach (
-                        $tiposError
-                        as $valor => $etiqueta
-                    )
-
-                        <option
-                            value="{{ $valor }}"
-                        >
-                            {{ $etiqueta }}
-                        </option>
-
-                    @endforeach
-                </select>
-
-
-                <select
-                    class="filter-control"
-                    wire:model.live="fuente"
-                >
-                    <option value="">
-                        Todas las fuentes
-                    </option>
-
-                    @foreach (
-                        $fuentes
-                        as $fuenteFiltro
-                    )
-
-                        <option
-                            value="{{
-                                $fuenteFiltro->id
-                            }}"
-                        >
-                            {{
-                                $fuenteFiltro
-                                    ->nombre
-                            }}
-                        </option>
-
-                    @endforeach
-                </select>
-
-
-                <select
-                    class="filter-control"
-                    wire:model.live="estado"
-                >
-                    <option value="">
-                        Todos los estados
-                    </option>
-
-                    <option value="pendiente">
-                        Pendiente
-                    </option>
-
-                    <option value="resuelto">
-                        Resuelto
-                    </option>
-                </select>
-
-            </div>
-
-
-            <div class="filters-actions">
-
-                <button
-                    type="button"
-                    class="
-                        clear-button
-                        search-button
-                    "
-                    wire:click="aplicarFiltros"
-                >
-                    Buscar
-                </button>
-
-                <button
-                    type="button"
-                    class="clear-button"
-                    wire:click="limpiarFiltros"
-                >
-                    Limpiar filtros
-                </button>
-
-            </div>
-
-        </section>
-
-
-        <section class="table-card">
-
-            <div class="section-title">
-                Incidencias registradas
-            </div>
-
-            <div class="section-description">
-                Historial almacenado en
-                bitacora_errores.
-            </div>
-
-
-            <div style="overflow-x:auto;">
-
-                <table class="errors-table">
-
-                    <thead>
-
-                        <tr>
-                            <th>Error</th>
-                            <th>Tipo</th>
-                            <th>Fuente</th>
-                            <th>Ejecución</th>
-                            <th>Fecha</th>
-                            <th>Estado</th>
-                            <th></th>
-                        </tr>
-
-                    </thead>
-
-
-                    <tbody>
-
-                        @forelse (
-                            $errores
-                            as $error
-                        )
-
-                            <tr
-                                class="clickable-row"
-                                onclick="
-                                    window.location.href=
-                                    '{{
-                                        route(
-                                            'filament.admin.pages.detalle-error',
-                                            [
-                                                'record' =>
-                                                    $error->id,
-                                            ]
-                                        )
-                                    }}'
-                                "
-                            >
-
-                                <td>
-
-                                    <div class="error-title">
-                                        {{
-                                            $error->mensaje
-                                        }}
-                                    </div>
-
-                                    @if (
-                                        $error
-                                            ->codigo_error
-                                    )
-
-                                        <span class="error-code">
-                                            {{
-                                                $error
-                                                    ->codigo_error
-                                            }}
-                                        </span>
-
-                                    @endif
-
-                                </td>
-
-
-                                <td>
-
-                                    @if ($error->tipo_error)
-
-                                        <span
-                                            class="
-                                                badge
-                                                badge-warning
-                                            "
-                                        >
-                                            {{
-                                                $error
-                                                    ->tipo_error
-                                            }}
-                                        </span>
-
-                                    @else
-
-                                        —
-
-                                    @endif
-
-                                </td>
-
-
-                                <td>
-
-                                    {{
-                                        $error
-                                            ->fuente
-                                            ?->nombre
-                                        ?? 'Sin fuente'
-                                    }}
-
-                                </td>
-
-
-                                <td>
-
-                                    @if (
-                                        $error
-                                            ->ejecucion_scraping_id
-                                    )
-
-                                        #{{
-                                            $error
-                                                ->ejecucion_scraping_id
-                                        }}
-
-                                    @else
-
-                                        —
-
-                                    @endif
-
-                                </td>
-
-
-                                <td>
-
-                                    {{
-                                        $error
-                                            ->created_at
-                                            ?->format(
-                                                'd/m/Y H:i'
-                                            )
-                                        ?? '—'
-                                    }}
-
-                                </td>
-
-
-                                <td>
-
-                                    <span
-                                        class="
-                                            badge
-                                            {{
-                                                $error
-                                                    ->resuelto
-                                                    ? 'badge-resolved'
-                                                    : 'badge-open'
-                                            }}
-                                        "
-                                    >
-                                        {{
-                                            $error
-                                                ->resuelto
-                                                ? 'Resuelto'
-                                                : 'Pendiente'
-                                        }}
-                                    </span>
-
-                                </td>
-
-
-                                <td>
-
-                                    <a
-                                        href="{{
-                                            route(
-                                                'filament.admin.pages.detalle-error',
-                                                [
-                                                    'record' =>
-                                                        $error->id,
-                                                ]
-                                            )
-                                        }}"
-                                        class="action"
-                                        onclick="
-                                            event.stopPropagation()
-                                        "
-                                    >
-                                        Ver detalle
-                                    </a>
-
-                                </td>
-
-                            </tr>
-
-
-                        @empty
-
-                            <tr class="empty-row">
-
-                                <td colspan="7">
-
-                                    <div class="empty-title">
-                                        Sin errores registrados
-                                    </div>
-
-                                    <div class="empty-text">
-
-                                        @if (
-                                            $buscar !== ''
-                                            || $tipo !== ''
-                                            || $fuente !== ''
-                                            || $estado !== ''
-                                            || $ejecucion !== null
-                                        )
-
-                                            No existen incidencias
-                                            que coincidan con los
-                                            filtros seleccionados.
-
-                                        @else
-
-                                            El sistema todavía no
-                                            ha registrado incidencias
-                                            en la bitácora.
-
-                                        @endif
-
-                                    </div>
-
-                                </td>
-
-                            </tr>
-
-                        @endforelse
-
-                    </tbody>
-
-                </table>
-
-            </div>
-
-
-            @if ($errores->hasPages())
-
-                <div class="pagination-wrap">
-                    {{ $errores->links('pagination.itsva') }}
-                </div>
-
-            @endif
-
-        </section>
-
-
-        <div class="notice">
-
-            La información mostrada proviene
-            directamente de
-
-            <strong>
-                bitacora_errores
-            </strong>.
-
-            No se generan incidencias ficticias
-            para completar la interfaz.
-
-        </div>
-
+@php
+    $colores = [
+        'red' => ['#FEE2E2', '#B91C1C'], 'yellow' => ['#FEF3C7', '#B45309'],
+        'green' => ['#D1FAE5', '#047857'], 'blue' => ['#DBEAFE', '#1D4ED8'],
+    ];
+    $origenes = ['motor' => ['Motor', '#EDE9FE', '#6D28D9'], 'web' => ['Web', '#DBEAFE', '#1D4ED8'], 'api' => ['API', '#CFFAFE', '#0E7490']];
+    $hayFiltros = trim($buscar) !== '' || $tipo !== '' || $fuente !== '' || $estado !== '' || $ejecucion !== null;
+@endphp
+
+<style>
+    .bit { color: #0F1827; }
+    .bit-cab h2 { margin: 0; font: 800 22px 'DM Sans', sans-serif; }
+    .bit-cab p { margin: 6px 0 18px; color: #64748B; font-size: 14px; max-width: 860px; line-height: 1.5; }
+    .bit-tarjetas { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-bottom: 16px; }
+    .bit-tarjeta { display: flex; gap: 12px; align-items: center; width: 100%; padding: 16px; border: 1px solid #DDE3EE; border-radius: 14px; background: #fff; text-align: left; font: inherit; cursor: pointer; transition: box-shadow .15s, transform .15s, border-color .15s; }
+    .bit-tarjeta:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(15, 24, 39, .08); }
+    .bit-tarjeta.activa { border-color: #059669; box-shadow: 0 0 0 2px rgba(5, 150, 105, .18); }
+    .bit-icono { width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .bit-valor { font: 800 24px 'DM Sans', sans-serif; line-height: 1.1; }
+    .bit-etq { font-size: 13px; font-weight: 700; }
+    .bit-ayuda { color: #94A3B8; font-size: 11px; }
+
+    .bit-filtros { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 16px; padding: 12px; border: 1px solid #DDE3EE; border-radius: 14px; background: #fff; }
+    .bit-filtros input, .bit-filtros select { min-height: 40px; max-width: 100%; border: 1px solid #DDE3EE; border-radius: 9px; padding: 0 12px; font-size: 13px; background: #F8FAFC; color: #0F1827; }
+    .bit-filtros input { flex: 1 1 280px; }
+    .bit-limpiar { border: 0; background: transparent; color: #047857; font-size: 13px; font-weight: 700; cursor: pointer; }
+    .bit-contexto { display: flex; gap: 10px; align-items: center; margin-bottom: 14px; padding: 10px 14px; border-radius: 12px; background: #EFF6FF; color: #1E3A8A; font-size: 13px; }
+
+    .bit-lista { overflow: hidden; border: 1px solid #DDE3EE; border-radius: 16px; background: #fff; }
+    .bit-fila { display: grid; grid-template-columns: 40px minmax(0, 1fr) auto; gap: 14px; align-items: start; padding: 14px 18px; border-top: 1px solid #F1F5F9; }
+    .bit-fila:first-child { border-top: 0; }
+    .bit-fila-icono { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; background: #F1F5F9; font-size: 17px; }
+    .bit-chips { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-bottom: 4px; }
+    .bit-chip { padding: 2px 9px; border-radius: 999px; font-size: 11px; font-weight: 700; }
+    .bit-mensaje { font-size: 14px; font-weight: 600; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; word-break: break-word; }
+    .bit-sub { margin-top: 3px; color: #64748B; font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .bit-fecha { text-align: right; font-size: 12px; font-weight: 600; white-space: nowrap; }
+    .bit-fecha span { display: block; color: #94A3B8; font-weight: 400; }
+    .bit-vacio { padding: 48px 20px; text-align: center; color: #64748B; font-size: 14px; }
+    .bit-vacio strong { display: block; margin-bottom: 4px; color: #0F1827; font-size: 15px; }
+    @media (max-width: 1000px) { .bit-tarjetas { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+    @media (max-width: 640px) { .bit-fila { grid-template-columns: 1fr; } .bit-fila-icono { display: none; } .bit-fecha { text-align: left; } }
+</style>
+
+<div class="bit">
+    <div class="bit-cab">
+        <h2>Bitácora de errores</h2>
+        <p>Incidencias de todo el sistema: el motor (buscador, fuentes oficiales, publicación, seguimiento y revalidación), su API y la página web. Si un error se repite, se agrupa en la misma fila. Toda la fila abre el detalle, donde se puede marcar como resuelto.</p>
     </div>
 
+    <div class="bit-tarjetas">
+        @foreach ($tarjetas as [$clave, $etiqueta, $valor, $ayuda, $icono, $color])
+            <button type="button" wire:click="$set('estado', '{{ $clave }}')" @class(['bit-tarjeta', 'activa' => $estado === $clave]) aria-pressed="{{ $estado === $clave ? 'true' : 'false' }}">
+                <span class="bit-icono" style="background: {{ $colores[$color][0] }}; color: {{ $colores[$color][1] }}">{!! \App\Filament\Apariencia\Iconos::svg($icono, 18) !!}</span>
+                <span>
+                    <span class="bit-valor" style="display: block">{{ $valor }}</span>
+                    <span class="bit-etq" style="display: block">{{ $etiqueta }}</span>
+                    <span class="bit-ayuda">{{ $ayuda }}</span>
+                </span>
+            </button>
+        @endforeach
+    </div>
+
+    <div class="bit-filtros">
+        <input type="search" wire:model.live.debounce.400ms="buscar" placeholder="Buscar en mensajes, enlaces o detalles…" aria-label="Buscar en la bitácora">
+        <select wire:model.live="tipo" aria-label="Origen">
+            <option value="">Todos los orígenes</option>
+            @foreach ($tiposUsados as $t)
+                @php [$texto, $icono] = \App\Filament\Admin\Pages\BitacoraErrores::infoTipo($t); @endphp
+                <option value="{{ $t }}">{{ $icono }} {{ $texto }}</option>
+            @endforeach
+        </select>
+        <select wire:model.live="fuente" aria-label="Fuente">
+            <option value="">Todas las fuentes</option>
+            @foreach ($fuentes as $f)
+                <option value="{{ $f->id }}">{{ $f->nombre }}</option>
+            @endforeach
+        </select>
+        <select wire:model.live="estado" aria-label="Estado">
+            <option value="">Cualquier estado</option>
+            <option value="pendiente">Pendientes</option>
+            <option value="resuelto">Resueltas</option>
+            <option value="hoy">De hoy</option>
+        </select>
+        @if ($hayFiltros)
+            <button type="button" class="bit-limpiar" wire:click="limpiarFiltros">Limpiar filtros</button>
+        @endif
+    </div>
+
+    @if ($ejecucionContexto)
+        <div class="bit-contexto">
+            Mostrando solo las incidencias de la ejecución #{{ $ejecucionContexto->id }}.
+            <button type="button" class="bit-limpiar" wire:click="quitarFiltroEjecucion">Ver todas</button>
+        </div>
+    @endif
+
+    <div class="bit-lista">
+        @forelse ($errores as $error)
+            @php
+                [$textoTipo, $iconoTipo, $origen] = \App\Filament\Admin\Pages\BitacoraErrores::infoTipo($error->tipo_error);
+                [$textoOrigen, $fondoOrigen, $colorOrigen] = $origenes[$origen];
+                $repeticiones = substr_count((string) $error->detalle, 'Se repitió');
+                $url = \App\Filament\Admin\Pages\DetalleError::getUrl(['record' => $error->id]);
+            @endphp
+            <div class="bit-fila" data-href="{{ $url }}" tabindex="0" wire:key="error-{{ $error->id }}">
+                <span class="bit-fila-icono" aria-hidden="true">{{ $iconoTipo }}</span>
+                <div style="min-width: 0">
+                    <div class="bit-chips">
+                        <span class="bit-chip" style="background: {{ $fondoOrigen }}; color: {{ $colorOrigen }}">{{ $textoOrigen }} · {{ $textoTipo }}</span>
+                        @if ($error->resuelto)
+                            <span class="bit-chip" style="background: #D1FAE5; color: #047857">Resuelta</span>
+                        @else
+                            <span class="bit-chip" style="background: #FEE2E2; color: #B91C1C">Pendiente</span>
+                        @endif
+                        @if ($repeticiones > 0)
+                            <span class="bit-chip" style="background: #FEF3C7; color: #B45309">Se repitió {{ $repeticiones }} {{ $repeticiones === 1 ? 'vez' : 'veces' }}</span>
+                        @endif
+                    </div>
+                    <div class="bit-mensaje" title="{{ $error->mensaje }}">{{ $error->mensaje }}</div>
+                    @if ($error->fuente || $error->url)
+                        <div class="bit-sub" title="{{ $error->url }}">
+                            {{ $error->fuente?->nombre }}{{ $error->fuente && $error->url ? ' · ' : '' }}{{ $error->url }}
+                        </div>
+                    @endif
+                </div>
+                <div class="bit-fecha" title="{{ $error->updated_at?->format('d/m/Y H:i') }}">
+                    {{ ($error->updated_at ?? $error->created_at)?->locale('es')->diffForHumans() }}
+                    <span>Desde {{ $error->created_at?->format('d/m/Y') }}</span>
+                </div>
+            </div>
+        @empty
+            <div class="bit-vacio">
+                @if ($hayFiltros)
+                    <strong>Sin incidencias con esos filtros</strong>
+                    <button type="button" class="bit-limpiar" wire:click="limpiarFiltros">Limpiar filtros</button>
+                @else
+                    <strong>Todo en orden</strong>
+                    No hay incidencias registradas. Cuando el motor, su API o la web tengan un error, aparecerá aquí.
+                @endif
+            </div>
+        @endforelse
+    </div>
+
+    <div style="margin-top: 16px">
+        {{ $errores->links('pagination.itsva') }}
+    </div>
+</div>
 </x-filament-panels::page>

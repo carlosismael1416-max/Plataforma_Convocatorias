@@ -69,7 +69,7 @@ def main() -> int:
             conexion.execute(
                 """
                 INSERT INTO bitacora_errores (tipo_error, codigo_error, mensaje, detalle, resuelto, created_at, updated_at)
-                VALUES ('CICLO_FALLIDO', %s, %s, %s, FALSE, NOW(), NOW())
+                VALUES ('CICLO_FALLIDO', %s, %s, %s, FALSE, NOW() AT TIME ZONE 'UTC', NOW() AT TIME ZONE 'UTC')
                 """,
                 (estado_salida or resultado, mensaje, detalle or None),
             )

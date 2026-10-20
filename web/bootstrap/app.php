@@ -18,4 +18,10 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->shouldRenderJsonWhen(
             fn (Request $request) => $request->is('api/*') || $request->expectsJson(),
         );
+
+        // Los fallos del servidor también quedan en la Bitácora de errores del
+        // admin (no solo en el log). Validaciones, 404 y 403 no se reportan.
+        $exceptions->report(function (Throwable $e): void {
+            \App\Services\Bitacora::registrarExcepcion($e);
+        });
     })->create();
