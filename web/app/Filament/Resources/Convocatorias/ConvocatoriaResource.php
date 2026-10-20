@@ -16,6 +16,7 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
@@ -191,6 +192,12 @@ class ConvocatoriaResource extends Resource
             \App\Filament\Resources\Convocatorias\RelationManagers\RevisionesRelationManager::class,
             \App\Filament\Resources\Convocatorias\RelationManagers\RevisionesAdministrativasRelationManager::class,
         ];
+    }
+
+    /** La tabla muestra el organismo bajo cada título: se carga de una vez. */
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()->with('organismo');
     }
 
     public static function getPages(): array

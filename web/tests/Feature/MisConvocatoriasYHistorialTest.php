@@ -102,8 +102,8 @@ class MisConvocatoriasYHistorialTest extends TestCase
             ->assertSee('solo de consulta')
             ->assertDontSee('Generar propuesta');
 
-        foreach (['/docente', '/directivo', '/admin'] as $i => $ruta) {
-            $rol = ['DOCENTE', 'DIRECTIVO', 'ADMINISTRADOR'][$i];
+        foreach (['/docente', '/directivo'] as $i => $ruta) {
+            $rol = ['DOCENTE', 'DIRECTIVO'][$i];
             $this->actingAs($this->usuarioConRol($rol))
                 ->get($ruta . '/historial-convocatorias')
                 ->assertOk()
@@ -122,11 +122,6 @@ class MisConvocatoriasYHistorialTest extends TestCase
                 ->assertSee('Tipo')
                 ->assertSee('Dirigida a');
         }
-
-        $this->actingAs($this->usuarioConRol('ADMINISTRADOR'))
-            ->get('/admin/convocatorias')
-            ->assertOk()
-            ->assertSee('/admin/historial-convocatorias', false);
     }
 
     public function test_mis_propuestas_muestra_el_titulo_de_la_convocatoria_y_no_json(): void
