@@ -56,6 +56,11 @@ Route::middleware('guest')->group(function (): void {
     ])
         ->middleware('throttle:5,1')
         ->name('password.update');
+
+    Route::get('/contrasena-actualizada', [
+        RecuperacionContrasenaController::class,
+        'listo',
+    ])->name('password.listo');
 });
 
 Route::get('/usuarios/{usuario}/foto', \App\Http\Controllers\FotoPerfilController::class)
