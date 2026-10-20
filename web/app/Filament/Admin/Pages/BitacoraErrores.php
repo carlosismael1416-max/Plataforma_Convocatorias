@@ -105,229 +105,72 @@ class BitacoraErrores extends Page
         $this->resetPage();
     }
 
+    /** De dónde viene cada tipo de incidencia (etiqueta, icono, color). */
+    public const TIPOS = [
+        'BUSCADOR' => ['Buscador', '🔎', 'motor'],
+        'PUBLICACION' => ['Publicación', '📤', 'motor'],
+        'FUENTE' => ['Fuente oficial', '🌐', 'motor'],
+        'SEGUIMIENTO' => ['Seguimiento', '🔁', 'motor'],
+        'REVALIDACION' => ['Revalidación', '✔️', 'motor'],
+        'MANTENIMIENTO' => ['Mantenimiento', '🧹', 'motor'],
+        'CICLO_FALLIDO' => ['Ciclo fallido', '⛔', 'motor'],
+        'API' => ['API del motor', '🔌', 'api'],
+        'WEB' => ['Página web', '🖥️', 'web'],
+    ];
+
+    public static function infoTipo(?string $tipo): array
+    {
+        return self::TIPOS[$tipo] ?? [ucfirst(mb_strtolower(str_replace('_', ' ', (string) ($tipo ?: 'Otro')))), '⚠️', 'motor'];
+    }
+
     protected function getViewData(): array
     {
-        /*
-        |--------------------------------------------------------------------------
-        | INDICADORES GENERALES
-        |--------------------------------------------------------------------------
-        */
+        $base = fn () => BitacoraError::query();
 
-        $totalErrores =
-            BitacoraError::query()
-                ->count();
+        $query = BitacoraError::query()->with(['fuente', 'ejecucionScraping']);
 
-        $pendientes =
-            BitacoraError::query()
-                ->where(
-                    'resuelto',
-                    false
-                )
-                ->count();
-
-        $resueltos =
-            BitacoraError::query()
-                ->where(
-                    'resuelto',
-                    true
-                )
-                ->count();
-
-        $fuentesRegistradas =
-            Fuente::query()
-                ->count();
-
-        /*
-        |--------------------------------------------------------------------------
-        | FUENTES MÁS AFECTADAS
-        |--------------------------------------------------------------------------
-        */
-
-        $topFuentes =
-            BitacoraError::query()
-                ->select('fuente_id')
-                ->selectRaw(
-                    'COUNT(*) AS total'
-                )
-                ->whereNotNull(
-                    'fuente_id'
-                )
-                ->groupBy(
-                    'fuente_id'
-                )
-                ->orderByDesc(
-                    'total'
-                )
-                ->limit(3)
-                ->with('fuente')
-                ->get();
-
-        /*
-        |--------------------------------------------------------------------------
-        | OPCIONES DE FILTRO
-        |--------------------------------------------------------------------------
-        */
-
-        $tiposError =
-            BitacoraError::query()
-                ->whereNotNull(
-                    'tipo_error'
-                )
-                ->where(
-                    'tipo_error',
-                    '<>',
-                    ''
-                )
-                ->distinct()
-                ->orderBy(
-                    'tipo_error'
-                )
-                ->pluck(
-                    'tipo_error',
-                    'tipo_error'
-                );
-
-        $fuentes =
-            Fuente::query()
-                ->orderBy(
-                    'nombre'
-                )
-                ->get([
-                    'id',
-                    'nombre',
-                ]);
-
-        /*
-        |--------------------------------------------------------------------------
-        | CONSULTA FILTRADA
-        |--------------------------------------------------------------------------
-        */
-
-        $query =
-            BitacoraError::query()
-                ->with([
-                    'fuente',
-                    'ejecucionScraping',
-                ]);
-
-        $buscar =
-            trim(
-                $this->buscar
-            );
+        $buscar = trim($this->buscar);
 
         if ($buscar !== '') {
-            $query->where(
-                function ($consulta) use (
-                    $buscar
-                ) {
-                    $patron =
-                        '%'.$buscar.'%';
-
-                    $consulta
-                        ->where(
-                            'mensaje',
-                            'ilike',
-                            $patron
-                        )
-                        ->orWhere(
-                            'tipo_error',
-                            'ilike',
-                            $patron
-                        )
-                        ->orWhere(
-                            'codigo_error',
-                            'ilike',
-                            $patron
-                        )
-                        ->orWhere(
-                            'detalle',
-                            'ilike',
-                            $patron
-                        );
-                }
-            );
+            $patron = '%' . $buscar . '%';
+            $query->where(fn ($q) => $q
+                ->where('mensaje', 'ilike', $patron)
+                ->orWhere('tipo_error', 'ilike', $patron)
+                ->orWhere('codigo_error', 'ilike', $patron)
+                ->orWhere('detalle', 'ilike', $patron)
+                ->orWhere('url', 'ilike', $patron));
         }
 
         if ($this->tipo !== '') {
-            $query->where(
-                'tipo_error',
-                $this->tipo
-            );
+            $query->where('tipo_error', $this->tipo);
         }
 
         if ($this->fuente !== '') {
-            $query->where(
-                'fuente_id',
-                (int) $this->fuente
-            );
+            $query->where('fuente_id', (int) $this->fuente);
         }
 
-        if ($this->estado === 'pendiente') {
-            $query->where(
-                'resuelto',
-                false
-            );
-        }
-
-        if ($this->estado === 'resuelto') {
-            $query->where(
-                'resuelto',
-                true
-            );
-        }
+        match ($this->estado) {
+            'pendiente' => $query->where('resuelto', false),
+            'resuelto' => $query->where('resuelto', true),
+            'hoy' => $query->where('updated_at', '>=', today()),
+            default => null,
+        };
 
         if ($this->ejecucion !== null) {
-            $query->where(
-                'ejecucion_scraping_id',
-                $this->ejecucion
-            );
+            $query->where('ejecucion_scraping_id', $this->ejecucion);
         }
 
-        $errores =
-            $query
-                ->orderByDesc(
-                    'created_at'
-                )
-                ->orderByDesc(
-                    'id'
-                )
-                ->paginate(20);
-
-        $ejecucionContexto =
-            $this->ejecucion !== null
-                ? EjecucionScraping::query()
-                    ->find(
-                        $this->ejecucion
-                    )
-                : null;
-
         return [
-            'totalErrores' =>
-                $totalErrores,
-
-            'pendientes' =>
-                $pendientes,
-
-            'resueltos' =>
-                $resueltos,
-
-            'fuentesRegistradas' =>
-                $fuentesRegistradas,
-
-            'topFuentes' =>
-                $topFuentes,
-
-            'tiposError' =>
-                $tiposError,
-
-            'fuentes' =>
-                $fuentes,
-
-            'errores' =>
-                $errores,
-
-            'ejecucionContexto' =>
-                $ejecucionContexto,
+            'tarjetas' => [
+                ['pendiente', 'Pendientes', $base()->where('resuelto', false)->count(), 'Sin resolver', 'alerta', 'red'],
+                ['hoy', 'Hoy', $base()->where('updated_at', '>=', today())->count(), 'Ocurridas o repetidas hoy', 'reloj', 'yellow'],
+                ['resuelto', 'Resueltas', $base()->where('resuelto', true)->count(), 'Atendidas', 'aprobado', 'green'],
+                ['', 'Todas', $base()->count(), 'Historial completo', 'documento', 'blue'],
+            ],
+            'tiposUsados' => $base()->whereNotNull('tipo_error')->distinct()->orderBy('tipo_error')->pluck('tipo_error'),
+            'fuentes' => Fuente::query()->orderBy('nombre')->get(['id', 'nombre']),
+            'errores' => $query->orderByDesc('updated_at')->orderByDesc('id')->paginate(20),
+            'ejecucionContexto' => $this->ejecucion !== null ? EjecucionScraping::query()->find($this->ejecucion) : null,
         ];
     }
 }

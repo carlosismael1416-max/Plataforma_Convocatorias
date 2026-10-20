@@ -139,8 +139,15 @@ class Dashboard extends BaseDashboard
                 ['etiqueta' => 'Base de datos', 'estado' => 'ok', 'texto' => 'OK'],
                 [
                     'etiqueta' => 'Ciclo automático (cada 6 h)',
-                    'estado' => $ciclo === null ? 'mal' : ($ciclo['atrasado'] ? 'aviso' : ($ciclo['estado'] === 'COMPLETADO' ? 'ok' : 'mal')),
-                    'texto' => $ciclo === null ? 'Sin reporte' : ($ciclo['atrasado'] ? 'Atrasado' : ucfirst(mb_strtolower($ciclo['estado']))),
+                    // Con advertencias el ciclo sí terminó: alguna fase tuvo errores
+                    // (quedan en la bitácora). Es aviso, no falla.
+                    'estado' => $ciclo === null ? 'mal' : ($ciclo['atrasado'] ? 'aviso' : match ($ciclo['estado']) {
+                        'COMPLETADO', 'APAGADO' => 'ok',
+                        'COMPLETADO_CON_ADVERTENCIAS' => 'aviso',
+                        default => 'mal',
+                    }),
+                    'texto' => $ciclo === null ? 'Sin reporte' : ($ciclo['atrasado'] ? 'Atrasado' : $ciclo['etiqueta']),
+                    'url' => $ciclo !== null && $ciclo['estado'] !== 'COMPLETADO' ? BitacoraErrores::getUrl() : null,
                 ],
                 [
                     'etiqueta' => 'Bitácora de errores',
@@ -179,8 +186,17 @@ class Dashboard extends BaseDashboard
             + (int) ($datos['seguimiento']['errores'] ?? 0)
             + (($datos['descubrimiento']['ok'] ?? true) ? 0 : 1);
 
+        $estado = (string) ($datos['estado'] ?? 'DESCONOCIDO');
+
         return [
-            'estado' => (string) ($datos['estado'] ?? 'DESCONOCIDO'),
+            'estado' => $estado,
+            'etiqueta' => [
+                'COMPLETADO' => 'Completado',
+                'COMPLETADO_CON_ADVERTENCIAS' => 'Completado con advertencias',
+                'FALLIDO' => 'Falló',
+                'APAGADO' => 'Motor apagado',
+                'YA_EN_EJECUCION' => 'En ejecución',
+            ][$estado] ?? ucfirst(mb_strtolower(str_replace('_', ' ', $estado))),
             'mensaje' => $datos['mensaje'] ?? null,
             'inicio' => $inicio,
             'duracion' => $fin ? max(1, (int) round($inicio->diffInSeconds($fin))) : null,

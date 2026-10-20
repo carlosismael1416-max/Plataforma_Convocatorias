@@ -452,8 +452,8 @@ def registrar_fallo(
                     %s,
                     %s,
                     false,
-                    NOW(),
-                    NOW()
+                    NOW() AT TIME ZONE 'UTC',
+                    NOW() AT TIME ZONE 'UTC'
                 )
                 """,
                 (

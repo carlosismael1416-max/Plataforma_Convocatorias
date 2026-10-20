@@ -13,6 +13,7 @@ import time
 from datetime import datetime
 from pathlib import Path
 
+from app.bitacora import registrar_incidencias_del_ciclo
 from app.descubrimiento.guardar_descubrimientos import (
     conectar,
 )
@@ -828,6 +829,10 @@ def ejecutar_ciclo(
             "revalidacion":
                 revalidacion,
         }
+
+        # Cada error de cada fase queda en la bitácora del administrador
+        # (antes solo en este reporte).
+        resultado["bitacora"] = registrar_incidencias_del_ciclo(resultado)
 
         archivo = (
             BASE_DIR
