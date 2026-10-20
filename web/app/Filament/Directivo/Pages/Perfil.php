@@ -3,7 +3,6 @@
 namespace App\Filament\Directivo\Pages;
 
 use App\Models\Convocatoria;
-use App\Models\ConvocatoriaRevisionAdministrativa;
 use App\Models\Departamento;
 use App\Models\User;
 use Filament\Notifications\Notification;
@@ -240,6 +239,8 @@ class Perfil extends Page
 
         $usuario->save();
 
+        \App\Services\RegistroActividad::registrar('CONTRASENA', 'Cambió su contraseña desde el perfil');
+
         $this->limpiarPassword();
 
         $this->mostrarCambioPassword =
@@ -285,11 +286,6 @@ class Perfil extends Page
                 $usuario->apellidos
             );
 
-        $actividad =
-            $this->actividadReciente(
-                $usuario
-            );
-
         return [
             'usuario' =>
                 $usuario,
@@ -303,8 +299,6 @@ class Perfil extends Page
             'iniciales' =>
                 $iniciales,
 
-            'actividad' =>
-                $actividad,
         ];
     }
 
@@ -380,131 +374,5 @@ class Perfil extends Page
         return $resultado !== ''
             ? $resultado
             : 'U';
-    }
-
-    private function actividadReciente(
-        User $usuario
-    ) {
-        $subidas =
-            Convocatoria::query()
-                ->where(
-                    'subido_por_user_id',
-                    $usuario->id
-                )
-                ->latest(
-                    'created_at'
-                )
-                ->limit(
-                    5
-                )
-                ->get()
-                ->map(
-                    function (
-                        Convocatoria $convocatoria
-                    ): array {
-                        $url =
-                            route(
-                                    'filament.directivo.pages.detalle-convocatoria',
-                                    [
-                                        'record' =>
-                                            $convocatoria->id,
-                                    ]
-                                );
-
-                        return [
-                            'tipo' =>
-                                'C',
-
-                            'titulo' =>
-                                'Registraste una convocatoria',
-
-                            'detalle' =>
-                                $convocatoria->titulo,
-
-                            'fecha_orden' =>
-                                $convocatoria->created_at,
-
-                            'fecha' =>
-                                $convocatoria
-                                    ->created_at
-                                    ?->locale('es')
-                                    ->diffForHumans()
-                                ?? 'Sin fecha',
-
-                            'url' =>
-                                $url,
-                        ];
-                    }
-                );
-
-        $revisiones =
-            ConvocatoriaRevisionAdministrativa::query()
-                ->with(
-                    'convocatoria'
-                )
-                ->where(
-                    'revisor_id',
-                    $usuario->id
-                )
-                ->latest(
-                    'fecha_decision'
-                )
-                ->limit(
-                    5
-                )
-                ->get()
-                ->map(
-                    function (
-                        ConvocatoriaRevisionAdministrativa $revision
-                    ): array {
-                        $convocatoria =
-                            $revision->convocatoria;
-
-                        return [
-                            'tipo' =>
-                                'R',
-
-                            'titulo' =>
-                                'Registraste una revisión',
-
-                            'detalle' =>
-                                $convocatoria?->titulo
-                                ?? 'Convocatoria',
-
-                            'fecha_orden' =>
-                                $revision->fecha_decision,
-
-                            'fecha' =>
-                                $revision
-                                    ->fecha_decision
-                                    ?->locale('es')
-                                    ->diffForHumans()
-                                ?? 'Sin fecha',
-
-                            'url' =>
-                                $convocatoria
-                                    ? route(
-                                        'filament.directivo.pages.detalle-convocatoria',
-                                        [
-                                            'record' =>
-                                                $convocatoria->id,
-                                        ]
-                                    )
-                                    : null,
-                        ];
-                    }
-                );
-
-        return $subidas
-            ->merge(
-                $revisiones
-            )
-            ->sortByDesc(
-                'fecha_orden'
-            )
-            ->take(
-                5
-            )
-            ->values();
     }
 }

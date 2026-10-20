@@ -966,6 +966,8 @@
 
             </section>
 
+            @include('filament.partials.actividad-reciente', ['historialUrl' => null])
+
         </main>
 
     </div>

@@ -9,7 +9,11 @@ use BackedEnum;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Filament\Support\Icons\Heroicon;
+use App\Models\Actividad;
+use App\Models\PropuestaRevision;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Collection;
+use Livewire\Attributes\Url;
 use Livewire\WithPagination;
 
 class Propuestas extends Page
@@ -40,6 +44,10 @@ class Propuestas extends Page
     public string $estado = '';
 
     public string $orden = 'actualizacion';
+
+    /** Pestaña: 'propuestas' (lista) o 'movimientos' (historial). */
+    #[Url(as: 'vista', except: 'propuestas')]
+    public string $vista = 'propuestas';
 
     public static function canAccess(): bool
     {
@@ -319,6 +327,11 @@ class Propuestas extends Page
             ->count();
 
         return [
+            'movimientos' =>
+                $this->vista === 'movimientos'
+                    ? $this->movimientos()
+                    : collect(),
+
             'propuestas' =>
                 $query->paginate(10),
 
@@ -332,6 +345,77 @@ class Propuestas extends Page
             'enviadas' =>
                 $enviadas,
         ];
+    }
+
+    /**
+     * Historial de movimientos de las propuestas del usuario: lo que él hizo
+     * (crear, editar cada sección, enviar) y los dictámenes que recibió.
+     * Últimos 60, del más reciente al más antiguo.
+     */
+    private function movimientos(): Collection
+    {
+        $usuarioId = auth()->id();
+
+        $propuestas = Propuesta::query()
+            ->where('user_id', $usuarioId)
+            ->pluck('titulo', 'id');
+
+        if ($propuestas->isEmpty()) {
+            return collect();
+        }
+
+        $propias = Actividad::query()
+            ->where('user_id', $usuarioId)
+            ->where('sujeto_tipo', 'propuesta')
+            ->whereIn('sujeto_id', $propuestas->keys())
+            ->latest('updated_at')
+            ->limit(60)
+            ->get()
+            ->map(function (Actividad $actividad): array {
+                [$etiqueta, $icono] = $actividad->infoAccion();
+
+                return [
+                    'icono' => $icono,
+                    'etiqueta' => $etiqueta,
+                    'descripcion' => $actividad->descripcion,
+                    'detalle' => null,
+                    'quien' => null,
+                    'propuesta_id' => $actividad->sujeto_id,
+                    'fecha' => $actividad->updated_at ?? $actividad->created_at,
+                ];
+            });
+
+        $dictamenes = PropuestaRevision::query()
+            ->with('usuario:id,name,apellidos')
+            ->whereIn('propuesta_id', $propuestas->keys())
+            ->where('user_id', '!=', $usuarioId)
+            ->latest()
+            ->limit(60)
+            ->get()
+            ->map(function (PropuestaRevision $revision) use ($propuestas): array {
+                [$verbo, $icono] = match ($revision->accion) {
+                    'APROBAR' => ['Aprobó', '✅'],
+                    'DEVOLVER' => ['Devolvió con observaciones', '↩️'],
+                    'RECHAZAR' => ['Rechazó', '⛔'],
+                    default => ['Revisó', '⚖️'],
+                };
+
+                return [
+                    'icono' => $icono,
+                    'etiqueta' => 'Dictamen',
+                    'descripcion' => $verbo . ' la propuesta «' . mb_strimwidth((string) $propuestas[$revision->propuesta_id], 0, 160, '…') . '»',
+                    'detalle' => $revision->observaciones,
+                    'quien' => $revision->usuario ? trim($revision->usuario->name . ' ' . $revision->usuario->apellidos) : null,
+                    'propuesta_id' => $revision->propuesta_id,
+                    'fecha' => $revision->created_at,
+                ];
+            });
+
+        return $propias
+            ->concat($dictamenes)
+            ->sortByDesc('fecha')
+            ->take(60)
+            ->values();
     }
 
     private function propuestaDelUsuario(

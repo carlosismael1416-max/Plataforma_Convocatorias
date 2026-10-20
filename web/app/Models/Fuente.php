@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\RegistraActividad;
 use Illuminate\Database\Eloquent\Model;
 
 class Fuente extends Model
 {
+    use RegistraActividad;
+
     protected $table = 'fuentes';
 
     protected $fillable = [
@@ -33,5 +36,15 @@ class Fuente extends Model
     public function convocatorias(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(Convocatoria::class, 'fuente_id');
+    }
+
+    protected function accionActividad(): array
+    {
+        return ['FUENTE', 'la fuente'];
+    }
+
+    protected function nombreActividad(): string
+    {
+        return (string) $this->nombre;
     }
 }

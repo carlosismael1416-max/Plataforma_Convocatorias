@@ -105,7 +105,8 @@ class RevisionPropuesta
 
             $actual->estado = 'ENVIADA';
             $actual->fecha_envio = now();
-            $actual->save();
+            RegistroActividad::sinRegistroAutomatico(fn () => $actual->save());
+            RegistroActividad::registrar('PROPUESTA_ENVIADA', 'Envió a revisión la propuesta «' . mb_strimwidth((string) $actual->titulo, 0, 160, '…') . '»', $actual, $autor->getKey());
 
             self::actualizarSeguimiento($actual, 'ENVIADA', 'Propuesta enviada a revisión');
 
@@ -177,7 +178,12 @@ class RevisionPropuesta
             ]);
 
             $actual->estado = self::DECISIONES[$decision];
-            $actual->save();
+            RegistroActividad::sinRegistroAutomatico(fn () => $actual->save());
+            RegistroActividad::registrar('DICTAMEN', [
+                'APROBAR' => 'Aprobó',
+                'DEVOLVER' => 'Devolvió con observaciones',
+                'RECHAZAR' => 'Rechazó',
+            ][$decision] . ' la propuesta «' . mb_strimwidth((string) $actual->titulo, 0, 160, '…') . '»', $actual, $revisor->getKey());
 
             [$seguimiento, $titulo, $tipo] = match ($decision) {
                 'APROBAR' => ['ACEPTADA', 'Propuesta aprobada', 'PROPUESTA_APROBADA'],

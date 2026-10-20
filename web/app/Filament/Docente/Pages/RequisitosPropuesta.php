@@ -930,6 +930,8 @@ class RequisitosPropuesta extends Page
         $propuesta ??=
             $this->propuestaDelUsuario();
 
+        \App\Services\RegistroActividad::registrar('PROPUESTA', 'Actualizó los requisitos y evidencias de la propuesta «' . mb_strimwidth((string) $propuesta->titulo, 0, 160, '…') . '»', $propuesta, agrupar: true);
+
         if (
             in_array(
                 $propuesta->estado,
@@ -944,7 +946,7 @@ class RequisitosPropuesta extends Page
             $propuesta->estado =
                 'EDITANDO';
 
-            $propuesta->save();
+            \App\Services\RegistroActividad::sinRegistroAutomatico(fn () => $propuesta->save());
         } else {
             $propuesta->touch();
         }
