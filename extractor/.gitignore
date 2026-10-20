@@ -190,9 +190,7 @@ app/listar_categorias.py
 # Pruebas automatizadas (se quedan en la máquina local)
 tests/
 
-# Instrucciones de asistentes, documentos y respaldos
-CLAUDE.md
-AGENTS.md
+# Documentos y respaldos
 *.docx
 *.pdf
 backups/
