@@ -14,7 +14,9 @@ use Filament\Notifications\Notification;
 use Filament\Schemas\Components\Actions;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use Filament\Support\Icons\Heroicon;
 use Illuminate\Support\Str;
 
 class RoleForm
@@ -23,8 +25,12 @@ class RoleForm
         Schema $schema
     ): Schema {
         return $schema
-            ->columns(2)
+            ->columns(1)
             ->components([
+                Section::make('Datos del rol')
+                    ->icon(Heroicon::OutlinedIdentification)
+                    ->columns(2)
+                    ->schema([
 
                 TextInput::make('nombre')
                     ->label('Nombre del rol')
@@ -111,6 +117,12 @@ class RoleForm
                 |
                 */
 
+                    ]),
+
+                Section::make('Permisos')
+                    ->icon(Heroicon::OutlinedShieldCheck)
+                    ->description('Elige qué puede hacer este rol. «Autoseleccionar» marca los permisos habituales según el nombre del rol.')
+                    ->schema([
                 Actions::make([
 
                     Action::make(
@@ -258,13 +270,15 @@ class RoleForm
                         'permisos',
                         'descripcion'
                     )
-                    ->columns(2)
+                    ->columns(['default' => 1, 'md' => 2, 'xl' => 3])
+                    ->gridDirection('row')
                     ->searchable()
                     ->bulkToggleable()
                     ->columnSpanFull()
                     ->helperText(
                         'Puedes modificar manualmente la selección después de aplicar la plantilla.'
                     ),
+                    ]),
             ]);
     }
 }

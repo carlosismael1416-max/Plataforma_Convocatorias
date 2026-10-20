@@ -103,7 +103,7 @@ Hay un solo login en `/login`. Según el rol, el usuario entra a su panel; las r
 | Subir convocatoria | Dos secciones con botones arriba. **Automática** (por defecto; `?modo=manual` abre la otra): se pega la URL, el motor extrae y valida, y el formulario se llena; si no cumple los criterios se avisa con los motivos y el usuario elige «Publicar de todas maneras» o «No publicar». **Manual:** el formulario completo. Al pasar de automática a manual se conserva lo ya extraído. En automática no se puede publicar sin analizar un enlace (se valida en el servidor). Se publica al momento (no si ya venció); un enlace que ya está en la plataforma no se duplica. Su autor puede corregirla. |
 | Calendario | Cierres y eventos personales. |
 | Propuestas | Propuestas propias en tarjetas (toda la fila abre el editor), con búsqueda, filtro por estado y los totales como filtros. |
-| Flujo de propuesta | Generar → Editor → Objetivos → Requisitos → Presupuesto → Cotizaciones → Cronograma → Entregables → Vista previa (PDF/Excel y **Enviar a revisión**). |
+| Flujo de propuesta | Generar → Editor → Objetivos → Requisitos → Presupuesto → Cotizaciones → Cronograma → Entregables → Vista previa (PDF/Excel y **Enviar a revisión**). Para continuar se exige lo esencial de cada paso (en el editor: resumen, justificación, metodología e impacto; luego al menos un objetivo, un concepto, una actividad y un entregable); «Guardar borrador» guarda incompleto y ofrece «Ver vista previa». |
 | Notificaciones | Avisos y preferencias (fechas de cierre, cambios en convocatorias que sigo, cambios en propuestas). |
 | Perfil | Datos de la cuenta (desde el menú del avatar). |
 
@@ -113,16 +113,16 @@ Tiene **todas las páginas de trabajo del docente** (mismas clases, el rol exigi
 | Página | Para qué sirve |
 |---|---|
 | Dashboard | Propuestas por revisar, aprobadas y devueltas del mes, convocatorias recientes, resumen del mes. |
-| Propuestas por revisar | Propuestas enviadas por docentes y directivos (incluidas las suyas). |
+| Propuestas por revisar | Pestañas «Por revisar» (enviadas por docentes y directivos, incluidas las suyas) e «Historial de movimientos» (cada envío y dictamen con autor, quién lo hizo, fecha y observaciones; filtros por convocatoria y movimiento). |
 | Revisar propuesta | Vista previa de solo lectura + dictamen: **Aprobar**, **Devolver con observaciones** (vuelve a edición) o **Rechazar**. |
 | Estadísticas | Convocatorias detectadas y publicadas por mes, por área y organismo; propuestas por estado. |
-| Reportes | Exportación PDF/Excel/CSV de convocatorias, propuestas y financiamiento. |
+| Reportes | Exportación PDF/Excel/CSV de convocatorias, propuestas y financiamiento. Cada exportación queda en `reportes_generados` y «Reportes recientes» permite generarla de nuevo con los mismos filtros. |
 
 ### 4.3 Administrador (`/admin`)
 | Página | Para qué sirve |
 |---|---|
 | Dashboard | Estadísticas, **interruptor del motor**, tarjeta del último ciclo automático, historial de ejecuciones y estado del sistema. |
-| Usuarios, Roles y permisos | Cuentas, roles (DOCENTE, DIRECTIVO, ADMINISTRADOR, SISTEMA) y permisos (`rol_permisos`). |
+| Usuarios, Roles y permisos | Cuentas, roles (DOCENTE, DIRECTIVO, ADMINISTRADOR, SISTEMA) y permisos (`rol_permisos`). Usuarios tiene la pestaña **Departamentos** (también se crean desde el campo del usuario con «+»). Los detalles de usuario y rol muestran una cabecera de perfil; los permisos largos se pliegan con «Ver más». Todas las páginas de detalle tienen «Volver». |
 | Fuentes web | Fuentes oficiales que consulta el motor. |
 | Motor de extracción | Estado de la API, **interruptor del motor**, «Ejecutar ciclo» por fuente, ejecuciones. |
 | Descubrimientos | Pestaña de **Motor de extracción** (no está en el menú): candidatos que el buscador encontró en internet. No son convocatorias y no se mezclan con ellas. Tarjetas que filtran (Descubiertos, En espera, Convertidos, Descartados, Con error); cada fila muestra título y dominio, estado y decisión del clasificador, evaluación (se aprueba con 80) y enlace a la convocatoria si ya se convirtió. Solo consulta. |
@@ -308,7 +308,7 @@ curl -s http://127.0.0.1:8001/health ; curl -s http://127.0.0.1:8001/db-check
 
 | Conjunto | Cantidad | Cómo |
 |---|---|---|
-| Web (PHPUnit) | 95 | `cd web && php artisan test`. Usa la base `convocatorias_itsva_test`; `tests/TestCase.php` aborta si el nombre no termina en `_test` (la vacía en cada prueba). |
+| Web (PHPUnit) | 103 | `cd web && php artisan test`. Usa la base `convocatorias_itsva_test`; `tests/TestCase.php` aborta si el nombre no termina en `_test` (la vacía en cada prueba). |
 | Extractor (unittest) | 115 | `cd extractor && ./.venv/bin/python -m unittest discover -s tests -t .` |
 | Verificaciones contra la base real | 5 scripts | `cd web && php tests/Verificacion/<script>.php` (revierten sus datos): `todas_las_paginas`, `permisos_por_rol`, `docente_no_ve_vencidas`, `propuesta_id_bloqueado`, `convocatoria_dependencias`. |
 | Recorrido en navegador | 3 paneles | `tests/Recorrido/preparar.sh` copia la base real a `convocatorias_itsva_test` y levanta una copia de la web en 127.0.0.1:8010 (la base real no se toca). Después `node tests/Recorrido/recorrer.cjs docente\|directivo\|admin` (clic en cada botón: errores 5xx/JS y botones sin efecto) y `node tests/Recorrido/llenar.cjs docente` (lo escrito se guarda tras recargar). Resultados en `tests/Recorrido/salida/`. No correr `php artisan test` mientras tanto (vacía esa base). Requiere Node y el Chromium de Playwright (`PLAYWRIGHT_CORE`, `CHROMIUM`). |

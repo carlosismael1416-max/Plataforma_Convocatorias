@@ -291,7 +291,11 @@
                 padding: 14px;
             }
         }
-    </style>
+    
+    .ver-mas { margin-top: 6px; padding: 6px 0; border: 0; background: transparent; color: #047857; font-size: 13px; font-weight: 700; cursor: pointer; text-align: left; }
+    .ver-mas:hover { text-decoration: underline; }
+    .role-links { display: flex; gap: 16px; flex-wrap: wrap; margin-top: auto; padding-top: 12px; }
+</style>
 
     <div class="admin-roles">
 
@@ -367,20 +371,29 @@
                         Permisos ({{ $rol->permisos->count() }})
                     </div>
 
-                    <div class="permissions">
-                        @forelse ($rol->permisos as $permiso)
-                            <div class="permission" title="{{ $permiso->descripcion }}">
+                    {{-- Solo los primeros 5; el resto con «Ver más» (antes la lista ocupaba toda la tarjeta). --}}
+                    <div class="permissions" x-data="{ todos: false }">
+                        @forelse ($rol->permisos->sortBy('descripcion')->values() as $i => $permiso)
+                            <div class="permission" title="{{ $permiso->descripcion }}" @if ($i >= 5) x-show="todos" x-cloak @endif>
                                 <span class="check">✓</span>
-                                {{ \Illuminate\Support\Str::ucfirst(str_replace('_', ' ', $permiso->nombre)) }}
+                                {{ $permiso->descripcion ?: \Illuminate\Support\Str::ucfirst(str_replace('_', ' ', $permiso->nombre)) }}
                             </div>
                         @empty
                             <div class="permission">Sin permisos asignados.</div>
                         @endforelse
+
+                        @if ($rol->permisos->count() > 5)
+                            <button type="button" class="ver-mas" x-on:click="todos = ! todos"
+                                x-text="todos ? 'Ver menos' : 'Ver más permisos ({{ $rol->permisos->count() - 5 }})'">
+                                Ver más permisos ({{ $rol->permisos->count() - 5 }})
+                            </button>
+                        @endif
                     </div>
 
-                    <a class="more" href="{{ \App\Filament\Resources\Roles\RoleResource::getUrl('edit', ['record' => $rol]) }}">
-                        Editar permisos del rol →
-                    </a>
+                    <div class="role-links">
+                        <a class="more" href="{{ \App\Filament\Resources\Roles\RoleResource::getUrl('view', ['record' => $rol]) }}">Ver detalle</a>
+                        <a class="more" href="{{ \App\Filament\Resources\Roles\RoleResource::getUrl('edit', ['record' => $rol]) }}">Editar permisos →</a>
+                    </div>
                 </article>
             @endforeach
         </div>
