@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\Convocatorias\Pages;
 
+use App\Filament\Concerns\BotonVolver;
+
 use App\Filament\Resources\Convocatorias\ConvocatoriaResource;
 use Filament\Actions\EditAction;
 use Filament\Resources\Pages\ViewRecord;
@@ -10,11 +12,15 @@ use Filament\Resources\Pages\ViewRecord;
 // se publican solas (motor validado o subida del personal).
 class ViewConvocatoria extends ViewRecord
 {
+    use BotonVolver;
+
     protected static string $resource = ConvocatoriaResource::class;
 
     protected function getHeaderActions(): array
     {
         return [
+            $this->accionVolver(),
+
             EditAction::make(),
         ];
     }
