@@ -5,7 +5,7 @@
 @endphp
 @include('filament.admin.detalle.estilos')
 <section class="det-cab">
-    <div class="det-avatar" aria-hidden="true">{{ $iniciales ?: 'U' }}</div>
+    <div class="det-avatar" aria-hidden="true" style="overflow: hidden">@if ($u->fotoUrl())<img src="{{ $u->fotoUrl() }}" alt="" style="width: 100%; height: 100%; object-fit: cover; border-radius: inherit">@else{{ $iniciales ?: 'U' }}@endif</div>
     <div class="det-info">
         <h2>{{ $nombre }}</h2>
         <p>{{ $u->email }}</p>

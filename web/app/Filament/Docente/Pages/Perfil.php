@@ -12,6 +12,8 @@ use Illuminate\Validation\Rules\Password;
 
 class Perfil extends Page
 {
+    use \App\Filament\Concerns\GestionaFotoPerfil;
+
     protected static ?int $navigationSort = 6;
 
     // Se abre desde el menú del avatar, no desde la barra lateral.

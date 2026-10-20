@@ -576,8 +576,10 @@
                 <section class="card profile-card">
 
                     <div class="avatar">
-                        {{ $iniciales }}
+                        @if ($usuario->fotoUrl())<img class="avatar-foto" src="{{ $usuario->fotoUrl() }}" alt="Foto de perfil">@else{{ $iniciales }}@endif
                     </div>
+
+                    @include('filament.partials.foto-perfil', ['usuario' => $usuario])
 
                     <div class="profile-name">
                         {{ $nombreCompleto }}

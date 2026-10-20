@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\Concerns\RegistraActividad;
 use Filament\Models\Contracts\FilamentUser;
+use Filament\Models\Contracts\HasAvatar;
 use Filament\Panel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -11,7 +12,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class User extends Authenticatable implements FilamentUser
+class User extends Authenticatable implements FilamentUser, HasAvatar
 {
     use RegistraActividad;
 
@@ -51,6 +52,20 @@ class User extends Authenticatable implements FilamentUser
     public function departamento(): BelongsTo
     {
         return $this->belongsTo(Departamento::class);
+    }
+
+    /** URL de la foto de perfil (null si no tiene); cambia al cambiar la foto. */
+    public function fotoUrl(): ?string
+    {
+        return $this->foto
+            ? route('usuarios.foto', ['usuario' => $this->id, 'v' => substr(md5($this->foto), 0, 8)])
+            : null;
+    }
+
+    /** Filament usa la foto en el menú de usuario; sin foto, las iniciales. */
+    public function getFilamentAvatarUrl(): ?string
+    {
+        return $this->fotoUrl();
     }
 
     public function tieneRol(string $rol): bool

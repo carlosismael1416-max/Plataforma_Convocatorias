@@ -15,7 +15,11 @@
         href="{{ $perfil ? $perfil::getUrl() : '#' }}"
         class="itsva-usuario"
     >
-        <span class="itsva-avatar itsva-avatar-{{ $rol ?? 'docente' }}">{{ $iniciales }}</span>
+        @if ($foto = $usuario->fotoUrl())
+            <img class="itsva-avatar itsva-avatar-foto" src="{{ $foto }}" alt="">
+        @else
+            <span class="itsva-avatar itsva-avatar-{{ $rol ?? 'docente' }}">{{ $iniciales }}</span>
+        @endif
         <span class="itsva-usuario-texto">
             <span class="itsva-usuario-nombre">{{ $nombre }}</span>
             <span class="itsva-usuario-correo">{{ $usuario->email }}</span>

@@ -205,6 +205,7 @@
         font: 700 11px var(--itsva-display);
     }
 
+    .itsva-avatar-foto { object-fit: cover; background: #E2E8F0; }
     .itsva-avatar-docente { background: var(--itsva-docente); }
     .itsva-avatar-directivo { background: var(--itsva-directivo); }
     .itsva-avatar-admin { background: var(--itsva-admin); }
