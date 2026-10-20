@@ -34,9 +34,6 @@ class Notificaciones extends Page
 
     public string $filtro = 'todas';
 
-    public bool $mostrarConfiguracion =
-        false;
-
     public static function canAccess(): bool
     {
         $usuario = auth()->user();
@@ -102,12 +99,6 @@ class Notificaciones extends Page
             $filtro;
 
         $this->resetPage();
-    }
-
-    public function alternarConfiguracion(): void
-    {
-        $this->mostrarConfiguracion =
-            ! $this->mostrarConfiguracion;
     }
 
     public function marcarComoLeida(

@@ -491,18 +491,6 @@
             <div class="header-actions">
 
                 <button
-                    class="btn"
-                    type="button"
-                    wire:click="alternarConfiguracion"
-                >
-                    {{
-                        $mostrarConfiguracion
-                            ? 'Cerrar configuración'
-                            : 'Configurar'
-                    }}
-                </button>
-
-                <button
                     class="btn btn-primary"
                     type="button"
                     wire:click="marcarTodasComoLeidas"
@@ -820,8 +808,7 @@
 
             <aside class="sidebar">
 
-                @if ($mostrarConfiguracion)
-
+                {{-- Preferencias siempre visibles (antes había que pulsar «Configurar»). --}}
                     <section class="side-card">
 
                         <div class="side-title">
@@ -938,24 +925,7 @@
 
                     </section>
 
-                @else
 
-                    <section class="side-card">
-
-                        <div class="side-title">
-                            Preferencias
-                        </div>
-
-                        <div class="info-box">
-                            Usa el botón
-                            <strong>Configurar</strong>
-                            para modificar qué tipos de
-                            avisos deseas recibir.
-                        </div>
-
-                    </section>
-
-                @endif
 
                 <section class="side-card">
 

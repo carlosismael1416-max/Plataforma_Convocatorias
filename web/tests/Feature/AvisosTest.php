@@ -93,6 +93,16 @@ class AvisosTest extends TestCase
         $this->assertSame(1, $propuesta->revisiones()->count());
     }
 
+    public function test_el_directivo_ve_sus_preferencias_sin_pulsar_configurar(): void
+    {
+        $this->actingAs($this->usuarioConRol('DIRECTIVO'))
+            ->get('/directivo/notificaciones')
+            ->assertOk()
+            ->assertSee('Preferencias')
+            ->assertDontSee('Usa el botón')
+            ->assertSee('alternarPreferencia', false);
+    }
+
     public function test_el_docente_cambia_sus_preferencias(): void
     {
         $docente = $this->usuarioConRol('DOCENTE');
