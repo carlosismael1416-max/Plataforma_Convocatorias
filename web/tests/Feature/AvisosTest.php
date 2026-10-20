@@ -118,6 +118,7 @@ class AvisosTest extends TestCase
         Filament::setCurrentPanel(Filament::getPanel('docente'));
 
         Livewire::test(\App\Filament\Docente\Resources\Convocatorias\Pages\CreateConvocatoria::class)
+            ->call('cambiarModo', 'manual')
             ->fillForm([
                 'titulo' => 'ZZ-SUBIDA',
                 'descripcion' => 'Descripción',
@@ -139,6 +140,7 @@ class AvisosTest extends TestCase
         Filament::setCurrentPanel(Filament::getPanel('docente'));
 
         Livewire::test(\App\Filament\Docente\Resources\Convocatorias\Pages\CreateConvocatoria::class)
+            ->call('cambiarModo', 'manual')
             ->fillForm([
                 'titulo' => 'ZZ-VENCIDA',
                 'descripcion' => 'Descripción',

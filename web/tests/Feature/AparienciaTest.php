@@ -92,11 +92,19 @@ class AparienciaTest extends TestCase
     {
         $this->actingAs($this->usuarioConRol('DOCENTE'));
 
+        // Dos secciones: automática (por defecto, solo el enlace) y manual.
         $this->get('/docente/convocatorias/create')
+            ->assertOk()
+            ->assertSeeInOrder(['Automática', 'Manual'])
+            ->assertSee('Pega el enlace de la convocatoria')
+            ->assertDontSee('Información básica')
+            ->assertSee('Se publica al momento');
+
+        $this->get('/docente/convocatorias/create?modo=manual')
             ->assertOk()
             ->assertSeeInOrder(['Información básica', 'Descripción y objetivo', 'Fechas y apoyo económico'])
             ->assertSee('Publicar convocatoria')
-            ->assertSee('Se publica al momento');
+            ->assertDontSee('Pega el enlace de la convocatoria');
     }
 
     public function test_la_paginacion_esta_en_espanol_y_con_el_estilo_propio(): void

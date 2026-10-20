@@ -61,6 +61,7 @@ class TiposConvocatoriaTest extends TestCase
         $this->comoDocente();
 
         Livewire::test(\App\Filament\Docente\Resources\Convocatorias\Pages\CreateConvocatoria::class)
+            ->call('cambiarModo', 'manual')
             ->fillForm([
                 'titulo' => 'ZZ-CONGRESO',
                 'tipo' => 'EVENTO',
