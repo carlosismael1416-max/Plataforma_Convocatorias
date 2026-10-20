@@ -181,3 +181,25 @@ app/listar_categorias.py
 # Copias rotas o temporales de código
 *.roto_*
 *.roto
+
+
+# ============================================================
+# NO SE SUBEN AL REPOSITORIO
+# ============================================================
+
+# Pruebas automatizadas (se quedan en la máquina local)
+tests/
+
+# Instrucciones de asistentes, documentos y respaldos
+CLAUDE.md
+AGENTS.md
+*.docx
+*.pdf
+backups/
+*.dump
+
+# Salidas del ciclo automático
+ciclo_automatico_ultimo.json
+descubrimiento_vista_previa.json
+descubrimiento_google_vista_previa.json
+google_news_url_cache.json
