@@ -35,6 +35,12 @@ class MotorExtraccion extends Page
 
     public ?int $fuente = null;
 
+    /** Descubrimientos es una pestaña de esta página: también la marca en el menú. */
+    public static function getNavigationItemActiveRoutePattern(): string|array
+    {
+        return [static::getRouteName(), 'filament.admin.resources.descubrimiento-webs.*'];
+    }
+
     public static function canAccess(): bool
     {
         $usuario = auth()->user();
