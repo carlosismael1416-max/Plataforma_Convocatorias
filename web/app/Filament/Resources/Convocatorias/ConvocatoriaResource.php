@@ -184,13 +184,9 @@ class ConvocatoriaResource extends Resource
     public static function getRelations(): array
     {
         return [
-            \App\Filament\Resources\Convocatorias\RelationManagers\ModalidadesFinanciamientoRelationManager::class,
-            \App\Filament\Resources\Convocatorias\RelationManagers\ApoyosFinancierosRelationManager::class,
-            \App\Filament\Resources\Convocatorias\RelationManagers\FinanciamientosRelationManager::class,
             \App\Filament\Resources\Convocatorias\RelationManagers\ArchivosRelationManager::class,
             \App\Filament\Resources\Convocatorias\RelationManagers\RequisitosRelationManager::class,
             \App\Filament\Resources\Convocatorias\RelationManagers\RevisionesRelationManager::class,
-            \App\Filament\Resources\Convocatorias\RelationManagers\RevisionesAdministrativasRelationManager::class,
         ];
     }
 

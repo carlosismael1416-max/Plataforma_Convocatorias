@@ -29,4 +29,9 @@ class Fuente extends Model
             'ultima_ejecucion' => 'datetime',
         ];
     }
+
+    public function convocatorias(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Convocatoria::class, 'fuente_id');
+    }
 }

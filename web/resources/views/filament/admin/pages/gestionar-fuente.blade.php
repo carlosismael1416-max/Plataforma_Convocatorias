@@ -627,14 +627,7 @@
                             !== null
                         )
 
-                            Cada
-                            {{
-                                number_format(
-                                    $fuente
-                                        ->frecuencia_scraping
-                                )
-                            }}
-                            min
+                            {{ \App\Filament\Admin\Pages\GestionarFuente::frecuenciaLegible($fuente->frecuencia_scraping) }}
 
                         @else
 
@@ -702,189 +695,8 @@
             <main class="main">
 
 
-                <section class="card">
-
-                    <div class="card-header">
-
-                        <div>
-
-                            <div class="card-title">
-                                Configuración de la fuente
-                            </div>
-
-                            <div class="card-description">
-                                Parámetros utilizados por
-                                el motor de extracción.
-                            </div>
-
-                        </div>
-
-                        <a
-                            href="{{
-                                route(
-                                    'filament.admin.resources.fuentes.edit',
-                                    [
-                                        'record' =>
-                                            $fuente->id,
-                                    ]
-                                )
-                            }}"
-                            class="
-                                edit-button
-                                button-link
-                            "
-                        >
-                            Editar configuración
-                        </a>
-
-                    </div>
 
 
-                    <div class="config-grid">
-
-                        <div class="config-item">
-
-                            <span class="config-label">
-                                Nombre
-                            </span>
-
-                            <span class="config-value">
-                                {{ $fuente->nombre }}
-                            </span>
-
-                        </div>
-
-
-                        <div class="config-item">
-
-                            <span class="config-label">
-                                Tipo de fuente
-                            </span>
-
-                            <span class="config-value">
-                                {{
-                                    $fuente->tipo_fuente
-                                    ?? 'Sin definir'
-                                }}
-                            </span>
-
-                        </div>
-
-
-                        <div
-                            class="
-                                config-item
-                                full
-                            "
-                        >
-
-                            <span class="config-label">
-                                Dirección web
-                            </span>
-
-                            <span class="config-value">
-                                {{ $fuente->url_base }}
-                            </span>
-
-                        </div>
-
-
-                        <div class="config-item">
-
-                            <span class="config-label">
-                                Frecuencia de consulta
-                            </span>
-
-                            <span class="config-value">
-                                @if (
-                                    $fuente
-                                        ->frecuencia_scraping
-                                    !== null
-                                )
-
-                                    {{
-                                        number_format(
-                                            $fuente
-                                                ->frecuencia_scraping
-                                        )
-                                    }}
-                                    minutos
-
-                                @else
-
-                                    Sin definir
-
-                                @endif
-                            </span>
-
-                        </div>
-
-
-                        <div class="config-item">
-
-                            <span class="config-label">
-                                Requiere JavaScript
-                            </span>
-
-                            <span class="config-value">
-                                {{
-                                    $fuente
-                                        ->requiere_javascript
-                                        ? 'Sí'
-                                        : 'No'
-                                }}
-                            </span>
-
-                        </div>
-
-                    </div>
-
-                </section>
-
-
-                <section class="card">
-
-                    <div class="card-header">
-
-                        <div>
-
-                            <div class="card-title">
-                                Configuración del extractor
-                            </div>
-
-                            <div class="card-description">
-                                Selectores y parámetros
-                                registrados para esta fuente.
-                            </div>
-
-                        </div>
-
-                    </div>
-
-
-                    @if ($selectorJson)
-
-                        <pre class="code-box">{{ $selectorJson }}</pre>
-
-                    @else
-
-                        <div class="config-empty">
-
-                            <strong>
-                                Sin configuración de selectores.
-                            </strong>
-
-                            <br>
-
-                            Esta fuente todavía no tiene
-                            información almacenada en
-                            <code>selector_config</code>.
-
-                        </div>
-
-                    @endif
-
-                </section>
 
 
                 <section class="card">
@@ -1292,19 +1104,18 @@
 
                     <div class="side-row">
 
+                        <span>Convocatorias aportadas</span>
+
+                        <strong>{{ \App\Models\Convocatoria::where('fuente_id', $fuente->id)->count() }}</strong>
+
+                    </div>
+
+                    <div class="side-row">
+
                         <span>Frecuencia</span>
 
                         <strong>
-                            {{
-                                $fuente
-                                    ->frecuencia_scraping
-                                !== null
-                                    ? number_format(
-                                        $fuente
-                                            ->frecuencia_scraping
-                                    ).' min'
-                                    : '—'
-                            }}
+                            {{ \App\Filament\Admin\Pages\GestionarFuente::frecuenciaLegible($fuente->frecuencia_scraping) }}
                         </strong>
 
                     </div>
@@ -1457,18 +1268,7 @@
                 </section>
 
 
-                <div class="visual-note">
 
-                    Los datos de esta pantalla
-                    son los registrados para la fuente.
-
-                    <br>
-
-                    La ejecución del scraper se
-                    administra desde el módulo
-                    Motor de Extracción.
-
-                </div>
 
             </aside>
 
