@@ -2,6 +2,8 @@
 
 namespace App\Filament\Docente\Pages;
 
+use App\Filament\Concerns\AvisaBorradorGuardado;
+
 use App\Filament\Concerns\RolDelPanel;
 use App\Models\Cotizacion;
 use App\Models\CronogramaActividad;
@@ -23,6 +25,8 @@ use Livewire\Attributes\Locked;
 
 class EntregablesPropuesta extends Page
 {
+    use AvisaBorradorGuardado;
+
     use RolDelPanel;
 
     use WithFileUploads;
@@ -562,6 +566,7 @@ class EntregablesPropuesta extends Page
                 'Entregables guardados'
             )
             ->success()
+            ->actions($this->accionesBorrador())
             ->send();
     }
 

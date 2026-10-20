@@ -2,6 +2,8 @@
 
 namespace App\Filament\Docente\Pages;
 
+use App\Filament\Concerns\AvisaBorradorGuardado;
+
 use App\Filament\Concerns\RolDelPanel;
 use App\Models\PresupuestoItem;
 use App\Models\Propuesta;
@@ -14,6 +16,8 @@ use Livewire\Attributes\Locked;
 
 class PresupuestoPropuesta extends Page
 {
+    use AvisaBorradorGuardado;
+
     use RolDelPanel;
 
     protected static bool $shouldRegisterNavigation = false;
@@ -466,6 +470,7 @@ class PresupuestoPropuesta extends Page
                 'Los conceptos presupuestales están actualizados.'
             )
             ->success()
+            ->actions($this->accionesBorrador())
             ->send();
     }
 

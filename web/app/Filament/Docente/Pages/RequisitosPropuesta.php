@@ -2,6 +2,8 @@
 
 namespace App\Filament\Docente\Pages;
 
+use App\Filament\Concerns\AvisaBorradorGuardado;
+
 use App\Filament\Concerns\RolDelPanel;
 use App\Models\ConvocatoriaRequisito;
 use App\Models\Evidencia;
@@ -19,6 +21,8 @@ use Livewire\Attributes\Locked;
 
 class RequisitosPropuesta extends Page
 {
+    use AvisaBorradorGuardado;
+
     use RolDelPanel;
 
     use WithFileUploads;
@@ -133,6 +137,7 @@ class RequisitosPropuesta extends Page
                 'El cumplimiento y las observaciones se guardaron correctamente.'
             )
             ->success()
+            ->actions($this->accionesBorrador())
             ->send();
     }
 
