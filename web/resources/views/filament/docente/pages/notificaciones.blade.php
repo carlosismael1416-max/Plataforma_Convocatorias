@@ -471,13 +471,6 @@
 
         <div class="notifications-actions">
 
-            <a
-                href="#preferencias-notificaciones"
-                class="notification-btn"
-            >
-                Preferencias
-            </a>
-
             <button
                 type="button"
                 class="
@@ -718,6 +711,9 @@
                         }}
                     "
                     wire:key="notificacion-{{ $notificacion->id }}"
+                    style="cursor: pointer"
+                    {{-- Toda la fila: abre su destino o, si no tiene, la marca leída. --}}
+                    x-on:click="if (! $event.target.closest('a, button')) $wire.{{ $tieneDestino ? 'abrirNotificacion' : 'marcarLeida' }}({{ $notificacion->id }})"
                 >
 
                     <div

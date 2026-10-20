@@ -67,6 +67,11 @@ class AccesoUnificadoController extends Controller
 
         $request->session()->regenerate();
 
+        // El acceso anterior se muestra en el perfil («Último acceso»); luego
+        // se registra el actual.
+        $request->session()->put('acceso_anterior', $usuario->ultimo_acceso?->toIso8601String());
+        $usuario->forceFill(['ultimo_acceso' => now()])->saveQuietly();
+
         return redirect($destino);
     }
 

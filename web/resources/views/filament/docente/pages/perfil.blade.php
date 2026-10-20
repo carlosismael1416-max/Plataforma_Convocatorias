@@ -799,32 +799,6 @@
                 <div class="section-header">
 
                     <div class="section-title">
-                        Preferencias
-                    </div>
-
-                    <div class="section-description">
-                        Configuración de avisos y
-                        preferencias personales.
-                    </div>
-
-                </div>
-
-                <div class="info-box">
-                    La base de datos actual todavía
-                    no contiene campos o una tabla
-                    para preferencias del usuario.
-                    Por ello esta sección no simula
-                    configuraciones que no puedan
-                    persistirse.
-                </div>
-
-            </section>
-
-            <section class="card section-card">
-
-                <div class="section-header">
-
-                    <div class="section-title">
                         Seguridad y cuenta
                     </div>
 
@@ -867,18 +841,17 @@
                     <div>
 
                         <div class="security-title">
-                            Último acceso registrado
+                            Inicio de sesión anterior
                         </div>
 
                         <div class="security-description">
-                            {{
-                                $usuario
-                                    ->ultimo_acceso
-                                    ?->format(
-                                        'd/m/Y H:i:s'
-                                    )
-                                ?? 'Todavía no existe un registro de último acceso.'
-                            }}
+                            @php
+                                $anterior = session('acceso_anterior');
+                                $anterior = $anterior ? \Illuminate\Support\Carbon::parse($anterior) : null;
+                            @endphp
+                            {{ $anterior
+                                ? $anterior->timezone('America/Merida')->locale('es')->isoFormat('dddd D [de] MMMM [de] YYYY, HH:mm') . ' (' . $anterior->locale('es')->diffForHumans() . ')'
+                                : 'Este es tu primer inicio de sesión registrado.' }}
                         </div>
 
                     </div>
