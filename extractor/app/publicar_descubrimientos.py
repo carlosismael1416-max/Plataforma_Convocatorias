@@ -2050,6 +2050,10 @@ def cerrar_pendientes_vencidas(
         WHERE estado = 'PENDIENTE_REVISION'
           AND origen = 'SCRAPING'
           AND fecha_cierre < CURRENT_DATE
+          -- Recién guardada y nunca revisada: primero se enriquece (para
+          -- que llegue completa al historial) y se cierra en el siguiente
+          -- ciclo.
+          AND updated_at > created_at + INTERVAL '1 minute'
         """
     )
 
@@ -2098,15 +2102,17 @@ def revalidar_pendientes(
         WHERE estado = 'PENDIENTE_REVISION'
           AND origen = 'SCRAPING'
           AND (
-                fecha_cierre IS NULL
-                OR fecha_cierre >= CURRENT_DATE
-              )
-          AND (
-                updated_at < NOW()
-                    - make_interval(hours => %s)
+                (
+                    (
+                        fecha_cierre IS NULL
+                        OR fecha_cierre >= CURRENT_DATE
+                    )
+                    AND updated_at < NOW()
+                        - make_interval(hours => %s)
+                )
                 -- Recién guardada y nunca revisada (p. ej. por la fase de
-                -- fuentes oficiales): se valida en el siguiente ciclo, no
-                -- 20 h después.
+                -- fuentes oficiales): se enriquece y valida en el siguiente
+                -- ciclo, aunque ya haya vencido, para que quede completa.
                 OR updated_at <= created_at + INTERVAL '1 minute'
               )
         ORDER BY (updated_at <= created_at + INTERVAL '1 minute') DESC, updated_at, id

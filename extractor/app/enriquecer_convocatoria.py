@@ -17,6 +17,8 @@ import requests
 
 from selectolax.parser import HTMLParser
 
+from app.fechas_convocatoria import anio_de_referencia, extraer_cierre_calendario
+
 from app.descubrimiento.clasificar_objetivo import (
     clasificar_objetivo_convocatoria,
 )
@@ -477,6 +479,21 @@ def limpiar_lineas(
     return resultado
 
 
+# Bases ordinales de las convocatorias mexicanas: «PRIMERA. Objetivo.»,
+# «Décima segunda.- Requisitos», «BASE 3. Calendario».
+ORDINALES = (
+    "primera|segunda|tercera|cuarta|quinta|sexta|septima|octava|novena|decima"
+    "|undecima|duodecima|vigesima"
+)
+
+_PREFIJO_ORDINAL = re.compile(
+    r"^(?:base\s+\d+|(?:" + ORDINALES + r")(?:\s+(?:" + ORDINALES.replace("decima|", "") + r"|primera|segunda))?)"
+    # Después del ordinal siempre hay puntuación («Primera vez…» no es base).
+    r"(?:(?<=\d)\s*(?:\.|-|:|\))*\s*|\s*(?:\.|-|:|\))+\s*)",
+    flags=re.IGNORECASE,
+)
+
+
 def quitar_numeracion_cabecera(
     texto: str,
 ) -> str:
@@ -484,13 +501,33 @@ def quitar_numeracion_cabecera(
         texto
     )
 
-    return re.sub(
+    texto = re.sub(
         r"^(?:[ivxlcdm]+|\d+)"
         r"(?:\.|\)|-|:)?\s+",
         "",
         texto,
         flags=re.IGNORECASE,
     ).strip()
+
+    # «primera. objetivo.» → «objetivo»
+    sin_ordinal = _PREFIJO_ORDINAL.sub("", texto).strip()
+
+    if sin_ordinal != texto:
+        texto = sin_ordinal.rstrip(" .:-")
+
+    return texto
+
+
+def es_base_ordinal(linea: str) -> bool:
+    """«SEGUNDA. Participantes.» (encabezado corto de una base)."""
+    normalizada = normalizar_texto(linea)
+
+    return (
+        len(normalizada) <= 90
+        and _PREFIJO_ORDINAL.match(normalizada) is not None
+        and _PREFIJO_ORDINAL.match(normalizada).end() > 0
+        and re.match(r"^(?:" + ORDINALES + r"|base\s+\d)", normalizada) is not None
+    )
 
 
 def parece_cabecera(
@@ -535,6 +572,11 @@ def parece_cabecera(
         r"(?:\.|\)|-|:)\s+.+",
         normalizada,
         flags=re.IGNORECASE,
+    ):
+        return True
+
+    if es_base_ordinal(
+        linea
     ):
         return True
 
@@ -1195,6 +1237,31 @@ def es_url_pdf(url: str | None) -> bool:
     return urlparse(url or "").path.lower().endswith(".pdf")
 
 
+def fecha_publicacion_html(arbol: HTMLParser) -> date | None:
+    """
+    Fecha de publicación que la propia página declara (WordPress y otros
+    CMS): article:published_time o datePublished de JSON-LD. La fecha de
+    modificación no cuenta.
+    """
+    candidatos = []
+
+    nodo = arbol.css_first('meta[property="article:published_time"]')
+    if nodo is not None:
+        candidatos.append(nodo.attributes.get("content") or "")
+
+    for script in arbol.css('script[type="application/ld+json"]'):
+        coincidencia = re.search(r'"datePublished"\s*:\s*"([^"]+)"', script.text() or "")
+        if coincidencia:
+            candidatos.append(coincidencia.group(1))
+
+    for valor in candidatos:
+        fecha = convertir_fecha(valor)
+        if fecha and 2000 <= fecha.year <= date.today().year + 1:
+            return fecha
+
+    return None
+
+
 def descargar_html_pagina_segura(
     url: str,
     url_base: str,
@@ -1371,8 +1438,17 @@ def construir_item_pagina_directa(
             None,
         )
 
+    fecha_publicacion = fecha_publicacion_html(arbol)
+
+    # Scripts, estilos y menús no son contenido (antes ensuciaban la
+    # descripción con código del sitio).
+    for nodo in arbol.css("script, style, noscript, template, svg, nav, footer, header"):
+        nodo.decompose()
+
+    contenido = arbol.css_first("article") or arbol.css_first("main") or arbol.body or arbol
+
     texto_pagina = (
-        arbol.text(
+        contenido.text(
             separator="\n",
             strip=True,
         )
@@ -1380,6 +1456,9 @@ def construir_item_pagina_directa(
     )
 
     return {
+        "_fecha_publicacion":
+            fecha_publicacion,
+
         "titulo":
             contexto[
                 "titulo"
@@ -1706,6 +1785,36 @@ def seleccionar_objetivo_documental(
     return candidatos[0][2]
 
 
+def completar_con_pagina(
+    item: dict,
+    contexto: dict,
+) -> dict:
+    """
+    El item del spider trae los PDF pero no el texto de la página ni su
+    fecha de publicación: se agregan con una sola descarga segura. Los
+    documentos del spider van primero; los demás de la página, después.
+    """
+    if item.get("_texto_pagina") or es_url_pdf(contexto.get("url_original")):
+        return item
+
+    try:
+        directo = construir_item_pagina_directa(contexto)
+    except Exception as error:
+        print(f"No se pudo leer la página para completar: {type(error).__name__}")
+        return item
+
+    documentos = list(item.get("documentos") or [])
+    vistos = {normalizar_url(d.get("url")) for d in documentos}
+    documentos += [d for d in directo.get("documentos") or [] if normalizar_url(d.get("url")) not in vistos]
+
+    return {
+        **item,
+        "documentos": documentos,
+        "_texto_pagina": directo.get("_texto_pagina") or "",
+        "_fecha_publicacion": directo.get("_fecha_publicacion"),
+    }
+
+
 def construir_enriquecimiento(
     contexto: dict,
     item: dict | None = None,
@@ -1744,6 +1853,11 @@ def construir_enriquecimiento(
         item = construir_item_pagina_directa(
             contexto
         )
+
+    item = completar_con_pagina(
+        item,
+        contexto,
+    )
 
     documentos = item.get(
         "documentos"
@@ -1845,6 +1959,22 @@ def construir_enriquecimiento(
         ):
             objetivo = candidato_general
 
+    lineas_pagina = limpiar_lineas(
+        texto_pagina
+    )
+
+    if objetivo is None:
+        candidato_pagina = extraer_seccion(
+            lineas_pagina,
+            CABECERAS_OBJETIVO,
+            max_caracteres=2200,
+        )
+
+        if objetivo_extraido_valido(
+            candidato_pagina
+        ):
+            objetivo = candidato_pagina
+
     descripcion = extraer_seccion(
         lineas,
         CABECERAS_DESCRIPCION,
@@ -1872,9 +2002,15 @@ def construir_enriquecimiento(
     )
 
     fechas_extra = extraer_fechas_publicacion_inicio(
-        lineas + limpiar_lineas(texto_pagina),
+        lineas + lineas_pagina,
         fechas_en_linea,
     )
+
+    # Si el documento no dice cuándo se publicó, la que declara la página
+    # (algunos sitios ponen ahí la fecha en que migraron su contenido, por
+    # eso solo de respaldo).
+    if not fechas_extra.get("fecha_publicacion") and item.get("_fecha_publicacion"):
+        fechas_extra["fecha_publicacion"] = item["_fecha_publicacion"]
 
     fecha_pdf, evidencia_pdf = (
         extraer_fecha_cierre(
@@ -1902,6 +2038,27 @@ def construir_enriquecimiento(
             evidencia_pdf
         )
 
+    # Tablas de calendario, fechas sin año o en la página: el año sale de
+    # la convocatoria (título o el más mencionado).
+    if fecha_cierre is None:
+        anio = anio_de_referencia(
+            contexto.get("titulo"),
+            texto_total or texto_pagina,
+        )
+
+        for origen, lineas_origen in (
+            ("calendario PDF", lineas),
+            ("calendario página", lineas_pagina),
+        ):
+            fecha_cierre, evidencia = extraer_cierre_calendario(
+                lineas_origen,
+                anio,
+            )
+
+            if fecha_cierre is not None:
+                evidencia_fecha = f"{origen}: {evidencia}"
+                break
+
     categoria_objetivo = contexto.get("categoria_objetivo")
 
     # Lo que entra por una fuente oficial no tiene descubrimiento: la
@@ -1920,6 +2077,14 @@ def construir_enriquecimiento(
     requisitos = extraer_requisitos(
         lineas
     )
+
+    if len(requisitos) < 2:
+        de_pagina = extraer_requisitos(
+            lineas_pagina
+        )
+
+        if len(de_pagina) > len(requisitos):
+            requisitos = de_pagina
 
     organismo_id = (
         buscar_organismo_existente(
