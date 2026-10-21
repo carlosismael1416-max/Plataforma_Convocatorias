@@ -476,7 +476,8 @@ def descargar_mismo_dominio(
     *,
     max_bytes: int,
     reintentos: int = 1,
-    timeout: tuple[int, int] = (10, 40),
+    # Algunos sitios de gobierno tardan más de 10 s en el saludo TLS.
+    timeout: tuple[int, int] = (20, 60),
 ) -> tuple[str, bytes, str]:
     """
     Descarga una URL institucional siguiendo solo

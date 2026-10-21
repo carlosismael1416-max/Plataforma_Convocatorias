@@ -200,27 +200,38 @@ def descripcion_de_pagina(texto_pagina: str, titulo: str | None, maximo: int = 9
 _SECCIONES_REQUISITOS = (
     (
         re.compile(
-            r"^\W*(?:[ivxlc]+[.)]|\d+[.)])?\s*(requisitos(?: (?:de|para) (?:participacion|participar|elegibilidad))?|"
-            r"poblacion objetivo|participantes|quienes pueden participar|elegibilidad|"
-            r"bases de participacion|condiciones de participacion)\s*:?$"
+            r"^\W*(?:[ivxlc]+[.)]|\d+[.)])?\s*(?:(?:primera|segunda|tercera|cuarta|quinta|sexta|septima|octava|novena|decima|undecima|duodecima)(?:\s+\w+)?\s*[.:)-]+\s*|base\s+\d+\s*[.:)-]*\s*)?(requisitos(?: (?:de|para) (?:participacion|participar|elegibilidad))?|requisitos generales|"
+            r"bases de participacion|condiciones de participacion)\s*[.:]?$"
         ),
         "requisito",
     ),
     (
-        re.compile(r"^\W*(?:[ivxlc]+[.)]|\d+[.)])?\s*(restricciones(?: de participacion)?|causas de no elegibilidad)\s*:?$"),
+        re.compile(
+            r"^\W*(?:[ivxlc]+[.)]|\d+[.)])?\s*(?:(?:primera|segunda|tercera|cuarta|quinta|sexta|septima|octava|novena|decima|undecima|duodecima)(?:\s+\w+)?\s*[.:)-]+\s*|base\s+\d+\s*[.:)-]*\s*)?(poblacion objetivo|participantes|quienes pueden participar|elegibilidad)\s*[.:]?$"
+        ),
+        "requisito",
+    ),
+    (
+        re.compile(r"^\W*(?:[ivxlc]+[.)]|\d+[.)])?\s*(?:(?:primera|segunda|tercera|cuarta|quinta|sexta|septima|octava|novena|decima|undecima|duodecima)(?:\s+\w+)?\s*[.:)-]+\s*|base\s+\d+\s*[.:)-]*\s*)?(restricciones(?: de participacion)?|causas de no elegibilidad)\s*[.:]?$"),
         "restriccion",
     ),
 )
 # Secciones en romanos con mayúscula («V. Calendario»); los incisos van en
 # minúscula («a)», «b.») o numerados/viñetas.
-_CABECERA_SECCION = re.compile(r"^\W*[IVXLC]+[.)]\s+[A-ZÁÉÍÓÚÑ]")
-_INCISO = re.compile(r"^\s*(?:([a-z])[.)]|(\d{1,2})[.)]|[•·\-–▪])\s+(.*)$")
+_CABECERA_SECCION = re.compile(
+    r"^\W*(?:[IVXLC]+[.)]\s+[A-ZÁÉÍÓÚÑ]"
+    # Bases ordinales: «CUARTA. Documentación.»
+    # (los romanos solo en mayúscula: «i. Título» es un inciso, no una sección)
+    r"|(?i:primera|segunda|tercera|cuarta|quinta|sexta|s[ée]ptima|octava|novena|d[ée]cima|und[ée]cima|duod[ée]cima)(?:\s+\w+)?\s*[.:)-]+\s*[A-ZÁÉÍÓÚÑa-záéíóúñ])",
+)
+_INCISO = re.compile(r"^\s*(?:([a-z])[.)]|(\d{1,2})[.)]|[•·\-–▪●])(?:\s+(.*)|\s*$)")
 
 
 def _textos_de_seccion(lineas: list[str], inicio: int, maximo: int) -> list[str]:
     incisos: list[list[str]] = []
     parrafo: list[str] = []
     tipo_principal = None
+    ultima_letra = ""
 
     for linea in lineas[inicio:]:
         # Pies de página del PDF («Página 4 de 10»).
@@ -237,14 +248,26 @@ def _textos_de_seccion(lineas: list[str], inicio: int, maximo: int) -> list[str]
 
         if coincide:
             tipo = "letra" if coincide.group(1) else "numero" if coincide.group(2) else "vineta"
+
+            # Los incisos con letra van en orden (a, b, c…): una letra fuera
+            # de secuencia es un romano en minúscula («i. Título», «v. …»)
+            # de una sublista.
+            if tipo == "letra" and tipo_principal == "letra":
+                esperada = chr(ord(ultima_letra) + 1) if ultima_letra else "a"
+                if coincide.group(1) != esperada:
+                    tipo = "romano"
+
             tipo_principal = tipo_principal or tipo
+
+            if tipo == "letra" and tipo == tipo_principal:
+                ultima_letra = coincide.group(1)
 
             # Una sublista (otro tipo de viñeta) pertenece al inciso que la
             # introduce, p. ej. «b) Haber obtenido una beca en: • …».
             if tipo != tipo_principal and incisos:
-                incisos[-1].append("; " + coincide.group(3).strip())
+                incisos[-1].append("; " + (coincide.group(3) or "").strip())
             else:
-                incisos.append([coincide.group(3).strip()])
+                incisos.append([(coincide.group(3) or "").strip()])
         elif incisos:
             incisos[-1].append(texto)
         else:
@@ -262,33 +285,36 @@ def _textos_de_seccion(lineas: list[str], inicio: int, maximo: int) -> list[str]
 
 
 def extraer_requisitos(lineas: list[str], maximo: int = 25) -> list[dict]:
-    """Requisitos y restricciones de participación de la convocatoria."""
+    """
+    Requisitos y restricciones de participación de la convocatoria. Si hay
+    una sección «Requisitos» se usa esa; «Participantes» o «Elegibilidad»
+    solo cuando no la hay (suelen describir a quién va dirigida).
+    """
+
+    def secciones(patron) -> list[int]:
+        return [
+            posicion
+            for posicion, linea in enumerate(lineas)
+            if len(normalizar(linea)) <= 70 and patron.match(normalizar(linea))
+        ]
+
+    principal, secundaria, restriccion = (patron for patron, _ in _SECCIONES_REQUISITOS)
+    inicios = [("requisito", p) for p in (secciones(principal)[:1] or secciones(secundaria)[:1])]
+    inicios += [("restriccion", p) for p in secciones(restriccion)[:1]]
 
     requisitos = []
-    usadas = set()
 
-    for posicion, linea in enumerate(lineas):
-        normal = normalizar(linea)
+    for tipo, posicion in inicios:
+        for texto in _textos_de_seccion(lineas, posicion + 1, maximo):
+            descripcion = " ".join(texto.split()).replace(" ;", ";").replace(":;", ":").strip("; ")
 
-        if len(normal) > 70:
-            continue
-
-        for patron, tipo in _SECCIONES_REQUISITOS:
-            if tipo in usadas or not patron.match(normal):
-                continue
-
-            usadas.add(tipo)
-
-            for texto in _textos_de_seccion(lineas, posicion + 1, maximo):
-                descripcion = " ".join(texto.split()).replace(" ;", ";").replace(":;", ":")
-
-                if 15 <= len(descripcion) <= 1200:
-                    requisitos.append({
-                        "titulo": ("Restricción " if tipo == "restriccion" else "Requisito ") + str(len(requisitos) + 1),
-                        "descripcion": descripcion,
-                        "obligatorio": True,
-                        "tipo_requisito": tipo,
-                        "orden": len(requisitos) + 1,
-                    })
+            if 15 <= len(descripcion) <= 1200:
+                requisitos.append({
+                    "titulo": ("Restricción " if tipo == "restriccion" else "Requisito ") + str(len(requisitos) + 1),
+                    "descripcion": descripcion,
+                    "obligatorio": True,
+                    "tipo_requisito": tipo,
+                    "orden": len(requisitos) + 1,
+                })
 
     return requisitos[:maximo * 2]
