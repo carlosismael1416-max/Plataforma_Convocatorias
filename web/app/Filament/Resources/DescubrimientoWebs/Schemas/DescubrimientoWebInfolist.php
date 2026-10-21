@@ -6,6 +6,7 @@ use App\Filament\Resources\Convocatorias\ConvocatoriaResource;
 use App\Models\DescubrimientoWeb;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\View;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 
@@ -30,6 +31,9 @@ class DescubrimientoWebInfolist
         return $schema
             ->columns(3)
             ->components([
+                View::make('filament.admin.detalle.estado-descubrimiento')
+                    ->columnSpanFull(),
+
                 Section::make('Resumen')
                     ->icon(Heroicon::OutlinedSparkles)
                     ->columnSpanFull()

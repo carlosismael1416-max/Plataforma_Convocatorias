@@ -1190,6 +1190,11 @@ def puntuar_documento_pagina(
     return score
 
 
+def es_url_pdf(url: str | None) -> bool:
+    """El enlace apunta a un PDF (por su ruta, sin consultar el sitio)."""
+    return urlparse(url or "").path.lower().endswith(".pdf")
+
+
 def descargar_html_pagina_segura(
     url: str,
     url_base: str,
@@ -1238,6 +1243,18 @@ def construir_item_pagina_directa(
     capítulos o páginas específicas enlazadas
     desde una convocatoria marco.
     """
+
+    # El enlace es directamente el PDF de la convocatoria (algunas
+    # dependencias publican solo el documento): ese PDF es la fuente.
+    if descarga is None and es_url_pdf(contexto["url_original"]):
+        return {
+            "titulo": contexto["titulo"],
+            "url_original": contexto["url_original"],
+            "descripcion": None,
+            "documentos": [{"nombre": "Convocatoria (PDF)", "url": contexto["url_original"]}],
+            "_texto_pagina": "",
+            "_origen_item": "PDF_DIRECTO",
+        }
 
     # descarga: (url_final, html) si quien llama ya bajó la página.
     url_final, html = descarga or (

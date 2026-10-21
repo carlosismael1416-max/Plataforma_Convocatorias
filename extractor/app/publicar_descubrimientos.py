@@ -34,7 +34,13 @@ from app.enriquecer_convocatoria import (
     aplicar_enriquecimiento,
     cargar_contexto,
     construir_enriquecimiento,
+    construir_item_pagina_directa,
+    descargar_html_pagina_segura,
+    descargar_pdf_seguro,
+    es_url_pdf,
 )
+from app.guardar_resultado_scrapy import guardar_resultado_scrapy
+from app.importar_desde_url import titulo_de_pagina
 
 
 
@@ -1670,6 +1676,31 @@ def procesar_descubrimiento(
                     "FUENTE_NO_DISPONIBLE",
             }
 
+        # El spider lee la URL como un listado; si el descubrimiento es la
+        # página de la convocatoria (o su PDF), se toma directamente.
+        try:
+            convocatoria = guardar_desde_pagina_directa(
+                descubrimiento,
+                fuente_id,
+            )
+        except Exception as error:
+            convocatoria = None
+            salida += (
+                "\nRespaldo de página directa: "
+                f"{type(error).__name__}: {error}"
+            )
+
+        if convocatoria is not None:
+            print("Guardada desde la página directa (el spider no la obtuvo).")
+
+            return finalizar_convocatoria_automatica(
+                descubrimiento=descubrimiento,
+                convocatoria=convocatoria,
+                fuente_id=fuente_id,
+                salida=salida + "\nGuardada desde la página directa.",
+                intento_registrado=True,
+            )
+
         actualizar_descubrimiento(
             descubrimiento["id"],
             estado="ERROR",
@@ -1715,6 +1746,93 @@ def procesar_descubrimiento(
 # Peor caso de un descubrimiento: extracción (300 s) + resolvedor
 # marco (900 s) + enriquecimiento (300 s).
 SEGUNDOS_MAX_POR_DESCUBRIMIENTO = 1500
+
+
+def guardar_desde_pagina_directa(
+    descubrimiento: dict,
+    fuente_id: int,
+) -> dict | None:
+    """
+    Respaldo cuando el spider no devuelve la convocatoria: la página del
+    descubrimiento (o el PDF, si el enlace es un PDF) se guarda como
+    convocatoria PENDIENTE_REVISION con sus documentos; después pasa por el
+    enriquecimiento y el validador de siempre. Mismas defensas de red
+    (solo direcciones públicas y redirecciones del mismo dominio).
+    """
+    url = descubrimiento["url_original"]
+    partes = urlparse(url)
+    url_base = f"{partes.scheme}://{partes.netloc}/"
+
+    if es_url_pdf(url):
+        # Comprueba que de verdad sea un PDF accesible.
+        descargar_pdf_seguro(url, url_base)
+        resultado = {
+            "titulo": (descubrimiento.get("titulo") or "").strip()
+            or partes.path.rsplit("/", 1)[-1].rsplit(".", 1)[0].replace("_", " ").replace("-", " "),
+            "url_original": url,
+            "descripcion": None,
+            "documentos": [{"nombre": "Convocatoria (PDF)", "url": url}],
+        }
+    else:
+        url_final, html = descargar_html_pagina_segura(url, url_base)
+        titulo = titulo_de_pagina(html) or (descubrimiento.get("titulo") or "").strip()
+        item = construir_item_pagina_directa(
+            {"titulo": titulo, "url_original": url_final, "fuente_url_base": url_base},
+            descarga=(url_final, html),
+        )
+        resultado = {
+            "titulo": titulo,
+            "url_original": url_final,
+            "descripcion": None,
+            "documentos": item.get("documentos") or [],
+        }
+
+    guardado = guardar_resultado_scrapy(resultado, fuente_id)
+
+    if not guardado.get("convocatoria_id"):
+        return None
+
+    conexion = conectar()
+
+    try:
+        return buscar_convocatoria_exacta(conexion, resultado["url_original"]) or {
+            "id": guardado["convocatoria_id"],
+            "titulo": resultado["titulo"],
+            "url": resultado["url_original"],
+            "fuente_id": fuente_id,
+            "estado": "PENDIENTE_REVISION",
+        }
+    finally:
+        conexion.rollback()
+        conexion.close()
+
+
+def procesar_con_registro(
+    descubrimiento: dict,
+) -> dict:
+    """
+    Procesa un descubrimiento y, si falla de forma inesperada, lo deja en
+    ERROR con el motivo. Lo usan el ciclo y «Extraer ahora» del panel.
+    """
+
+    try:
+        return procesar_descubrimiento(
+            descubrimiento
+        )
+
+    except Exception as error:
+        mensaje = f"{type(error).__name__}: {error}"
+
+        actualizar_descubrimiento(
+            descubrimiento["id"],
+            estado="ERROR",
+            error=mensaje,
+        )
+
+        return {
+            "estado": "ERROR",
+            "error": mensaje,
+        }
 
 
 def procesar_aprobados(
@@ -1797,33 +1915,9 @@ def procesar_aprobados(
             ],
         )
 
-        try:
-            resultado = (
-                procesar_descubrimiento(
-                    descubrimiento
-                )
-            )
-
-        except Exception as error:
-            actualizar_descubrimiento(
-                descubrimiento["id"],
-                estado="ERROR",
-                error=(
-                    f"{type(error).__name__}: "
-                    f"{error}"
-                ),
-            )
-
-            resultado = {
-                "estado":
-                    "ERROR",
-
-                "error":
-                    (
-                        f"{type(error).__name__}: "
-                        f"{error}"
-                    ),
-            }
+        resultado = procesar_con_registro(
+            descubrimiento
+        )
 
         if (
             resultado[
