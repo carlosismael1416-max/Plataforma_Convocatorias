@@ -694,9 +694,7 @@
                                                 deliverable-description
                                             "
                                         >
-                                            {{
-                                                $item->descripcion
-                                            }}
+                                            <div class="rico-html">{!! \App\Support\TextoEnriquecido::mostrar($item->descripcion, '') !!}</div>
                                         </div>
 
                                     @endif
@@ -1109,12 +1107,7 @@
                                 Descripción
                             </label>
 
-                            <textarea
-                                class="textarea"
-                                maxlength="5000"
-                                wire:model="descripcion"
-                                placeholder="Descripción del entregable..."
-                            ></textarea>
+                            <x-editor-enriquecido campo="descripcion" :editable="$editable ?? true" :limite="5000" placeholder="Descripción del entregable…" />
 
                             @error('descripcion')
                                 <div class="field-error">

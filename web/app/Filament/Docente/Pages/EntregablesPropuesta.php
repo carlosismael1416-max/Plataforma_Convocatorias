@@ -138,7 +138,8 @@ class EntregablesPropuesta extends Page
             'descripcion' => [
                 'nullable',
                 'string',
-                'max:5000',
+                'max:200000',
+                new \App\Rules\LongitudTexto(5000),
             ],
 
             'cronogramaActividadId' => [
@@ -237,9 +238,7 @@ class EntregablesPropuesta extends Page
                         trim($this->nombre);
 
                     $entregable->descripcion =
-                        $this->textoONull(
-                            $this->descripcion
-                        );
+                        (\App\Support\TextoEnriquecido::sanear($this->descripcion) ?: null);
 
                     $entregable->fecha_limite =
                         $this->fechaLimite

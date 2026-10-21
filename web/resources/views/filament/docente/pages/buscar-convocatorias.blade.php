@@ -654,10 +654,7 @@
 
                         <div class="conv-description">
 
-                            {{ \Illuminate\Support\Str::limit(
-                                $convocatoria->descripcion,
-                                170
-                            ) }}
+                            {{ \Illuminate\Support\Str::limit($convocatoria->descripcionTexto(), 170) }}
 
                         </div>
 

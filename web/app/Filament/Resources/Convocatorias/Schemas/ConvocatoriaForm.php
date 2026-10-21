@@ -5,9 +5,9 @@ namespace App\Filament\Resources\Convocatorias\Schemas;
 use App\Filament\Schemas\CamposTipoConvocatoria;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Section;
+use App\Filament\Forms\EditorEnriquecido;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 
@@ -29,13 +29,13 @@ class ConvocatoriaForm
                             ->maxLength(500)
                             ->columnSpanFull(),
                         ...CamposTipoConvocatoria::campos(),
-                        Textarea::make('descripcion')
+                        EditorEnriquecido::make('descripcion')
                             ->label('Descripción')
-                            ->rows(6)
+                            ->limite(10000)
                             ->columnSpanFull(),
-                        Textarea::make('objetivo')
+                        EditorEnriquecido::make('objetivo')
                             ->label('Objetivo')
-                            ->rows(4)
+                            ->limite(5000)
                             ->columnSpanFull(),
                     ]),
 

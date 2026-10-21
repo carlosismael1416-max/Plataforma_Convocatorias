@@ -2,6 +2,9 @@
 
 namespace App\Models;
 
+use App\Support\TextoEnriquecido;
+use Illuminate\Support\HtmlString;
+
 use App\Models\Concerns\RegistraActividad;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -89,6 +92,28 @@ class Convocatoria extends Model
      * Lo que ven todos los usuarios como convocatoria abierta (docente,
      * directivo y admin usan el mismo criterio): publicada y no vencida.
      */
+    /** Descripción para mostrar: con formato si se escribió en el editor; el texto del motor, en párrafos. */
+    public function descripcionHtml(string $siVacio = 'Sin descripción.'): HtmlString
+    {
+        return TextoEnriquecido::mostrar($this->descripcion, $siVacio);
+    }
+
+    public function objetivoHtml(string $siVacio = 'Sin objetivo.'): HtmlString
+    {
+        return TextoEnriquecido::mostrar($this->objetivo, $siVacio);
+    }
+
+    /** Solo el texto (extractos, búsquedas, exportaciones, calendario). */
+    public function descripcionTexto(): string
+    {
+        return TextoEnriquecido::texto($this->descripcion);
+    }
+
+    public function objetivoTexto(): string
+    {
+        return TextoEnriquecido::texto($this->objetivo);
+    }
+
     public function scopeVisibles(Builder $query): Builder
     {
         return $query

@@ -30,7 +30,7 @@
     .ee .ql-editor { min-height: 180px; max-height: 520px; overflow-y: auto; padding: 14px 16px; }
     .ee .ql-editor.ql-blank::before { color: #94A3B8; font-style: normal; left: 16px; }
     .ee .ql-snow .ql-picker.ql-font { width: 140px; }
-    .ee .ql-snow .ql-picker.ql-size { width: 78px; }
+    .ee .ql-snow .ql-picker.ql-size { width: 92px; }
     .ee .ql-snow .ql-picker.ql-font .ql-picker-label::before, .ee .ql-snow .ql-picker.ql-font .ql-picker-item::before { content: 'Fuente'; }
     .ee .ql-snow .ql-picker.ql-size .ql-picker-label::before, .ee .ql-snow .ql-picker.ql-size .ql-picker-item::before { content: 'Tamaño'; }
     @foreach ($pilas as $nombre => $pila)
@@ -75,6 +75,8 @@
         // La instancia de Quill no va en el estado de Alpine: su proxy
         // reactivo rompe la selección del editor.
         let quill = null;
+        // Último HTML enviado o recibido, para no recargar lo que uno mismo escribió.
+        let ultimo = '';
 
         return {
             caracteres: 0,
@@ -88,7 +90,8 @@
                     readOnly: ! editable,
                     modules: {
                         toolbar: [
-                            [{ font: fuentes }, { size: tamanos }],
+                            // false = sin formato (la letra normal); la barra dice «Fuente» / «Tamaño».
+                            [{ font: [false, ...fuentes] }, { size: [false, ...tamanos] }],
                             ['bold', 'italic', 'underline', 'strike'],
                             [{ color: [] }, { background: [] }],
                             [{ list: 'ordered' }, { list: 'bullet' }],
@@ -98,11 +101,15 @@
                     },
                 });
 
-                const inicial = this.$wire.get(campo) || '';
-                if (inicial) {
-                    quill.setContents(quill.clipboard.convert({ html: inicial }), 'silent');
-                }
-                this.contar();
+                this.cargar(this.$wire.get(campo));
+
+                // El servidor cambió el campo (editar otro registro, limpiar
+                // el formulario, reordenar): el editor muestra el nuevo valor.
+                this.$wire.$watch(campo, (valor) => {
+                    if ((valor || '') !== ultimo) {
+                        this.cargar(valor);
+                    }
+                });
 
                 let espera = null;
                 quill.on('text-change', () => {
@@ -113,11 +120,22 @@
                 // Antes de cualquier acción (guardar, continuar) el valor ya está al día.
                 quill.root.addEventListener('blur', () => this.sincronizar());
             },
+            cargar(valor) {
+                ultimo = valor || '';
+                // Texto sin formato (del motor o anterior al editor): cada línea, un párrafo.
+                const html = /<[a-z][^>]*>/i.test(ultimo)
+                    ? ultimo
+                    : ultimo.split(/\r?\n/).map((l) => '<p>' + l.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</p>').join('');
+                quill.setContents(ultimo ? quill.clipboard.convert({ html }) : [], 'silent');
+                this.contar();
+            },
             contar() {
                 this.caracteres = Math.max(0, quill.getText().trim().length);
             },
             sincronizar() {
                 const html = quill.getText().trim() === '' ? '' : quill.getSemanticHTML();
+                if (html === ultimo) return;
+                ultimo = html;
                 this.$wire.set(campo, html, false);
             },
         };

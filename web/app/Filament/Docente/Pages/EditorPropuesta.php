@@ -446,28 +446,28 @@ class EditorPropuesta extends Page
                 'nullable',
                 'string',
                 'max:200000',
-                $this->maximoDeTexto(),
+                new \App\Rules\LongitudTexto(10000),
             ],
 
             'justificacion' => [
                 'nullable',
                 'string',
                 'max:200000',
-                $this->maximoDeTexto(),
+                new \App\Rules\LongitudTexto(10000),
             ],
 
             'metodologia' => [
                 'nullable',
                 'string',
                 'max:200000',
-                $this->maximoDeTexto(),
+                new \App\Rules\LongitudTexto(10000),
             ],
 
             'impactoEsperado' => [
                 'nullable',
                 'string',
                 'max:200000',
-                $this->maximoDeTexto(),
+                new \App\Rules\LongitudTexto(10000),
             ],
         ]);
 
@@ -615,15 +615,5 @@ class EditorPropuesta extends Page
         return $html !== ''
             ? $html
             : null;
-    }
-
-    /** El límite de 10,000 caracteres cuenta el texto, no el formato. */
-    private function maximoDeTexto(): \Closure
-    {
-        return function (string $atributo, mixed $valor, \Closure $falla): void {
-            if (TextoEnriquecido::longitud((string) $valor) > 10000) {
-                $falla('El texto no debe pasar de 10,000 caracteres.');
-            }
-        };
     }
 }

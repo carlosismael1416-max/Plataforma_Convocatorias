@@ -261,8 +261,7 @@ class GenerarPropuesta extends Page
                                 | suele empezar con el fundamento legal.
                                 */
                                 'resumen' =>
-                                    $convocatoria->objetivo
-                                    ?: $convocatoria->descripcion,
+                                    \App\Support\TextoEnriquecido::sanear($convocatoria->objetivo ?: $convocatoria->descripcion),
 
                                 'justificacion' =>
                                     $this->justificacionInicial(
@@ -500,9 +499,9 @@ class GenerarPropuesta extends Page
                 . $convocatoria->fecha_cierre->format('d/m/Y') . '.';
         }
 
-        if (filled($convocatoria->objetivo)) {
+        if ($convocatoria->objetivoTexto() !== '') {
             $texto .= "\n\nObjetivo de la convocatoria: "
-                . trim($convocatoria->objetivo);
+                . $convocatoria->objetivoTexto();
         }
 
         return $texto

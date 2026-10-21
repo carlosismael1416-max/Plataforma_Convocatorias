@@ -8,6 +8,8 @@ use App\Filament\Concerns\RolDelPanel;
 use App\Models\Propuesta;
 use App\Models\PropuestaObjetivo;
 use App\Models\User;
+use App\Rules\LongitudTexto;
+use App\Support\TextoEnriquecido;
 use App\Models\UsuarioConvocatoria;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
@@ -461,11 +463,19 @@ class ObjetivosPropuesta extends Page
 
         $this->resetErrorBag();
 
+        // Texto con formato (editor): se guarda HTML saneado.
+        $this->objetivoGeneral = TextoEnriquecido::sanear($this->objetivoGeneral);
+
+        foreach ($this->objetivosEspecificos as $indice => $objetivo) {
+            $this->objetivosEspecificos[$indice]['descripcion'] = TextoEnriquecido::sanear((string) ($objetivo['descripcion'] ?? ''));
+        }
+
         $this->validate([
             'objetivoGeneral' => [
                 'nullable',
                 'string',
-                'max:800',
+                'max:20000',
+                new LongitudTexto(800),
             ],
 
             'objetivosEspecificos' => [
@@ -475,7 +485,8 @@ class ObjetivosPropuesta extends Page
             'objetivosEspecificos.*.descripcion' => [
                 'nullable',
                 'string',
-                'max:600',
+                'max:20000',
+                new LongitudTexto(600),
             ],
         ]);
 

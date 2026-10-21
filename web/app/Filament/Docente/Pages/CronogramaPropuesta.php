@@ -130,7 +130,8 @@ class CronogramaPropuesta extends Page
             'descripcion' => [
                 'nullable',
                 'string',
-                'max:5000',
+                'max:200000',
+                new \App\Rules\LongitudTexto(5000),
             ],
 
             'fechaInicio' => [
@@ -199,9 +200,7 @@ class CronogramaPropuesta extends Page
             trim($this->actividad);
 
         $registro->descripcion =
-            $this->textoONull(
-                $this->descripcion
-            );
+            (\App\Support\TextoEnriquecido::sanear($this->descripcion) ?: null);
 
         $registro->fecha_inicio =
             $this->fechaInicio;
