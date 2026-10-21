@@ -468,6 +468,57 @@ def analizar_url_endpoint(
         _ANALISIS_EN_CURSO.release()
 
 
+@app.post(
+    "/descubrimientos/{descubrimiento_id}/procesar",
+    status_code=202,
+)
+def procesar_descubrimiento_ahora(descubrimiento_id: int):
+    """
+    «Extraer ahora» del panel: procesa un descubrimiento sin esperar al
+    ciclo (mismo proceso y umbrales). Corre en segundo plano; el panel ve
+    el avance en el estado del descubrimiento.
+    """
+
+    from app.procesar_descubrimiento_ahora import SALIDA_OK, SALIDA_NO_PROCESABLE, comprobar
+
+    try:
+        conexion = conectar()
+
+        try:
+            codigo, motivo = comprobar(descubrimiento_id, conexion)
+        finally:
+            conexion.close()
+
+    except psycopg.Error:
+        raise HTTPException(status_code=503, detail="No se pudo consultar PostgreSQL.")
+
+    if codigo != SALIDA_OK:
+        raise HTTPException(
+            status_code=404 if codigo == SALIDA_NO_PROCESABLE and "no existe" in (motivo or "") else 409,
+            detail=motivo,
+        )
+
+    try:
+        proceso = subprocess.Popen(
+            [sys.executable, "-m", "app.procesar_descubrimiento_ahora", "--id", str(descubrimiento_id)],
+            cwd=BASE_DIR,
+            stdout=None,
+            stderr=None,
+            start_new_session=True,
+        )
+
+    except OSError as error:
+        _registrar_en_bitacora("API", f"Extraer ahora (descubrimiento {descubrimiento_id}): {error}")
+        raise HTTPException(status_code=500, detail="No se pudo iniciar el extractor.")
+
+    return {
+        "status": "accepted",
+        "message": "La extracción empezó; puede tardar unos minutos.",
+        "descubrimiento_id": descubrimiento_id,
+        "process_id": proceso.pid,
+    }
+
+
 @app.get("/health")
 def health():
     return {
