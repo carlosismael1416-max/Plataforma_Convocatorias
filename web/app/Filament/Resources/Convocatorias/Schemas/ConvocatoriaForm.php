@@ -56,7 +56,7 @@ class ConvocatoriaForm
                             ->default('PENDIENTE_REVISION')
                             ->disabled()
                             ->dehydrated(false)
-                            ->helperText('Lo decide el motor: publica lo que pasa el validador y cierra las vencidas.'),
+                            ->helperText('Lo decide el motor (publica lo que pasa el validador y cierra las vencidas) o tu revisión manual con «Revisar y decidir».'),
                         Select::make('organismo_id')
                             ->label('Organismo')
                             ->relationship('organismo', 'nombre')

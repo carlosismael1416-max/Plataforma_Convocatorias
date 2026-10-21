@@ -106,6 +106,7 @@ def actualizar_estado(
             estado = %s,
             updated_at = NOW()
         WHERE id = %s
+          AND estado <> 'DESCARTADA'
         """,
         (
             estado,

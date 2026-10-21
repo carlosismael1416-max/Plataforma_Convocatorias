@@ -169,6 +169,12 @@ trait ImportaDesdeEnlace
 
         $existente = $this->convocatoriaConMismoEnlace($data['url_original'] ?? null);
 
+        if ($existente && $existente->estado === 'DESCARTADA') {
+            throw ValidationException::withMessages([
+                'data.url_original' => 'Un administrador ya revisó este enlace y decidió no publicarlo. Si crees que es un error, pídele que lo revise de nuevo.',
+            ]);
+        }
+
         if ($existente && $existente->estado !== 'PENDIENTE_REVISION') {
             throw ValidationException::withMessages([
                 'data.url_original' => 'Esta convocatoria ya está en la plataforma (enlace repetido). Búscala en el buscador o en el historial.',
