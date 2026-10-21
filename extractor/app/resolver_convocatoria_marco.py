@@ -1309,6 +1309,10 @@ def crear_o_actualizar_capitulos(
                         "PUBLICADA"
                     )
 
+                # Descartada a mano por un administrador: se queda así.
+                if estado_actual == "DESCARTADA":
+                    nuevo_estado = "DESCARTADA"
+
                 cursor.execute(
                     """
                     UPDATE convocatorias

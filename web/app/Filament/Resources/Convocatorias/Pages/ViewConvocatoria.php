@@ -8,8 +8,8 @@ use App\Filament\Resources\Convocatorias\ConvocatoriaResource;
 use Filament\Actions\EditAction;
 use Filament\Resources\Pages\ViewRecord;
 
-// El administrador ya no aprueba ni solicita correcciones de convocatorias;
-// se publican solas (motor validado o subida del personal).
+// Se publican solas (motor validado o subida del personal); las que el
+// validador no publicó las revisa el administrador en RevisarConvocatoria.
 class ViewConvocatoria extends ViewRecord
 {
     use BotonVolver;
@@ -20,6 +20,13 @@ class ViewConvocatoria extends ViewRecord
     {
         return [
             $this->accionVolver(),
+
+            \Filament\Actions\Action::make('revisar')
+                ->label('Revisar y decidir')
+                ->icon('heroicon-o-clipboard-document-check')
+                ->color('warning')
+                ->visible(fn (): bool => in_array($this->getRecord()->estado, \App\Services\RevisionConvocatoria::REVISABLES, true))
+                ->url(fn (): string => \App\Filament\Admin\Pages\RevisarConvocatoria::getUrl(['record' => $this->getRecord()->id])),
 
             EditAction::make(),
         ];

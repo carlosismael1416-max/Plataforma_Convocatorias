@@ -24,7 +24,7 @@ class ListConvocatorias extends ListRecords
 
     public function getSubheading(): ?string
     {
-        return 'Supervisa las convocatorias detectadas por el motor y las registradas manualmente antes de su publicación en la plataforma.';
+        return 'Supervisa las convocatorias del motor y las subidas a mano. Las que el validador no publicó puedes revisarlas y decidir tú.';
     }
 
     protected function getHeaderActions(): array
@@ -47,6 +47,8 @@ class ListConvocatorias extends ListRecords
             'todas' => Tab::make('Todas'),
             'no_publicadas' => Tab::make('No publicadas')
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('estado', 'PENDIENTE_REVISION')),
+            'descartadas' => Tab::make('Descartadas')
+                ->modifyQueryUsing(fn (Builder $query) => $query->where('estado', 'DESCARTADA')),
             'vigentes' => Tab::make('Vigentes')
                 ->modifyQueryUsing(fn (Builder $query) => $query->visibles()),
             'cerradas' => Tab::make('Cerradas')
@@ -79,6 +81,14 @@ class ListConvocatorias extends ListRecords
                 ->where(fn ($q) => $q->historial()->orWhere('estado', 'ARCHIVADA'))
                 ->count();
 
+        $descartadas =
+            Convocatoria::query()
+                ->where(
+                    'estado',
+                    'DESCARTADA'
+                )
+                ->count();
+
         $scraping =
             Convocatoria::query()
                 ->where(
@@ -101,6 +111,9 @@ class ListConvocatorias extends ListRecords
 
             'pendientesRevision' =>
                 $pendientes,
+
+            'descartadas' =>
+                $descartadas,
 
             'publicadasActivas' =>
                 $publicadasActivas,

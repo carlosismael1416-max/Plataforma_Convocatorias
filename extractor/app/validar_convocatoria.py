@@ -706,11 +706,13 @@ def validar_convocatoria(
                 resultado["dirigido_a"],
             )
 
+        # Un administrador la descartó a mano: el motor nunca la publica.
         if (
             publicar
             and resultado[
                 "publicable"
             ]
+            and convocatoria.get("estado") != "DESCARTADA"
         ):
             cursor = conexion.cursor()
 
@@ -721,6 +723,7 @@ def validar_convocatoria(
                     estado = 'PUBLICADA',
                     updated_at = NOW()
                 WHERE id = %s
+                  AND estado <> 'DESCARTADA'
                 """,
                 (
                     convocatoria_id,

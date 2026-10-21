@@ -207,21 +207,23 @@ class ConvocatoriasTable
                 'desc'
             )
 
+            // Las no publicadas y descartadas abren la revisión manual.
             ->recordUrl(
-                fn (
-                    Convocatoria $record
-                ): string =>
-                    ConvocatoriaResource::getUrl(
-                        'view',
-                        [
-                            'record' =>
-                                $record,
-                        ]
-                    )
+                fn (Convocatoria $record): string => in_array($record->estado, \App\Services\RevisionConvocatoria::REVISABLES, true)
+                    ? \App\Filament\Admin\Pages\RevisarConvocatoria::getUrl(['record' => $record->id])
+                    : ConvocatoriaResource::getUrl('view', ['record' => $record])
             )
 
-            // Toda la fila abre el detalle; aquí solo editar y eliminar, como iconos.
             ->recordActions([
+                \Filament\Actions\Action::make('revisar')
+                    ->label('Revisar y decidir')
+                    ->icon('heroicon-o-clipboard-document-check')
+                    ->iconButton()
+                    ->tooltip('Revisar y decidir')
+                    ->color('warning')
+                    ->visible(fn (Convocatoria $record): bool => in_array($record->estado, \App\Services\RevisionConvocatoria::REVISABLES, true))
+                    ->url(fn (Convocatoria $record): string => \App\Filament\Admin\Pages\RevisarConvocatoria::getUrl(['record' => $record->id])),
+
                 EditAction::make()
                     ->label('Editar')
                     ->iconButton()

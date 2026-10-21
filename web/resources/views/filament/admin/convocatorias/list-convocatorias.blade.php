@@ -58,7 +58,7 @@
 
         .stats {
             display: grid;
-            grid-template-columns: repeat(4, minmax(0, 1fr));
+            grid-template-columns: repeat(5, minmax(0, 1fr));
             gap: 14px;
             margin-bottom: 20px;
         }
@@ -117,6 +117,11 @@
         .gray {
             background: #F1F5F9;
             color: #475569;
+        }
+
+        .red {
+            background: #FEE2E2;
+            color: #B91C1C;
         }
 
         .stat-value {
@@ -335,8 +340,15 @@
             <button type="button" wire:click="$set('activeTab', 'no_publicadas')" @class(['stat', 'activa' => ($this->activeTab ?? 'todas') === 'no_publicadas']) aria-pressed="{{ ($this->activeTab ?? 'todas') === 'no_publicadas' ? 'true' : 'false' }}">
                 <div class="stat-icon yellow">{!! \App\Filament\Apariencia\Iconos::svg('portapapeles', 20) !!}</div>
                 <div class="stat-value">{{ $pendientesRevision }}</div>
-                <div class="stat-label">No publicadas (validador)</div>
-                <div class="stat-help">Internas; el motor las revalida solo</div>
+                <div class="stat-label">No publicadas</div>
+                <div class="stat-help">El validador no las aprobó; revísalas</div>
+            </button>
+
+            <button type="button" wire:click="$set('activeTab', 'descartadas')" @class(['stat', 'activa' => ($this->activeTab ?? 'todas') === 'descartadas']) aria-pressed="{{ ($this->activeTab ?? 'todas') === 'descartadas' ? 'true' : 'false' }}">
+                <div class="stat-icon red">{!! \App\Filament\Apariencia\Iconos::svg('rechazado', 20) !!}</div>
+                <div class="stat-value">{{ $descartadas }}</div>
+                <div class="stat-label">Descartadas</div>
+                <div class="stat-help">Un administrador decidió no publicarlas</div>
             </button>
 
             <button type="button" wire:click="$set('activeTab', 'vigentes')" @class(['stat', 'activa' => ($this->activeTab ?? 'todas') === 'vigentes']) aria-pressed="{{ ($this->activeTab ?? 'todas') === 'vigentes' ? 'true' : 'false' }}">
@@ -410,8 +422,9 @@
             </div>
 
             <div>
-                Las convocatorias se publican solas; el directivo revisa las
-                propuestas que se preparan para participar en ellas.
+                Las convocatorias se publican solas cuando pasan el validador. Las que no lo pasan
+                quedan en «No publicadas»: ábrelas para validarlas de nuevo y decidir si se publican
+                o se descartan.
             </div>
 
         </div>
