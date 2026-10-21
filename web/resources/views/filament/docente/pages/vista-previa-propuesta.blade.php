@@ -191,6 +191,12 @@
 
     /* Texto con formato del editor (HTML saneado). */
     .text.rico { white-space: normal; }
+    .rico-vp { white-space: normal; }
+    .rico-vp p { margin: 0 0 .4em; }
+    .rico-vp p:last-child { margin-bottom: 0; }
+    .rico-vp ul, .rico-vp ol { margin: 0 0 .4em; padding-left: 1.4em; }
+    .rico-vp ul { list-style: disc; }
+    .rico-vp ol { list-style: decimal; }
     .text.rico p { margin: 0 0 .5em; }
     .text.rico p:last-child { margin-bottom: 0; }
     .text.rico ul, .text.rico ol { margin: 0 0 .5em; padding-left: 1.4em; }
@@ -993,11 +999,7 @@
 
                         <br>
 
-                        {{
-                            $objetivoGeneral
-                                ?->descripcion
-                            ?? 'No registrado.'
-                        }}
+                        <div class="rico-vp">{!! \App\Support\TextoEnriquecido::mostrar($objetivoGeneral?->descripcion, 'No registrado.') !!}</div>
                     </div>
 
                     <div class="list">
@@ -1014,10 +1016,7 @@
                                 </span>
 
                                 <div class="text">
-                                    {{
-                                        $objetivo
-                                            ->descripcion
-                                    }}
+                                    <div class="rico-vp">{!! \App\Support\TextoEnriquecido::mostrar($objetivo->descripcion, '') !!}</div>
                                 </div>
 
                             </div>
@@ -1634,10 +1633,7 @@
                                     )
 
                                         <div class="item-sub">
-                                            {{
-                                                $actividad
-                                                    ->descripcion
-                                            }}
+                                            <div class="rico-vp">{!! \App\Support\TextoEnriquecido::mostrar($actividad->descripcion, '') !!}</div>
                                         </div>
 
                                     @endif
@@ -1789,10 +1785,7 @@
                                     )
 
                                         <div class="item-sub">
-                                            {{
-                                                $entregable
-                                                    ->descripcion
-                                            }}
+                                            <div class="rico-vp">{!! \App\Support\TextoEnriquecido::mostrar($entregable->descripcion, '') !!}</div>
                                         </div>
 
                                     @endif

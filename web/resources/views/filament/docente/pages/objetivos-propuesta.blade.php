@@ -629,21 +629,7 @@
                         </span>
                     </label>
 
-                    <textarea
-                        class="textarea"
-                        maxlength="800"
-                        wire:model.live.debounce.700ms="objetivoGeneral"
-                        @disabled(! $editable)
-                    ></textarea>
-
-                    <div class="counter">
-                        {{
-                            mb_strlen(
-                                $objetivoGeneral
-                            )
-                        }}
-                        / 800 caracteres
-                    </div>
+                    <x-editor-enriquecido campo="objetivoGeneral" :editable="$editable" :limite="800" placeholder="Ejemplo: Desarrollar un sistema… que permita…" />
 
                     @error('objetivoGeneral')
                         <div class="field-error">
@@ -682,7 +668,7 @@
 
                     <div
                         class="objective-item"
-                        wire:key="objetivo-especifico-{{ $objetivo['id'] ?? 'nuevo-'.$indice }}"
+                        wire:key="objetivo-especifico-{{ $indice }}-{{ $objetivo['id'] ?? 'nuevo' }}"
                     >
 
                         <div class="objective-top">
@@ -750,25 +736,7 @@
 
                         <div class="field">
 
-                            <textarea
-                                class="textarea"
-                                maxlength="600"
-                                wire:model.live.debounce.700ms="objetivosEspecificos.{{ $indice }}.descripcion"
-                                @disabled(! $editable)
-                            ></textarea>
-
-                            <div class="counter">
-                                {{
-                                    mb_strlen(
-                                        (string) (
-                                            $objetivo[
-                                                'descripcion'
-                                            ] ?? ''
-                                        )
-                                    )
-                                }}
-                                / 600 caracteres
-                            </div>
+                            <x-editor-enriquecido :campo="'objetivosEspecificos.' . $indice . '.descripcion'" :editable="$editable" :limite="600" placeholder="Un resultado concreto y medible…" />
 
                             @error(
                                 'objetivosEspecificos.'

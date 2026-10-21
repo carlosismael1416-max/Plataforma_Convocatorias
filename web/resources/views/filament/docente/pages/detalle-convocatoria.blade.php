@@ -622,10 +622,7 @@
                         >
                             <label>Descripción</label>
 
-                            <div>
-                                {{ $convocatoria->descripcion
-                                    ?? 'Sin descripción' }}
-                            </div>
+                            <div class="rico-html">{!! $convocatoria->descripcionHtml('Sin descripción') !!}</div>
                         </div>
 
                         <div
@@ -636,10 +633,7 @@
                         >
                             <label>Objetivo</label>
 
-                            <div>
-                                {{ $convocatoria->objetivo
-                                    ?? 'Sin objetivo' }}
-                            </div>
+                            <div class="rico-html">{!! $convocatoria->objetivoHtml('Sin objetivo') !!}</div>
                         </div>
 
                         <div class="detalle-field">

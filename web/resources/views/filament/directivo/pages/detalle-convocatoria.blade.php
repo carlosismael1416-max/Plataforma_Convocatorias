@@ -683,12 +683,7 @@
                     ) !== ''
                 )
 
-                    <div class="text">
-                        {{
-                            $convocatoria
-                                ->descripcion
-                        }}
-                    </div>
+                    <div class="text rico-html">{!! $convocatoria->descripcionHtml() !!}</div>
 
                 @else
 
@@ -763,12 +758,7 @@
                     ) !== ''
                 )
 
-                    <div class="text">
-                        {{
-                            $convocatoria
-                                ->objetivo
-                        }}
-                    </div>
+                    <div class="text rico-html">{!! $convocatoria->objetivoHtml() !!}</div>
 
                 @else
 

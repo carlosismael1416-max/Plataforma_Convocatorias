@@ -396,9 +396,7 @@ class VistaPreviaPropuesta extends Page
             ) {
                 $fila([
                     'GENERAL',
-                    $data[
-                        'objetivoGeneral'
-                    ]->descripcion,
+                    TextoEnriquecido::texto($data['objetivoGeneral']->descripcion),
                     $data[
                         'objetivoGeneral'
                     ]->orden,
@@ -413,8 +411,7 @@ class VistaPreviaPropuesta extends Page
             ) {
                 $fila([
                     'ESPECÍFICO',
-                    $objetivo
-                        ->descripcion,
+                    TextoEnriquecido::texto($objetivo->descripcion),
                     $objetivo->orden,
                 ]);
             }
@@ -495,8 +492,7 @@ class VistaPreviaPropuesta extends Page
                 $fila([
                     $item->concepto,
 
-                    $item->descripcion
-                    ?? '',
+                    TextoEnriquecido::texto($item->descripcion),
 
                     $item
                         ->categoria_gasto
@@ -622,9 +618,7 @@ class VistaPreviaPropuesta extends Page
                     $actividad
                         ->actividad,
 
-                    $actividad
-                        ->descripcion
-                    ?? '',
+                    TextoEnriquecido::texto($actividad->descripcion),
 
                     $actividad
                         ->fecha_inicio
@@ -680,9 +674,7 @@ class VistaPreviaPropuesta extends Page
                 $fila([
                     $entregable->nombre,
 
-                    $entregable
-                        ->descripcion
-                    ?? '',
+                    TextoEnriquecido::texto($entregable->descripcion),
 
                     $entregable
                         ->actividad

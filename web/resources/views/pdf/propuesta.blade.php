@@ -268,11 +268,7 @@
 
         <br>
 
-        {{
-            $objetivoGeneral
-                ?->descripcion
-            ?? 'No registrado.'
-        }}
+        <div class="rico">{!! \App\Support\TextoEnriquecido::mostrar($objetivoGeneral?->descripcion, 'No registrado.') !!}</div>
     </div>
 
     @foreach (
@@ -287,7 +283,7 @@
 
             <br>
 
-            {{ $objetivo->descripcion }}
+            <div class="rico">{!! \App\Support\TextoEnriquecido::mostrar($objetivo->descripcion, '') !!}</div>
         </div>
     @endforeach
 </div>
@@ -596,7 +592,7 @@
 
             @if ($actividad->descripcion)
                 <div>
-                    {{ $actividad->descripcion }}
+                    <div class="rico">{!! \App\Support\TextoEnriquecido::mostrar($actividad->descripcion, '') !!}</div>
                 </div>
             @endif
 
@@ -656,7 +652,7 @@
 
             @if ($entregable->descripcion)
                 <div>
-                    {{ $entregable->descripcion }}
+                    <div class="rico">{!! \App\Support\TextoEnriquecido::mostrar($entregable->descripcion, '') !!}</div>
                 </div>
             @endif
 

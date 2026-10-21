@@ -712,6 +712,14 @@
         color: #94A3B8 !important;
         font-style: italic;
     }
+
+    /* Texto con formato (editor tipo Word), guardado como HTML saneado. */
+    .rico-html { white-space: normal; }
+    .rico-html p { margin: 0 0 .45em; }
+    .rico-html p:last-child { margin-bottom: 0; }
+    .rico-html ul, .rico-html ol { margin: 0 0 .45em; padding-left: 1.3em; }
+    .rico-html ul { list-style: disc; }
+    .rico-html ol { list-style: decimal; }
 </style>
 
 <script>

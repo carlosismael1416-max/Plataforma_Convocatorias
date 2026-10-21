@@ -100,10 +100,10 @@
                 </div>
 
                 <div class="rv-etq">Descripción</div>
-                <div class="rv-texto">{{ $convocatoria->descripcion ?: 'Sin descripción.' }}</div>
+                <div class="rv-texto rico-html">{!! $convocatoria->descripcionHtml() !!}</div>
                 @if (filled($convocatoria->objetivo))
                     <div class="rv-etq">Objetivo</div>
-                    <div class="rv-texto">{{ $convocatoria->objetivo }}</div>
+                    <div class="rv-texto rico-html">{!! $convocatoria->objetivoHtml() !!}</div>
                 @endif
             </section>
 

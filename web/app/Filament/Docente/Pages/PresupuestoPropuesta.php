@@ -142,7 +142,8 @@ class PresupuestoPropuesta extends Page
             'descripcion' => [
                 'nullable',
                 'string',
-                'max:5000',
+                'max:200000',
+                new \App\Rules\LongitudTexto(5000),
             ],
 
             'categoriaGasto' => [
@@ -276,9 +277,7 @@ class PresupuestoPropuesta extends Page
             );
 
         $item->descripcion =
-            $this->textoONull(
-                $this->descripcion
-            );
+            (\App\Support\TextoEnriquecido::sanear($this->descripcion) ?: null);
 
         $item->categoria_gasto =
             $this->categoriaGasto;

@@ -5,12 +5,12 @@ namespace App\Filament\Docente\Resources\Convocatorias\Schemas;
 use App\Filament\Schemas\CamposTipoConvocatoria;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Text;
 use Filament\Schemas\Components\View;
+use App\Filament\Forms\EditorEnriquecido;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 
@@ -78,16 +78,16 @@ class ConvocatoriaForm
                         ->visible($mostrar)
                         ->icon(Heroicon::OutlinedDocumentText)
                         ->schema([
-                            Textarea::make('descripcion')
+                            EditorEnriquecido::make('descripcion')
                                 ->label('Descripción general')
-                                ->placeholder('Propósito, alcance y a quién va dirigida la convocatoria...')
-                                ->required()
-                                ->rows(5),
+                                ->marcador('Propósito, alcance y a quién va dirigida la convocatoria...')
+                                ->limite(10000)
+                                ->required(),
 
-                            Textarea::make('objetivo')
+                            EditorEnriquecido::make('objetivo')
                                 ->label('Objetivo de la convocatoria')
-                                ->placeholder('¿Qué busca financiar o apoyar?')
-                                ->rows(3),
+                                ->marcador('¿Qué busca financiar o apoyar?')
+                                ->limite(5000),
                         ]),
 
                     Section::make('Fechas y apoyo económico')

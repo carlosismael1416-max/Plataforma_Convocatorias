@@ -215,15 +215,7 @@ class DetalleConvocatoria extends Page
 
             'descripcionCorta' =>
                 Str::limit(
-                    trim(
-                        (string)
-                        (
-                            $convocatoria
-                                ->descripcion
-                            ?: $convocatoria
-                                ->objetivo
-                        )
-                    ),
+                    $convocatoria->descripcionTexto() ?: $convocatoria->objetivoTexto(),
                     1000
                 ),
         ];

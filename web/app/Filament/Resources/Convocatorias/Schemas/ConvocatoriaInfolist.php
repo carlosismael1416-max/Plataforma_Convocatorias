@@ -24,8 +24,8 @@ class ConvocatoriaInfolist
                     ->icon(Heroicon::OutlinedDocumentText)
                     ->columnSpan(['default' => 1, 'lg' => 2])
                     ->schema([
-                        TextEntry::make('descripcion')->label('Descripción')->placeholder('Sin descripción')->prose(),
-                        TextEntry::make('objetivo')->label('Objetivo')->placeholder('Sin objetivo')->prose(),
+                        TextEntry::make('descripcion')->label('Descripción')->placeholder('Sin descripción')->html()->formatStateUsing(fn (?string $state) => \App\Support\TextoEnriquecido::sanear($state))->extraAttributes(['class' => 'rico-html']),
+                        TextEntry::make('objetivo')->label('Objetivo')->placeholder('Sin objetivo')->html()->formatStateUsing(fn (?string $state) => \App\Support\TextoEnriquecido::sanear($state))->extraAttributes(['class' => 'rico-html']),
                     ]),
 
                 Section::make('Clasificación')

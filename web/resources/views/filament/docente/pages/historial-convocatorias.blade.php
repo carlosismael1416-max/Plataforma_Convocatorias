@@ -92,7 +92,7 @@
                     <div class="hist-org">{{ $c->organismo->nombre }}</div>
                 @endif
                 @if ($c->descripcion)
-                    <div class="hist-desc">{{ \Illuminate\Support\Str::limit(strip_tags($c->descripcion), 220) }}</div>
+                    <div class="hist-desc">{{ \Illuminate\Support\Str::limit($c->descripcionTexto(), 220) }}</div>
                 @endif
                 <div>@include('filament.itsva.tipo-convocatoria', ['convocatoria' => $c])</div>
                 <div class="hist-chips">

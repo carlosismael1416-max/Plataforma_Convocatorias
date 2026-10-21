@@ -46,11 +46,17 @@ class ConvocatoriaInfolist
                 TextEntry::make('descripcion')
                     ->label('Descripción')
                     ->placeholder('Sin descripción')
+                    ->html()
+                    ->formatStateUsing(fn (?string $state) => \App\Support\TextoEnriquecido::sanear($state))
+                    ->extraAttributes(['class' => 'rico-html'])
                     ->columnSpanFull(),
 
                 TextEntry::make('objetivo')
                     ->label('Objetivo')
                     ->placeholder('Sin objetivo')
+                    ->html()
+                    ->formatStateUsing(fn (?string $state) => \App\Support\TextoEnriquecido::sanear($state))
+                    ->extraAttributes(['class' => 'rico-html'])
                     ->columnSpanFull(),
 
                 TextEntry::make('categoria.nombre')
