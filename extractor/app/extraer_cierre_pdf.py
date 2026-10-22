@@ -1,5 +1,4 @@
 import re
-from pathlib import Path
 
 from app.extraer_fechas import (
     PATRON_FECHA,
@@ -131,18 +130,3 @@ def extraer_cierre_pdf(texto):
         "etiqueta": None,
         "usar_como_fecha_cierre": False,
     }
-
-
-if __name__ == "__main__":
-    archivo = Path(
-        "data/textos/secihti_oea_2026.txt"
-    )
-
-    texto = archivo.read_text(
-        encoding="utf-8",
-        errors="replace",
-    )
-
-    print(
-        extraer_cierre_pdf(texto)
-    )

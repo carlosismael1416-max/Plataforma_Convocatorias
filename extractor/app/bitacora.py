@@ -14,7 +14,6 @@ from app.descubrimiento.guardar_descubrimientos import conectar
 
 # created_at/updated_at son «timestamp sin zona» y la web (Laravel) los lee
 # como UTC; NOW() de esta conexión está en hora de México.
-AHORA_UTC = "(NOW() AT TIME ZONE 'UTC')"
 
 MAX_DETALLE = 4000
 

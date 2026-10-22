@@ -336,52 +336,6 @@ def imagenes_calendario(
     return resultado
 
 
-def leer_imagen_calendario(
-    url: str,
-    url_pagina: str,
-) -> str:
-    _, contenido, _ = (
-        descargar_seguro(
-            url,
-            url_pagina,
-        )
-    )
-
-    imagen = Image.open(
-        io.BytesIO(
-            contenido
-        )
-    )
-
-    imagen = ImageOps.exif_transpose(
-        imagen
-    )
-
-    imagen = ImageOps.grayscale(
-        imagen
-    )
-
-    imagen = ImageOps.autocontrast(
-        imagen
-    )
-
-    ancho, alto = imagen.size
-
-    imagen = imagen.resize(
-        (
-            ancho * 2,
-            alto * 2,
-        )
-    )
-
-    return pytesseract.image_to_string(
-        imagen,
-        lang="spa",
-        config="--psm 6",
-    )
-
-
-
 def preparar_imagen_ocr(
     contenido: bytes,
 ):
@@ -610,7 +564,6 @@ def buscar_cierre_por_coordenadas(
     )
 
     return candidatos[0]
-
 
 
 def buscar_cierre_ocr_secuencial(
@@ -1088,7 +1041,6 @@ def resolver_capitulo(
         "errores":
             errores,
     }
-
 
 
 def obtener_datos_padre(

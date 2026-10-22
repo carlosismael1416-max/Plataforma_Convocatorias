@@ -25,7 +25,6 @@ import re
 import unicodedata
 from urllib.parse import unquote, urlparse
 
-TIPOS = ("FINANCIAMIENTO", "BECA", "PREMIO", "CONCURSO", "EVENTO", "FORMACION", "NO_APLICA")
 
 AUDIENCIAS = ("INSTITUCION", "DOCENTES", "ESTUDIANTES")
 

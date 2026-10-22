@@ -3,7 +3,6 @@ from __future__ import annotations
 import argparse
 import json
 import os
-import re
 import time
 
 from datetime import datetime
@@ -158,41 +157,6 @@ def normalizar_url(
         ),
         "",
     ))
-
-
-def base_desde_resultado(
-    resultado: dict,
-) -> str | None:
-    fuente_url = (
-        resultado.get(
-            "fuente_url"
-        )
-        or ""
-    ).strip()
-
-    if fuente_url.startswith(
-        (
-            "http://",
-            "https://",
-        )
-    ):
-        return fuente_url
-
-    dominio = (
-        resultado.get(
-            "dominio"
-        )
-        or ""
-    ).strip()
-
-    if not dominio:
-        return None
-
-    return (
-        "https://"
-        + dominio
-        + "/"
-    )
 
 
 def dominio_de_url(
