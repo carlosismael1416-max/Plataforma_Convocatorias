@@ -1,12 +1,6 @@
-import json
 import re
 from datetime import date
-from pathlib import Path
 
-
-ARCHIVO = Path(
-    "data/textos/convocatoria_investigacion_2025.txt"
-)
 
 MESES = {
     "enero": 1,
@@ -201,49 +195,3 @@ def buscar_fecha(
     )
 
     return fecha, hora
-
-
-def main():
-    texto = ARCHIVO.read_text(
-        encoding="utf-8"
-    )
-
-    calendario = obtener_calendario(
-        texto
-    )
-
-    publicacion, _ = buscar_fecha(
-        calendario,
-        r"Publicación\s+de\s+la\s+Convocatoria",
-    )
-
-    apertura, _ = buscar_fecha(
-        calendario,
-        r"Apertura\s+del\s+sistema\s+para\s+captura\s+de",
-    )
-
-    cierre, hora_cierre = buscar_fecha(
-        calendario,
-        r"Cierre\s+del\s+sistema\s+para\s+captura\s+de",
-    )
-
-    resultado = {
-        "fecha_publicacion": publicacion,
-        "fecha_apertura": apertura,
-        "fecha_cierre_pdf_original": cierre,
-        "hora_cierre": hora_cierre,
-        "zona_horaria": "America/Mexico_City",
-        "fecha_cierre_definitiva_verificada": False,
-    }
-
-    print(
-        json.dumps(
-            resultado,
-            ensure_ascii=False,
-            indent=2,
-        )
-    )
-
-
-if __name__ == "__main__":
-    main()

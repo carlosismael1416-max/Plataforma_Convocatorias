@@ -1,8 +1,6 @@
 
 import argparse
 import json
-import subprocess
-import sys
 from pathlib import Path
 from datetime import date
 from urllib.parse import urlparse
@@ -291,82 +289,6 @@ def ejecutar(
 
 
 
-def analizar_pdf_seleccionado(modo, vigencia, buscar):
-    if modo == "todos" and vigencia == "todas":
-        archivo_entrada = (
-            BASE_DIR / "scraping_vista_previa.json"
-        )
-    else:
-        archivo_entrada = (
-            BASE_DIR / "scraping_filtrado.json"
-        )
-
-    convocatorias = json.loads(
-        archivo_entrada.read_text(encoding="utf-8")
-    )
-
-    coincidencias = [
-        item
-        for item in convocatorias
-        if buscar.casefold()
-        in (item.get("titulo") or "").casefold()
-    ]
-
-    if len(coincidencias) != 1:
-        raise ValueError(
-            "El análisis financiero necesita una "
-            "única convocatoria seleccionada. "
-            f"Coincidencias: {len(coincidencias)}. "
-            "Prueba otro título o amplía el límite."
-        )
-
-    carpeta = BASE_DIR / "data" / "resultados"
-    carpeta.mkdir(parents=True, exist_ok=True)
-
-    # Entregar solamente la convocatoria elegida
-    # al programa de análisis financiero.
-    seleccion = (
-        carpeta / "seleccion_analisis_pdf.json"
-    )
-
-    seleccion.write_text(
-        json.dumps(
-            coincidencias,
-            ensure_ascii=False,
-            indent=2,
-        ),
-        encoding="utf-8",
-    )
-
-    salida = (
-        carpeta / "analisis_financiero_integrado.json"
-    )
-
-    print("\n=== ANÁLISIS FINANCIERO ===")
-    print(
-        "Convocatoria:",
-        coincidencias[0]["titulo"],
-    )
-
-    # Scrapy ya terminó su primera ejecución.
-    # El segundo proceso utiliza un reactor nuevo.
-    subprocess.run(
-        [
-            sys.executable,
-            "-m",
-            "app.analizar_finanzas_json",
-            "--buscar",
-            coincidencias[0]["titulo"],
-            "--entrada",
-            str(seleccion),
-            "--salida",
-            str(salida),
-        ],
-        cwd=BASE_DIR,
-        check=True,
-    )
-
-
 def main():
     parser = argparse.ArgumentParser(
         description=(
@@ -434,29 +356,7 @@ def main():
         help="Fecha de referencia AAAA-MM-DD.",
     )
 
-    parser.add_argument(
-        "--analizar-pdf",
-        action="store_true",
-        help="Analizar los PDF de una convocatoria.",
-    )
-
-    parser.add_argument(
-        "--buscar-pdf",
-        help="Parte del título que se desea analizar.",
-    )
-
     argumentos = parser.parse_args()
-
-    if argumentos.analizar_pdf and argumentos.guardar:
-        parser.error(
-            "--analizar-pdf solo está disponible "
-            "en Vista previa."
-        )
-
-    if argumentos.analizar_pdf and not argumentos.buscar_pdf:
-        parser.error(
-            "Debes indicar --buscar-pdf."
-        )
 
 
     ejecutar(
@@ -468,13 +368,6 @@ def main():
         fuente_id=argumentos.fuente_id,
         url_inicial=argumentos.url,
     )
-
-    if argumentos.analizar_pdf:
-        analizar_pdf_seleccionado(
-            modo=argumentos.modo,
-            vigencia=argumentos.vigencia,
-            buscar=argumentos.buscar_pdf,
-        )
 
 
 if __name__ == "__main__":
