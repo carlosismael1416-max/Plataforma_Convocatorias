@@ -1,4 +1,7 @@
 <x-filament-panels::page>
+    @if (filament()->getId() === 'admin')
+        @include('filament.itsva.pestanas-admin-convocatorias', ['activa' => 'convocatorias'])
+    @endif
     <style>
         .admin-calls {
             --text: #0F1827;

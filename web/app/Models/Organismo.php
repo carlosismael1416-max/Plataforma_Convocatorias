@@ -23,4 +23,9 @@ class Organismo extends Model
             'estado' => 'boolean',
         ];
     }
+
+    public function convocatorias(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Convocatoria::class);
+    }
 }

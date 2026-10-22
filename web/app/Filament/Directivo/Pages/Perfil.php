@@ -2,7 +2,6 @@
 
 namespace App\Filament\Directivo\Pages;
 
-use App\Models\Convocatoria;
 use App\Models\Departamento;
 use App\Models\User;
 use Filament\Notifications\Notification;

@@ -10,7 +10,6 @@ use App\Models\User;
 use App\Services\Avisos;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
-use Illuminate\Database\Eloquent\Builder;
 
 class Notificaciones extends Page
 {

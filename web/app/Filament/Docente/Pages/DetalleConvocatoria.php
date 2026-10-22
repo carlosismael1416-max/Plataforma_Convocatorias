@@ -3,6 +3,7 @@
 namespace App\Filament\Docente\Pages;
 
 use App\Filament\Concerns\GestionaMisConvocatorias;
+use App\Filament\Concerns\RolDelPanel;
 use App\Models\Convocatoria;
 use App\Models\Propuesta;
 use App\Models\User;
@@ -13,6 +14,8 @@ use Filament\Panel;
 class DetalleConvocatoria extends Page
 {
     use GestionaMisConvocatorias;
+
+    use RolDelPanel;
 
     protected static bool $shouldRegisterNavigation = false;
 
@@ -53,7 +56,7 @@ class DetalleConvocatoria extends Page
 
         return $usuario instanceof User
             && (bool) $usuario->estado
-            && $usuario->tieneRol('DOCENTE');
+            && $usuario->tieneRol(static::rolDelPanel());
     }
 
     public function mount(int|string $record): void

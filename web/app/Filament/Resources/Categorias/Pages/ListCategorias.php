@@ -10,10 +10,14 @@ class ListCategorias extends ListRecords
 {
     protected static string $resource = CategoriaResource::class;
 
+    protected string $view = 'filament.admin.catalogos.list-categorias';
+
+    protected static ?string $title = 'Categorías';
+
     protected function getHeaderActions(): array
     {
         return [
-            CreateAction::make(),
+            CreateAction::make()->label('Nueva categoría'),
         ];
     }
 }
