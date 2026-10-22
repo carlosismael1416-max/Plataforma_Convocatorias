@@ -43,6 +43,12 @@ class ConvocatoriaResource extends Resource
     protected static ?string $recordTitleAttribute =
         'titulo';
 
+    /** Organismos y Categorías son pestañas de Convocatorias: también la marcan en el menú. */
+    public static function getNavigationItemActiveRoutePattern(): string|array
+    {
+        return ['filament.admin.resources.convocatorias.*', 'filament.admin.resources.organismos.*', 'filament.admin.resources.categorias.*'];
+    }
+
     public static function form(
         Schema $schema
     ): Schema {

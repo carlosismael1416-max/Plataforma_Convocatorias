@@ -2,7 +2,6 @@
 
 namespace App\Filament\Docente\Resources\Convocatorias\Schemas;
 
-use App\Models\Convocatoria;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Schema;
 

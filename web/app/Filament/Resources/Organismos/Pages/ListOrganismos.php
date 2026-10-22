@@ -10,10 +10,14 @@ class ListOrganismos extends ListRecords
 {
     protected static string $resource = OrganismoResource::class;
 
+    protected string $view = 'filament.admin.catalogos.list-organismos';
+
+    protected static ?string $title = 'Organismos';
+
     protected function getHeaderActions(): array
     {
         return [
-            CreateAction::make(),
+            CreateAction::make()->label('Nuevo organismo'),
         ];
     }
 }
