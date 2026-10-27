@@ -97,6 +97,10 @@ return [
             'prefix_indexes' => true,
             'search_path' => 'public',
             'sslmode' => env('DB_SSLMODE', 'prefer'),
+            // Laravel escribe fechas en UTC (app.timezone); sin esto PostgreSQL
+            // las leía en la zona del servidor (México) y las columnas
+            // «timestamp with time zone» quedaban 6 h adelantadas.
+            'timezone' => 'UTC',
         ],
 
         'sqlsrv' => [

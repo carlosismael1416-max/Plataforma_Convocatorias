@@ -57,6 +57,11 @@
             background: var(--primary);
         }
 
+        .engine-status-apagado { background: #FEE2E2; color: #B91C1C; }
+        .engine-status-apagado .status-dot { background: #DC2626; }
+        .engine-status-caido { background: #FEF3C7; color: #B45309; }
+        .engine-status-caido .status-dot { background: #D97706; }
+
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -597,11 +602,16 @@
             </div>
 
 
-            <div class="engine-status">
+            {{-- Apagado manda: aunque la API responda, no se extrae nada. --}}
+            <div @class([
+                'engine-status',
+                'engine-status-apagado' => ! $motorActivo,
+                'engine-status-caido' => $motorActivo && ! $apiDisponible,
+            ]) title="{{ ! $motorActivo ? 'El interruptor está apagado: no se buscan ni se extraen convocatorias.' : ($apiDisponible ? 'La API del extractor responde.' : 'La API del extractor (127.0.0.1:8001) no responde.') }}">
 
                 <span class="status-dot"></span>
 
-                {{ $apiDisponible ? 'Extractor en línea' : 'Extractor sin respuesta' }}
+                {{ ! $motorActivo ? 'Extracción fuera de línea' : ($apiDisponible ? 'Extractor en línea' : 'Extractor sin respuesta') }}
 
             </div>
 
