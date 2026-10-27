@@ -961,6 +961,8 @@
 
                 @endif
 
+                @include('filament.partials.cerrar-sesion')
+
             </section>
 
             @include('filament.partials.actividad-reciente', ['historialUrl' => null])

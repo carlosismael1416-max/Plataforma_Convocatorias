@@ -913,6 +913,8 @@
 
                         </form>
 
+                        @include('filament.partials.cerrar-sesion')
+
                     </div>
 
                 </section>

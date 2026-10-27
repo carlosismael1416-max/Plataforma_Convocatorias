@@ -1,4 +1,10 @@
-<x-acceso titulo="Iniciar sesión" subtitulo="Consulta, gestiona y desarrolla propuestas para oportunidades de financiamiento.">
+<x-acceso :titulo="isset($agregando) ? 'Agregar otra cuenta' : 'Iniciar sesión'" :subtitulo="isset($agregando) ? 'Entra con tu otra cuenta; podrás cambiar entre ellas desde el engrane del menú.' : 'Consulta, gestiona y desarrolla propuestas para oportunidades de financiamiento.'">
+    @isset($agregando)
+        <div class="ayuda" style="margin-bottom: 14px; padding: 10px 12px; border-radius: 10px; background: #EFF6FF; color: #1E3A8A">
+            Tu sesión como <strong>{{ trim($agregando->name . ' ' . $agregando->apellidos) }}</strong> sigue abierta.
+            <a href="{{ url()->previous() !== url()->current() ? url()->previous() : '/login' }}" style="color: #1D4ED8; font-weight: 700">Volver</a>
+        </div>
+    @endisset
     <form method="POST" action="{{ route('login.submit') }}">
         @csrf
 

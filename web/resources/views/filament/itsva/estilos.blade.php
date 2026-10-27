@@ -160,15 +160,98 @@
         color: #fff;
     }
 
-    .itsva-usuario {
+    /* Usuario abajo en el menú lateral, con el engrane de configuración. */
+    .itsva-usuario-zona {
+        position: relative;
         display: flex;
         align-items: center;
-        gap: 8px;
         margin-top: auto;
-        padding: 16px;
         border-top: 1px solid rgba(255, 255, 255, .08);
+    }
+
+    .itsva-usuario {
+        display: flex;
+        flex: 1;
+        min-width: 0;
+        align-items: center;
+        gap: 8px;
+        padding: 16px 6px 16px 16px;
         text-decoration: none;
     }
+
+    .itsva-engrane {
+        display: inline-flex;
+        flex-shrink: 0;
+        align-items: center;
+        justify-content: center;
+        width: 34px;
+        height: 34px;
+        margin-right: 12px;
+        border: 0;
+        border-radius: 9px;
+        background: transparent;
+        color: #94B8D8;
+        cursor: pointer;
+    }
+
+    .itsva-engrane:hover,
+    .itsva-engrane[aria-expanded="true"] {
+        background: rgba(255, 255, 255, .1);
+        color: #fff;
+    }
+
+    .itsva-menu-cuenta {
+        position: absolute;
+        right: 10px;
+        bottom: calc(100% + 6px);
+        left: 10px;
+        z-index: 40;
+        padding: 8px;
+        border: 1px solid #DDE3EE;
+        border-radius: 14px;
+        background: #fff;
+        box-shadow: 0 16px 40px rgba(15, 24, 39, .25);
+    }
+
+    .itsva-menu-titulo {
+        padding: 8px 10px 4px;
+        color: #94A3B8;
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: .05em;
+        text-transform: uppercase;
+    }
+
+    .itsva-menu-actual {
+        display: flex;
+        flex-direction: column;
+        padding: 2px 10px 8px;
+        border-bottom: 1px solid #EEF2F7;
+    }
+
+    .itsva-menu-actual strong { color: #0F1827; font-size: 13px; }
+    .itsva-menu-actual span { color: #64748B; font-size: 11px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+    .itsva-menu-opcion {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        padding: 9px 10px;
+        border: 0;
+        border-radius: 9px;
+        background: transparent;
+        color: #1E293B;
+        font: 600 13px var(--itsva-display, inherit);
+        text-align: left;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    .itsva-menu-opcion:hover { background: #F1F5F9; }
+    .itsva-menu-cuenta-rol { color: #64748B; font-size: 11px; font-weight: 400; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .itsva-menu-salir { color: #B91C1C; border-top: 1px solid #EEF2F7; border-radius: 0 0 9px 9px; margin-top: 4px; }
+    .itsva-menu-nota { padding: 4px 10px 6px; color: #94A3B8; font-size: 10px; }
+    [x-cloak] { display: none !important; }
 
     .itsva-usuario-texto {
         display: flex;

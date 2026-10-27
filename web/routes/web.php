@@ -25,6 +25,13 @@ Route::post('/logout', [
     ->middleware('auth')
     ->name('logout');
 
+Route::post('/cuentas/{usuario}/cambiar', [
+    AccesoUnificadoController::class,
+    'cambiarCuenta',
+])
+    ->middleware('auth')
+    ->name('cuentas.cambiar');
+
 // Un solo inicio de sesión: las URL antiguas de cada panel llevan a /login.
 foreach (['admin', 'directivo', 'docente'] as $panel) {
     Route::redirect("/{$panel}/login", '/login');

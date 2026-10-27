@@ -11,8 +11,16 @@ use Illuminate\View\View;
 
 class AccesoUnificadoController extends Controller
 {
+    /** Cuentas con las que se inició sesión en este navegador (para «Cambiar de cuenta»). */
+    public const CUENTAS_SESION = 'cuentas_recordadas';
+
     public function mostrar(Request $request): View|RedirectResponse
     {
+        // «Agregar otra cuenta»: el login se muestra sin cerrar la sesión actual.
+        if (Auth::check() && $request->boolean('agregar')) {
+            return view('auth.login', ['agregando' => Auth::user()]);
+        }
+
         if (Auth::check()) {
             $usuario = Auth::user();
 
@@ -69,6 +77,7 @@ class AccesoUnificadoController extends Controller
         }
 
         $request->session()->regenerate();
+        $this->recordarCuenta($request, $usuario);
 
         // El acceso anterior se muestra en el perfil («Último acceso»); luego
         // se registra el actual.
@@ -88,6 +97,41 @@ class AccesoUnificadoController extends Controller
         $request->session()->regenerateToken();
 
         return redirect('/login');
+    }
+
+    /**
+     * Cambia a otra cuenta con la que ya se inició sesión en este navegador
+     * (alguien con cuenta de docente y otra de administrador, por ejemplo).
+     * No pide la contraseña otra vez: ya se comprobó al agregarla. «Cerrar
+     * sesión» olvida todas.
+     */
+    public function cambiarCuenta(Request $request, User $usuario): RedirectResponse
+    {
+        $recordadas = (array) $request->session()->get(self::CUENTAS_SESION, []);
+
+        abort_unless(in_array($usuario->id, $recordadas, true), 403);
+
+        $destino = $this->panelDelUsuario($usuario);
+
+        if ($destino === null) {
+            $request->session()->put(self::CUENTAS_SESION, array_values(array_diff($recordadas, [$usuario->id])));
+
+            return back()->with('error_cuenta', 'Esa cuenta ya no está activa.');
+        }
+
+        Auth::login($usuario);
+        $request->session()->regenerate();
+        $request->session()->put(self::CUENTAS_SESION, $recordadas);
+        \App\Services\RegistroActividad::registrar('INICIO_SESION', 'Cambió a esta cuenta desde otra sesión abierta', usuarioId: $usuario->id);
+
+        return redirect($destino);
+    }
+
+    private function recordarCuenta(Request $request, User $usuario): void
+    {
+        $recordadas = (array) $request->session()->get(self::CUENTAS_SESION, []);
+        $recordadas[] = $usuario->id;
+        $request->session()->put(self::CUENTAS_SESION, array_values(array_unique($recordadas)));
     }
 
     private function panelDelUsuario(User $usuario): ?string
