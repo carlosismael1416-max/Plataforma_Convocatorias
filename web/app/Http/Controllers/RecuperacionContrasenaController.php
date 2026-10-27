@@ -32,13 +32,11 @@ class RecuperacionContrasenaController extends Controller
 
         // Solo cuentas activas; el mensaje es el mismo en todos los casos
         // para no revelar qué correos existen.
-        $activa = User::query()
-            ->where('email', $datos['email'])
-            ->where('estado', true)
-            ->exists();
+        // El correo no distingue mayúsculas (Docente@ = docente@).
+        $cuenta = User::porCorreo($datos['email']);
 
-        if ($activa) {
-            Password::sendResetLink(['email' => $datos['email']]);
+        if ($cuenta && $cuenta->estado) {
+            Password::sendResetLink(['email' => $cuenta->email]);
         }
 
         return back()->with('status', self::MENSAJE_ENVIO);
@@ -63,6 +61,8 @@ class RecuperacionContrasenaController extends Controller
                 ReglaContrasena::min(8)->letters()->numbers(),
             ],
         ]);
+
+        $datos['email'] = User::porCorreo($datos['email'])?->email ?? $datos['email'];
 
         $estado = Password::reset(
             $datos,

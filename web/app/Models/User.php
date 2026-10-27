@@ -44,6 +44,22 @@ class User extends Authenticatable implements FilamentUser, HasAvatar
         ];
     }
 
+    /** Los correos se guardan en minúsculas (el inicio de sesión no distingue mayúsculas). */
+    protected function email(): \Illuminate\Database\Eloquent\Casts\Attribute
+    {
+        return \Illuminate\Database\Eloquent\Casts\Attribute::make(
+            set: fn (?string $valor) => $valor === null ? null : mb_strtolower(trim($valor)),
+        );
+    }
+
+    /** Cuenta por correo sin distinguir mayúsculas (hay cuentas guardadas como «Docente@…»). */
+    public static function porCorreo(?string $correo): ?self
+    {
+        return static::query()
+            ->whereRaw('LOWER(email) = ?', [mb_strtolower(trim((string) $correo))])
+            ->first();
+    }
+
     public function role(): BelongsTo
     {
         return $this->belongsTo(Role::class);

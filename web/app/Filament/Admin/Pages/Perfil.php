@@ -102,12 +102,7 @@ class Perfil extends Page
                     'email',
                     'max:255',
 
-                    Rule::unique(
-                        'users',
-                        'email'
-                    )->ignore(
-                        $usuario->id
-                    ),
+                    new \App\Rules\CorreoDisponible($usuario->id),
                 ],
             ], [
                 'nombre.required' =>

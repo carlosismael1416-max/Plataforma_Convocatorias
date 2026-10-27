@@ -39,8 +39,11 @@ class AccesoUnificadoController extends Controller
             'password' => ['required', 'string'],
         ]);
 
+        // El correo no distingue mayúsculas: se usa el que tiene guardado la cuenta.
+        $cuenta = User::porCorreo($datos['email']);
+
         if (! Auth::attempt([
-            'email' => $datos['email'],
+            'email' => $cuenta?->email ?? $datos['email'],
             'password' => $datos['password'],
             'estado' => true,
         ], $request->boolean('remember'))) {

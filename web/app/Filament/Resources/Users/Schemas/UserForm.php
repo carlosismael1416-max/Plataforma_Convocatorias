@@ -46,7 +46,7 @@ class UserForm
                             ->label('Correo institucional')
                             ->email()
                             ->required()
-                            ->unique(ignoreRecord: true)
+                            ->rule(fn (?\App\Models\User $record) => new \App\Rules\CorreoDisponible($record?->id))
                             ->maxLength(255)
                             ->autocomplete('off')
                             ->placeholder('nombre@itsva.edu.mx')
