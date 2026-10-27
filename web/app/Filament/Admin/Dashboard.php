@@ -135,6 +135,7 @@ class Dashboard extends BaseDashboard
                 ->all(),
 
             'sistema' => [
+                ['etiqueta' => 'Interruptor del motor', 'estado' => \App\Services\InterruptorMotor::activo() ? 'ok' : 'aviso', 'texto' => \App\Services\InterruptorMotor::activo() ? 'Encendido' : 'Apagado'],
                 ['etiqueta' => 'API del extractor', 'estado' => $apiDisponible ? 'ok' : 'mal', 'texto' => $apiDisponible ? 'OK' : 'Sin respuesta'],
                 ['etiqueta' => 'Base de datos', 'estado' => 'ok', 'texto' => 'OK'],
                 [

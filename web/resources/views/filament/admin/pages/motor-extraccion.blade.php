@@ -767,9 +767,12 @@
                             <button
                                 type="button"
                                 class="secondary-btn"
-                                wire:click="$refresh"
+                                wire:click="actualizarEstado"
+                                wire:loading.attr="disabled"
+                                wire:target="actualizarEstado"
                             >
-                                Actualizar estado
+                                <span wire:loading.remove wire:target="actualizarEstado">Actualizar estado</span>
+                                <span wire:loading wire:target="actualizarEstado">Actualizando…</span>
                             </button>
 
                             <button

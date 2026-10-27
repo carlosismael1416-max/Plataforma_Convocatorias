@@ -72,6 +72,40 @@ class MotorExtraccion extends Page
         }
     }
 
+    /**
+     * «Actualizar estado»: vuelve a leer el interruptor, la API y las
+     * ejecuciones (la página se redibuja) y dice cómo quedó todo.
+     */
+    public function actualizarEstado(): void
+    {
+        $motorActivo = \App\Services\InterruptorMotor::activo();
+
+        try {
+            $api = Http::timeout(2)
+                ->get(rtrim((string) config('services.extractor.url', 'http://127.0.0.1:8001'), '/') . '/health')
+                ->json('status') === 'ok';
+        } catch (\Throwable) {
+            $api = false;
+        }
+
+        $activa = EjecucionScraping::query()->whereIn('estado', ['INICIADO', 'EJECUTANDO'])->latest('id')->first();
+        $ultima = EjecucionScraping::query()->latest('id')->first();
+
+        $partes = [
+            $motorActivo ? 'Motor encendido' : 'Motor apagado: no se busca ni se extrae',
+            $api ? 'API del extractor en línea' : 'API del extractor sin respuesta',
+            $activa
+                ? 'Hay una ejecución en curso (#' . $activa->id . ')'
+                : ($ultima ? 'Última ejecución: #' . $ultima->id . ', ' . mb_strtolower(str_replace('_', ' ', (string) $ultima->estado)) : 'Sin ejecuciones registradas'),
+        ];
+
+        Notification::make()
+            ->title('Estado actualizado')
+            ->body(implode(' · ', $partes) . '.')
+            ->{$motorActivo && $api ? 'success' : 'warning'}()
+            ->send();
+    }
+
     public function ejecutarCiclo(): void
     {
         if (! InterruptorMotor::activo()) {

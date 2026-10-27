@@ -74,13 +74,14 @@
 
         {{-- Motor: último ciclo automático --}}
         <section class="dd-card dd-motor">
-            <div @class(['dd-motor-cab', 'dd-motor-caido' => ! $apiDisponible || $ciclo === null])>
+            <div @class(['dd-motor-cab', 'dd-motor-caido' => ! $motorActivo || ! $apiDisponible || $ciclo === null])>
                 <div class="dd-motor-info">
                     <div class="dd-motor-icono">{!! $svg('cpu', 22) !!}</div>
                     <div>
                         <h3>
                             Motor de extracción
-                            <span class="dd-pastilla">{{ $apiDisponible ? 'EN LÍNEA' : 'SIN RESPUESTA' }}</span>
+                            {{-- Apagado manda: aunque la API responda, no se extrae nada. --}}
+                            <span class="dd-pastilla">{{ ! $motorActivo ? 'FUERA DE LÍNEA' : ($apiDisponible ? 'EN LÍNEA' : 'SIN RESPUESTA') }}</span>
                         </h3>
                         <p class="dd-motor-sub">
                             @if ($ciclo)
