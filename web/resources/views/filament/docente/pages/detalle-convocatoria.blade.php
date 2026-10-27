@@ -259,16 +259,15 @@
             font-size: 13px;
         }
 
+        /* Acciones debajo del título, dentro de la tarjeta del encabezado. */
         .detalle-actions {
             display: flex;
             align-items: center;
             flex-wrap: wrap;
             gap: 10px;
             margin-top: 18px;
-            padding: 18px;
-            background: white;
-            border: 1px solid #DDE3EE;
-            border-radius: 12px;
+            padding-top: 16px;
+            border-top: 1px solid #EEF2F7;
         }
 
         .detalle-btn {
@@ -455,6 +454,60 @@
                     </div>
 
                 </div>
+
+            </div>
+
+            <div class="detalle-actions">
+
+                <a
+                    href="{{ route('filament.' . filament()->getId() . '.pages.' . ($disponible ? 'buscar-convocatorias' : 'historial-convocatorias')) }}"
+                    class="detalle-btn detalle-btn-secondary"
+                >
+                    ← {{ $disponible ? 'Volver a búsqueda' : 'Volver al historial' }}
+                </a>
+
+                @if ($disponible)
+                    @if ($guardada)
+                        <button type="button" wire:click="quitarDeMis({{ $convocatoria->id }})"
+                            wire:confirm="¿Quitar esta convocatoria de Mis convocatorias? También se quita de favoritas."
+                            wire:loading.attr="disabled" class="detalle-btn detalle-btn-success" title="Quitar de Mis convocatorias">
+                            ✓ En Mis convocatorias · Quitar
+                        </button>
+                    @else
+                        <button type="button" wire:click="guardarEnMis({{ $convocatoria->id }})"
+                            wire:loading.attr="disabled" class="detalle-btn detalle-btn-primary">
+                            + Guardar en Mis convocatorias
+                        </button>
+                    @endif
+
+                    <button type="button" wire:click="alternarFavorita({{ $convocatoria->id }})"
+                        wire:loading.attr="disabled" class="detalle-btn {{ $favorita ? 'detalle-btn-fav' : 'detalle-btn-secondary' }}"
+                        aria-pressed="{{ $favorita ? 'true' : 'false' }}">
+                        {{ $favorita ? '★ Favorita · Quitar' : '☆ Marcar favorita' }}
+                    </button>
+
+                    <a
+                        href="{{ route('filament.' . filament()->getId() . '.pages.generar-propuesta', ['convocatoria' => $convocatoria->id]) }}"
+                        class="detalle-btn detalle-btn-purple"
+                    >
+                        {{ $tienePropuesta ? 'Ver / continuar propuesta' : 'Generar propuesta' }}
+                    </a>
+                @else
+                    @if ($guardada)
+                        <button type="button" wire:click="quitarDeMis({{ $convocatoria->id }})"
+                            wire:loading.attr="disabled" class="detalle-btn detalle-btn-secondary">
+                            Quitar de Mis convocatorias
+                        </button>
+                    @endif
+                    <span class="detalle-cerrada">Convocatoria cerrada: solo de consulta.</span>
+                @endif
+
+                @if ($convocatoria->url_original)
+                    <a href="{{ $convocatoria->url_original }}" target="_blank" rel="noopener noreferrer"
+                        class="detalle-btn detalle-btn-secondary detalle-spacer">
+                        Sitio oficial ↗
+                    </a>
+                @endif
 
             </div>
 
@@ -1228,60 +1281,6 @@
             </section>
 
         @endif
-
-        <div class="detalle-actions">
-
-            <a
-                href="{{ route('filament.' . filament()->getId() . '.pages.' . ($disponible ? 'buscar-convocatorias' : 'historial-convocatorias')) }}"
-                class="detalle-btn detalle-btn-secondary"
-            >
-                ← {{ $disponible ? 'Volver a búsqueda' : 'Volver al historial' }}
-            </a>
-
-            @if ($disponible)
-                @if ($guardada)
-                    <button type="button" wire:click="quitarDeMis({{ $convocatoria->id }})"
-                        wire:confirm="¿Quitar esta convocatoria de Mis convocatorias? También se quita de favoritas."
-                        wire:loading.attr="disabled" class="detalle-btn detalle-btn-success" title="Quitar de Mis convocatorias">
-                        ✓ En Mis convocatorias · Quitar
-                    </button>
-                @else
-                    <button type="button" wire:click="guardarEnMis({{ $convocatoria->id }})"
-                        wire:loading.attr="disabled" class="detalle-btn detalle-btn-primary">
-                        + Guardar en Mis convocatorias
-                    </button>
-                @endif
-
-                <button type="button" wire:click="alternarFavorita({{ $convocatoria->id }})"
-                    wire:loading.attr="disabled" class="detalle-btn {{ $favorita ? 'detalle-btn-fav' : 'detalle-btn-secondary' }}"
-                    aria-pressed="{{ $favorita ? 'true' : 'false' }}">
-                    {{ $favorita ? '★ Favorita · Quitar' : '☆ Marcar favorita' }}
-                </button>
-
-                <a
-                    href="{{ route('filament.' . filament()->getId() . '.pages.generar-propuesta', ['convocatoria' => $convocatoria->id]) }}"
-                    class="detalle-btn detalle-btn-purple"
-                >
-                    {{ $tienePropuesta ? 'Ver / continuar propuesta' : 'Generar propuesta' }}
-                </a>
-            @else
-                @if ($guardada)
-                    <button type="button" wire:click="quitarDeMis({{ $convocatoria->id }})"
-                        wire:loading.attr="disabled" class="detalle-btn detalle-btn-secondary">
-                        Quitar de Mis convocatorias
-                    </button>
-                @endif
-                <span class="detalle-cerrada">Convocatoria cerrada: solo de consulta.</span>
-            @endif
-
-            @if ($convocatoria->url_original)
-                <a href="{{ $convocatoria->url_original }}" target="_blank" rel="noopener noreferrer"
-                    class="detalle-btn detalle-btn-secondary detalle-spacer">
-                    Sitio oficial ↗
-                </a>
-            @endif
-
-        </div>
 
     </div>
 
