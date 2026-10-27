@@ -25,7 +25,7 @@ class Reportes extends Page
 
     protected static ?string $navigationLabel = 'Reportes';
 
-    protected static ?int $navigationSort = 10;
+    protected static ?int $navigationSort = 11;
 
 
     protected string $view =

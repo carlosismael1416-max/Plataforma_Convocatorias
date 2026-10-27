@@ -494,9 +494,7 @@ class VistaPreviaPropuesta extends Page
 
                     TextoEnriquecido::texto($item->descripcion),
 
-                    $item
-                        ->categoria_gasto
-                    ?? '',
+                    \App\Models\CategoriaGasto::etiqueta($item->categoria_gasto),
 
                     $cantidad,
 

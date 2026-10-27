@@ -1236,15 +1236,7 @@
                                             </td>
 
                                             <td>
-                                                {{
-                                                    str_replace(
-                                                        '_',
-                                                        ' ',
-                                                        $item
-                                                            ->categoria_gasto
-                                                        ?? '—'
-                                                    )
-                                                }}
+                                                {{ \App\Models\CategoriaGasto::etiqueta($item->categoria_gasto) }}
                                             </td>
 
                                             <td>

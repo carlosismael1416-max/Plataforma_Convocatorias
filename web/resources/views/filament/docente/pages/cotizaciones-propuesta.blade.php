@@ -722,16 +722,7 @@
                                 </span>
 
                                 <span class="detail-value">
-                                    {{
-                                        str_replace(
-                                            '_',
-                                            ' ',
-                                            $cotizacion
-                                                ->presupuestoItem
-                                                ?->categoria_gasto
-                                            ?? 'Sin categoría'
-                                        )
-                                    }}
+                                    {{ \App\Models\CategoriaGasto::etiqueta($cotizacion->presupuestoItem?->categoria_gasto) }}
                                 </span>
                             </div>
 

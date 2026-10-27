@@ -6,6 +6,7 @@ use App\Filament\Concerns\AvisaBorradorGuardado;
 
 use App\Filament\Concerns\RolDelPanel;
 use App\Models\PresupuestoItem;
+use App\Models\CategoriaGasto;
 use App\Models\Propuesta;
 use App\Models\User;
 use App\Models\UsuarioConvocatoria;
@@ -34,16 +35,6 @@ class PresupuestoPropuesta extends Page
     // La vista ya trae su encabezado (título, descripción y acciones).
     protected ?string $heading = '';
 
-    public const CATEGORIAS = [
-        'EQUIPO' => 'Equipo',
-        'MATERIALES' => 'Materiales',
-        'SERVICIOS' => 'Servicios',
-        'VIATICOS' => 'Viáticos',
-        'PERSONAL' => 'Personal',
-        'INFRAESTRUCTURA' => 'Infraestructura',
-        'OTRO' => 'Otro',
-    ];
-
     // El navegador no puede cambiarla: identifica la propuesta
     // del usuario validada en mount().
     #[Locked]
@@ -55,7 +46,7 @@ class PresupuestoPropuesta extends Page
 
     public string $descripcion = '';
 
-    public string $categoriaGasto = 'EQUIPO';
+    public string $categoriaGasto = '';
 
     public string $cantidad = '1';
 
@@ -95,6 +86,9 @@ class PresupuestoPropuesta extends Page
 
         $this->propuestaId =
             $propuesta->id;
+
+        $this->categoriaGasto =
+            (string) array_key_first(CategoriaGasto::opciones());
 
         $this->moneda =
             strtoupper(
@@ -148,9 +142,10 @@ class PresupuestoPropuesta extends Page
 
             'categoriaGasto' => [
                 'required',
+                // Activas o la que ya tenía el concepto que se edita.
                 Rule::in(
                     array_keys(
-                        self::CATEGORIAS
+                        CategoriaGasto::opciones($this->categoriaDelConceptoEditado())
                     )
                 ),
             ],
@@ -764,7 +759,10 @@ class PresupuestoPropuesta extends Page
                 $items,
 
             'categorias' =>
-                self::CATEGORIAS,
+                CategoriaGasto::opciones($this->categoriaDelConceptoEditado()),
+
+            'etiquetasCategoria' =>
+                CategoriaGasto::etiquetas(),
 
             'totalesCategoria' =>
                 $totalesCategoria,
@@ -945,7 +943,7 @@ class PresupuestoPropuesta extends Page
         $this->itemEditandoId = null;
         $this->concepto = '';
         $this->descripcion = '';
-        $this->categoriaGasto = 'EQUIPO';
+        $this->categoriaGasto = (string) array_key_first(CategoriaGasto::opciones());
         $this->cantidad = '1';
         $this->precioUnitario = '';
     }
@@ -988,6 +986,14 @@ class PresupuestoPropuesta extends Page
 
         return $texto !== ''
             ? $texto
+            : null;
+    }
+
+    /** Categoría guardada del concepto en edición (puede estar ya desactivada). */
+    private function categoriaDelConceptoEditado(): ?string
+    {
+        return $this->itemEditandoId
+            ? PresupuestoItem::query()->whereKey($this->itemEditandoId)->where('propuesta_id', $this->propuestaId)->value('categoria_gasto')
             : null;
     }
 }

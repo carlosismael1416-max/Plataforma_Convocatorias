@@ -29,6 +29,7 @@ class Actividad extends Model
         'MOTOR' => ['Motor', '⚙️'],
         'REPORTE' => ['Reporte', '📊'],
         'BITACORA' => ['Bitácora', '🧾'],
+        'CATALOGO' => ['Catálogos', '🗂️'],
     ];
 
     public function usuario(): BelongsTo

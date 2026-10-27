@@ -360,11 +360,7 @@
                         </td>
 
                         <td>
-                            {{
-                                $item
-                                    ->categoria_gasto
-                                ?? '—'
-                            }}
+                            {{ \App\Models\CategoriaGasto::etiqueta($item->categoria_gasto) }}
                         </td>
 
                         <td>

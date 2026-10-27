@@ -34,7 +34,7 @@ class HistorialActividades extends Page
 
     // Al final del menú, después de Convocatorias.
     protected static ?int $navigationSort =
-        9;
+        10;
 
     #[Url(as: 'q', except: '')]
     public string $buscar = '';

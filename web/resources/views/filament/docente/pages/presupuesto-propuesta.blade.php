@@ -661,7 +661,7 @@
                                         <td>
                                             <span class="category-tag">
                                                 {{
-                                                    $categorias[
+                                                    $etiquetasCategoria[
                                                         $item->categoria_gasto
                                                         ?: 'OTRO'
                                                     ]
