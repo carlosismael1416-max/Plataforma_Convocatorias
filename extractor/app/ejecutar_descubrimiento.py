@@ -68,6 +68,11 @@ load_dotenv(
 )
 
 
+# «when:60d»: solo notas de los últimos 60 días (sin ella, Google News
+# devuelve notas de convocatorias de hace años). SECIHTI y TecNM traen
+# convocatorias nacionales, en las que el ITSVA sí puede participar.
+VENTANA_GOOGLE = "when:60d"
+
 CONSULTAS_GOOGLE = [
     (
         '"convocatoria" '
@@ -92,6 +97,16 @@ CONSULTAS_GOOGLE = [
         '"beca de investigación" '
         'México convocatoria'
     ),
+    (
+        '"convocatoria" SECIHTI'
+    ),
+    (
+        '"convocatoria" TecNM investigación'
+    ),
+]
+CONSULTAS_GOOGLE = [
+    f"{consulta} {VENTANA_GOOGLE}"
+    for consulta in CONSULTAS_GOOGLE
 ]
 
 
@@ -1329,6 +1344,7 @@ def deduplicar_candidatos(
     encontrados = {}
 
     prioridad_metodo = {
+        "PAGINA_PROPIA_DESDE_NOTA": 7,
         "GOOGLE_NEWS_INSTITUCIONAL": 6,
         "ENLACE_INSTITUCIONAL_DESDE_NOTICIA": 5,
         "HTML_LIGERO": 3,

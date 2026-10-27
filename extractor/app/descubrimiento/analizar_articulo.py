@@ -687,6 +687,10 @@ def analizar_articulo(
             [],
         "texto":
             "",
+        # Enlaces dentro del texto de la nota (sin menús ni pies):
+        # de aquí sale la página propia de la convocatoria.
+        "enlaces_cuerpo":
+            [],
     }
 
     if descarga[
@@ -714,6 +718,14 @@ def analizar_articulo(
 
     resultado["texto"] = extraer_texto_principal(
         descarga["html"]
+    )
+
+    # Importación local: pagina_propia usa funciones de este módulo.
+    from app.descubrimiento.pagina_propia import enlaces_del_cuerpo
+
+    resultado["enlaces_cuerpo"] = enlaces_del_cuerpo(
+        descarga["html"],
+        descarga["url_final"],
     )
 
     dominio_articulo = dominio_de(

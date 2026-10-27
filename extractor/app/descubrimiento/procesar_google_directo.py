@@ -16,6 +16,17 @@ from app.descubrimiento.resolver_google_news import (
 
 from app.descubrimiento.analizar_articulo import (
     analizar_articulo,
+    es_institucional,
+)
+
+from app.descubrimiento.elegibilidad import (
+    evaluar_elegibilidad,
+)
+
+from app.descubrimiento.pagina_propia import (
+    buscar_pagina_propia,
+    es_nota,
+    portales_en_nota,
 )
 
 from app.descubrimiento.buscar_html_ligero import (
@@ -397,6 +408,69 @@ def es_portal(
     }
 
 
+def elegible_por_nota(
+    item: dict,
+) -> bool:
+    dominio = item.get("dominio") or ""
+
+    return evaluar_elegibilidad(
+        item.get("titulo") or "",
+        f"https://{dominio}/" if dominio else "",
+    )["elegible"]
+
+
+def candidato_pagina_propia(
+    articulo: dict,
+    item: dict,
+    titulo: str,
+    url_nota: str,
+) -> dict | None:
+    """
+    Si la nota enlaza la página propia de la convocatoria (y el ITSVA
+    puede participar), el candidato es esa página; la nota queda como
+    origen y contexto.
+    """
+    propia = buscar_pagina_propia(
+        articulo.get("enlaces_cuerpo") or [],
+        titulo,
+        url_nota,
+    )
+
+    if propia is None:
+        return None
+
+    print(
+        "  Página propia:",
+        propia["url"],
+    )
+
+    candidato = construir_candidato(
+        url=propia["url"],
+        titulo=elegir_titulo_candidato(
+            propia["texto"],
+            titulo,
+            propia["url"],
+        ),
+        metodo="PAGINA_PROPIA_DESDE_NOTA",
+        contexto=articulo.get("texto", ""),
+        pagina_origen=url_nota,
+        estado_fuente=(
+            "INSTITUCIONAL_DESCUBIERTA_DESDE_NOTICIA"
+            if es_institucional(propia["dominio"])
+            else "PAGINA_PROPIA_DESDE_NOTICIA"
+        ),
+        evidencia_google={
+            "titulo": item.get("titulo"),
+            "fuente": item.get("fuente_nombre"),
+            "articulo": url_nota,
+            "puntaje_enlace": propia["puntaje"],
+            "razones_enlace": propia["razones"],
+        },
+    )
+
+    return candidato if candidato_util(candidato) else None
+
+
 def procesar_resultados_google(
     resultados_google: list[dict],
     max_resultados: int = 12,
@@ -408,6 +482,28 @@ def procesar_resultados_google(
             "estado_google"
         ) in ESTADOS_GOOGLE_VALIDOS
     ]
+
+    # Antes de descargar nada: las notas de otro estado o de otro país
+    # (por título y dominio del medio) no ocupan los lugares de
+    # resolución directa.
+    no_elegibles = [
+        item
+        for item in seleccionados
+        if not elegible_por_nota(item)
+    ]
+
+    seleccionados = [
+        item
+        for item in seleccionados
+        if item not in no_elegibles
+    ]
+
+    if no_elegibles:
+        print()
+        print(
+            "Omitidas (el ITSVA no puede participar):",
+            len(no_elegibles),
+        )
 
     seleccionados.sort(
         key=lambda item:
@@ -602,6 +698,49 @@ def procesar_resultados_google(
         # La propia publicación es
         # institucional.
         # ==================================
+
+        # ==================================
+        # Nota o boletín que enlaza la
+        # página propia de la convocatoria.
+        # ==================================
+
+        if (
+            articulo["estado"] == "COMPLETADO"
+            and (
+                not articulo["publicacion_institucional"]
+                or es_nota(url_original, titulo)
+            )
+        ):
+            propia = candidato_pagina_propia(
+                articulo,
+                item,
+                titulo,
+                url_original,
+            )
+
+            evidencia["analisis_articulo"]["pagina_propia"] = (
+                propia["url"] if propia else None
+            )
+
+            if propia is not None:
+                candidatos.append(propia)
+                evidencias.append(evidencia)
+                continue
+
+            # Sin página propia, el sitio del organismo que la nota
+            # enlaza se explora como portal.
+            for portal_url in portales_en_nota(
+                articulo.get("enlaces_cuerpo") or [],
+                titulo,
+                url_original,
+            ):
+                portales.append({
+                    "url": portal_url,
+                    "dominio": dominio_de(portal_url),
+                    "titulo": titulo,
+                    "origen": "PORTAL_DESDE_NOTA",
+                    "prioridad": 110 + int(item.get("puntaje_google", 0)),
+                })
 
         if articulo[
             "publicacion_institucional"
