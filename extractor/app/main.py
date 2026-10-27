@@ -420,6 +420,56 @@ def _registrar_en_bitacora(tipo: str, mensaje: str, url: str | None = None) -> N
         pass
 
 
+class AnalizarArchivoRequest(BaseModel):
+    nombre: str = Field(default="convocatoria", max_length=255)
+    # PDF o imagen en base64 (hasta 15 MB del archivo original).
+    contenido_base64: str = Field(min_length=8, max_length=21_000_000)
+
+
+@app.post("/convocatorias/analizar-archivo")
+def analizar_archivo_endpoint(datos: AnalizarArchivoRequest):
+    """
+    «Subir convocatoria desde un archivo» (PDF o imagen): lee el texto,
+    lo analiza como el motor y aplica el validador, sin guardar nada.
+    """
+
+    import base64
+    import binascii
+
+    from app.importar_desde_archivo import ArchivoInvalido, analizar_archivo
+
+    if not motor_activo():
+        raise HTTPException(
+            status_code=409,
+            detail="El motor de extracción está apagado. Usa la subida manual o pide a un administrador que lo encienda.",
+        )
+
+    try:
+        contenido = base64.b64decode(datos.contenido_base64, validate=True)
+    except (binascii.Error, ValueError):
+        raise HTTPException(status_code=422, detail="El archivo no llegó completo.")
+
+    if not _ANALISIS_EN_CURSO.acquire(blocking=False):
+        raise HTTPException(status_code=429, detail="Hay otro análisis en curso. Intenta de nuevo en un momento.")
+
+    try:
+        with contextlib.redirect_stdout(io.StringIO()):
+            return analizar_archivo(contenido, datos.nombre)
+
+    except ArchivoInvalido as error:
+        raise HTTPException(status_code=422, detail=str(error))
+
+    except psycopg.Error:
+        raise HTTPException(status_code=503, detail="No se pudo consultar PostgreSQL.")
+
+    except Exception as error:
+        _registrar_en_bitacora("API", f"Analizar archivo «{datos.nombre}»: {type(error).__name__}: {error}")
+        raise HTTPException(status_code=502, detail=f"No se pudo leer la convocatoria del archivo: {type(error).__name__}.")
+
+    finally:
+        _ANALISIS_EN_CURSO.release()
+
+
 @app.post("/convocatorias/analizar-url")
 def analizar_url_endpoint(
     datos: AnalizarUrlRequest,

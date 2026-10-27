@@ -73,3 +73,7 @@ Route::middleware('guest')->group(function (): void {
 Route::get('/usuarios/{usuario}/foto', \App\Http\Controllers\FotoPerfilController::class)
     ->middleware('auth')
     ->name('usuarios.foto');
+
+Route::get('/convocatorias/archivos/{archivo}', \App\Http\Controllers\ArchivoConvocatoriaController::class)
+    ->middleware('auth')
+    ->name('convocatorias.archivo');

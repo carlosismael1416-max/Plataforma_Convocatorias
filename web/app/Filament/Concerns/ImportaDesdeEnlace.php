@@ -3,10 +3,14 @@
 namespace App\Filament\Concerns;
 
 use App\Models\Convocatoria;
+use App\Models\ConvocatoriaArchivo;
 use Filament\Notifications\Notification;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
+use Livewire\WithFileUploads;
 
 /**
  * «Subir convocatoria» → «Desde un enlace»: el usuario pega la URL, el
@@ -18,7 +22,12 @@ use Illuminate\Validation\ValidationException;
  */
 trait ImportaDesdeEnlace
 {
+    use WithFileUploads;
+
     public string $enlace = '';
+
+    /** PDF o imagen de la convocatoria («Subir desde un archivo»). */
+    public $archivoConvocatoria = null;
 
     /** Respuesta del extractor (datos, validacion, existente…). */
     public ?array $analisis = null;
@@ -96,7 +105,64 @@ trait ImportaDesdeEnlace
             return;
         }
 
-        $this->analisis = $respuesta->json();
+        // Un enlace reemplaza a un archivo analizado antes.
+        $this->archivoConvocatoria = null;
+        $this->rellenarConAnalisis($respuesta->json(), $enlace);
+    }
+
+    /**
+     * «Desde un archivo»: el PDF o la imagen de la convocatoria se lee con el
+     * extractor (texto del PDF; OCR en imágenes) y llena el formulario igual
+     * que un enlace. Al publicar, el archivo queda como documento.
+     */
+    public function analizarArchivo(): void
+    {
+        abort_unless(static::canAccess(), 403);
+
+        $this->validate(
+            ['archivoConvocatoria' => ['required', 'file', 'mimes:pdf,jpg,jpeg,png,webp', 'max:15360']],
+            [
+                'archivoConvocatoria.required' => 'Elige el PDF o la imagen de la convocatoria.',
+                'archivoConvocatoria.mimes' => 'Sube un PDF o una imagen (JPG, PNG o WebP).',
+                'archivoConvocatoria.max' => 'El archivo no debe pesar más de 15 MB.',
+            ],
+        );
+
+        try {
+            $respuesta = Http::acceptJson()
+                ->timeout(180)
+                ->post(rtrim((string) config('services.extractor.url'), '/') . '/convocatorias/analizar-archivo', [
+                    'nombre' => mb_substr($this->archivoConvocatoria->getClientOriginalName(), 0, 255),
+                    'contenido_base64' => base64_encode((string) file_get_contents($this->archivoConvocatoria->getRealPath())),
+                ]);
+        } catch (ConnectionException) {
+            $this->avisar('El motor de extracción no responde', 'Usa la subida manual o inténtalo más tarde.');
+
+            return;
+        }
+
+        if (! $respuesta->successful()) {
+            $this->avisar(
+                match ($respuesta->status()) {
+                    409 => 'El motor de extracción está apagado',
+                    422 => 'No se pudo leer el archivo',
+                    429 => 'Hay otro análisis en curso',
+                    default => 'No se pudo extraer la convocatoria',
+                },
+                (string) ($respuesta->json('detail') ?? 'Usa la subida manual.')
+            );
+
+            return;
+        }
+
+        $this->enlace = '';
+        $this->rellenarConAnalisis($respuesta->json(), null);
+    }
+
+    /** Llena el formulario con lo que encontró el extractor (enlace o archivo). */
+    private function rellenarConAnalisis(array $analisis, ?string $enlace): void
+    {
+        $this->analisis = $analisis;
         $this->publicarIgual = false;
 
         $datos = $this->analisis['datos'] ?? [];
@@ -135,8 +201,39 @@ trait ImportaDesdeEnlace
     /** «No publicar»: se descarta lo analizado y el formulario queda vacío. */
     public function descartarAnalisis(): void
     {
-        $this->reset(['enlace', 'analisis', 'publicarIgual']);
+        $this->reset(['enlace', 'analisis', 'publicarIgual', 'archivoConvocatoria']);
         $this->form->fill();
+    }
+
+    /**
+     * Al publicar desde un archivo, el archivo queda como documento de la
+     * convocatoria (disco privado; lo sirve la ruta convocatorias.archivo).
+     */
+    protected function adjuntarArchivoSubido(Convocatoria $convocatoria): void
+    {
+        if (! $this->archivoConvocatoria || $this->modo !== 'automatica') {
+            return;
+        }
+
+        $contenido = (string) file_get_contents($this->archivoConvocatoria->getRealPath());
+        $extension = strtolower($this->archivoConvocatoria->getClientOriginalExtension() ?: 'pdf');
+        $ruta = 'convocatorias/' . $convocatoria->id . '/' . Str::random(16) . '.' . $extension;
+
+        Storage::disk('local')->put($ruta, $contenido);
+
+        $archivo = new ConvocatoriaArchivo;
+        $archivo->forceFill([
+            'convocatoria_id' => $convocatoria->id,
+            'nombre' => mb_substr($this->archivoConvocatoria->getClientOriginalName() ?: 'Convocatoria', 0, 255),
+            'tipo_archivo' => $extension === 'pdf' ? 'PDF' : 'IMAGEN',
+            'mime_type' => $this->archivoConvocatoria->getMimeType(),
+            'ruta_archivo' => $ruta,
+            'tamano_bytes' => strlen($contenido),
+            'hash_archivo' => hash('sha256', $contenido),
+        ])->save();
+
+        $archivo->forceFill(['url_archivo' => route('convocatorias.archivo', $archivo)])->save();
+        $this->archivoConvocatoria = null;
     }
 
     /**
@@ -163,7 +260,7 @@ trait ImportaDesdeEnlace
     {
         if (! $this->mostrarFormulario()) {
             throw ValidationException::withMessages([
-                'enlace' => 'Analiza un enlace primero o cambia a la sección «Manual».',
+                'enlace' => 'Analiza un enlace o un archivo primero, o cambia a la sección «Manual».',
             ]);
         }
 

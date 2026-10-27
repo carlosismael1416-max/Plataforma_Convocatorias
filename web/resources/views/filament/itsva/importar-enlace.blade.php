@@ -8,6 +8,14 @@
     $existente = $analisis['existente'] ?? null;
     $panel = filament()->getId();
     $modo = $pagina->modo;
+    $desdeArchivo = isset($analisis['archivo']);
+    // Un archivo nunca trae enlace ni fuente: no es un error del documento.
+    if ($desdeArchivo && $validacion) {
+        $validacion['bloqueos'] = array_values(array_filter(
+            $validacion['bloqueos'] ?? [],
+            fn ($b) => ! str_contains($b, 'URL oficial') && ! str_contains($b, 'fuente asociada')
+        ));
+    }
 @endphp
 
 <div class="imp">
@@ -34,6 +42,12 @@
         .imp-error { position: relative; z-index: 1; margin-top: 8px; color: #FECACA; font-size: 13px; font-weight: 600; }
         .imp-cargando { position: relative; z-index: 1; margin-top: 10px; font-size: 13px; color: #DBEAFE; }
         .imp-nota { margin-top: 10px; color: #BFDBFE; font-size: 12px; position: relative; z-index: 1; }
+        .imp-o { position: relative; z-index: 1; display: flex; align-items: center; gap: 10px; margin: 16px 0 12px; color: #BFDBFE; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; }
+        .imp-o::before, .imp-o::after { content: ''; flex: 1; height: 1px; background: rgba(255,255,255,.25); }
+        .imp-archivo { flex: 1 1 320px; display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 0 14px; border: 2px dashed rgba(255,255,255,.5); border-radius: 10px; color: #fff; font-size: 13px; cursor: pointer; }
+        .imp-archivo:hover { background: rgba(255,255,255,.08); }
+        .imp-archivo span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .imp-leido { margin-bottom: 6px; font-size: 12px; opacity: .85; }
 
         .imp-res { border-radius: 14px; padding: 16px 18px; border: 1px solid; }
         .imp-ok { background: #ECFDF5; border-color: #A7F3D0; color: #065F46; }
@@ -70,8 +84,8 @@
 
     @if ($modo === 'automatica')
     <section class="imp-caja">
-        <h3>✨ Pega el enlace de la convocatoria</h3>
-        <p>Pega el enlace oficial de la convocatoria: la leemos igual que el motor, llenamos el formulario y te decimos si cumple los criterios. Después podrás revisarla y corregirla antes de publicar.</p>
+        <h3>✨ Pega el enlace o sube el archivo de la convocatoria</h3>
+        <p>La leemos igual que el motor, llenamos el formulario y te decimos si cumple los criterios. Después podrás revisarla y corregirla antes de publicar.</p>
 
         <div class="imp-fila">
             <input type="url" wire:model="enlace" wire:keydown.enter.prevent="analizarEnlace"
@@ -91,7 +105,30 @@
             <div class="imp-error">{{ $message }}</div>
         @enderror
 
-        <div class="imp-nota">Solo se leen sitios públicos. Nada se publica hasta que pulses «Publicar convocatoria».</div>
+        <div class="imp-o">o sube el archivo</div>
+
+        <div class="imp-fila">
+            <label class="imp-archivo">
+                <input type="file" wire:model="archivoConvocatoria" accept="application/pdf,image/jpeg,image/png,image/webp" style="display: none">
+                📄 <span wire:loading.remove wire:target="archivoConvocatoria">{{ $pagina->archivoConvocatoria ? $pagina->archivoConvocatoria->getClientOriginalName() : 'Elige el PDF o la imagen (cartel, captura) — hasta 15 MB' }}</span>
+                <span wire:loading wire:target="archivoConvocatoria">Subiendo archivo…</span>
+            </label>
+            <button type="button" class="imp-btn imp-btn-blanco" wire:click="analizarArchivo"
+                wire:loading.attr="disabled" wire:target="analizarArchivo,archivoConvocatoria">
+                <span wire:loading.remove wire:target="analizarArchivo">📄 Analizar archivo</span>
+                <span wire:loading wire:target="analizarArchivo">Leyendo…</span>
+            </button>
+        </div>
+
+        <div class="imp-cargando" wire:loading wire:target="analizarArchivo">
+            Leyendo el archivo… las imágenes y los PDF escaneados tardan un poco más.
+        </div>
+
+        @error('archivoConvocatoria')
+            <div class="imp-error">{{ $message }}</div>
+        @enderror
+
+        <div class="imp-nota">Solo se leen sitios públicos y archivos PDF o de imagen. Nada se publica hasta que pulses «Publicar convocatoria»; si la publicas, el archivo queda como documento de la convocatoria.</div>
     </section>
 
     @if ($analisis)
@@ -108,6 +145,7 @@
             </section>
         @elseif ($validacion['publicable'] ?? false)
             <section class="imp-res imp-ok">
+                @if ($desdeArchivo)<div class="imp-leido">📄 {{ $analisis['archivo'] }} · {{ number_format($analisis['caracteres_leidos'] ?? 0) }} caracteres leídos</div>@endif
                 <h4>✅ Cumple los criterios <span class="imp-puntaje">{{ $validacion['score'] }}/{{ $validacion['umbral'] }}</span></h4>
                 <div style="font-size: 13px">Revisa los datos que llenamos abajo y pulsa «Publicar convocatoria».</div>
                 <div class="imp-acciones">
@@ -116,6 +154,7 @@
             </section>
         @else
             <section class="imp-res imp-mal">
+                @if ($desdeArchivo)<div class="imp-leido">📄 {{ $analisis['archivo'] }} · {{ number_format($analisis['caracteres_leidos'] ?? 0) }} caracteres leídos. Si tienes el enlace oficial, agrégalo abajo: ayuda a verificarla.</div>@endif
                 <h4>⚠️ No cumple todos los criterios automáticos <span class="imp-puntaje">{{ $validacion['score'] ?? 0 }}/{{ $validacion['umbral'] ?? 70 }}</span></h4>
                 <div style="font-size: 13px">El motor no la publicaría sola por:</div>
                 <ul>

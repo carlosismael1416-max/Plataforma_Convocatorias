@@ -100,6 +100,7 @@ class CreateConvocatoria extends CreateRecord
         $convocatoria->estado = 'PUBLICADA';
 
         $convocatoria->save();
+        $this->adjuntarArchivoSubido($convocatoria);
 
         return $convocatoria;
     }

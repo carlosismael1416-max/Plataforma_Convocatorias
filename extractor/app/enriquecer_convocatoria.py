@@ -1935,6 +1935,32 @@ def construir_enriquecimiento(
                     ),
             })
 
+    return analizar_textos(
+        contexto,
+        item,
+        textos,
+        texto_pagina,
+        documentos_procesados,
+        errores_documentos,
+    )
+
+
+def analizar_textos(
+    contexto: dict,
+    item: dict,
+    textos: list[str],
+    texto_pagina: str,
+    documentos_procesados: list | None = None,
+    errores_documentos: list | None = None,
+) -> dict:
+    """
+    Saca descripción, objetivo, fechas, montos, requisitos, categoría y
+    organismo de los textos de los documentos (y de la página). Lo usan el
+    enriquecimiento (PDF descargados) y «Subir desde un archivo».
+    """
+    documentos_procesados = documentos_procesados or []
+    errores_documentos = errores_documentos or []
+
     texto_total = "\n".join(
         textos
     )

@@ -90,6 +90,58 @@ def _json(valor):
     return valor
 
 
+def datos_y_validacion(extraido: dict, titulo: str | None, url: str | None, fuente_id: int | None) -> dict:
+    """
+    Datos para el formulario y resultado del validador a partir de lo que
+    sacó el enriquecimiento (enlace o archivo). No guarda nada.
+    """
+    datos = {
+        "titulo": titulo,
+        "url_original": url,
+        "descripcion": extraido.get("descripcion"),
+        "objetivo": extraido.get("objetivo"),
+        "fecha_cierre": extraido.get("fecha_cierre"),
+        "fecha_publicacion": extraido.get("fecha_publicacion"),
+        "fecha_inicio": extraido.get("fecha_inicio"),
+        "monto_minimo": extraido.get("monto_minimo"),
+        "monto_maximo": extraido.get("monto_maximo"),
+        "moneda": extraido.get("moneda") or "MXN",
+        "organismo_id": extraido.get("organismo_id"),
+        "categoria_id": extraido.get("categoria_id"),
+        "fuente_id": fuente_id,
+    }
+
+    # Mismas restricciones que la tabla (si no, el guardado fallaría).
+    if datos["fecha_inicio"] and datos["fecha_cierre"] and datos["fecha_inicio"] > datos["fecha_cierre"]:
+        datos["fecha_inicio"] = None
+    if (
+        datos["monto_minimo"] is not None
+        and datos["monto_maximo"] is not None
+        and datos["monto_minimo"] > datos["monto_maximo"]
+    ):
+        datos["monto_minimo"] = None
+
+    validacion = evaluar_convocatoria({"id": 0, **datos})
+    datos["tipo"] = validacion["tipo"]
+    datos["dirigido_a"] = validacion["dirigido_a"]
+
+    return {
+        "datos": {clave: _json(valor) for clave, valor in datos.items()},
+        "requisitos": [
+            r.get("descripcion") if isinstance(r, dict) else str(r)
+            for r in (extraido.get("requisitos") or [])
+        ][:15],
+        "validacion": {
+            "publicable": validacion["publicable"],
+            "score": validacion["score"],
+            "umbral": validacion["umbral"],
+            "razones": validacion["razones"],
+            "bloqueos": validacion["bloqueos"],
+        },
+        "documentos": extraido.get("documentos_procesados") or [],
+    }
+
+
 def analizar_url(url: str) -> dict:
     url = (url or "").strip()
 
@@ -138,53 +190,11 @@ def analizar_url(url: str) -> dict:
     item = construir_item_pagina_directa(contexto, descarga=(url_final, html))
     extraido = construir_enriquecimiento(contexto, item=item)
 
-    datos = {
-        "titulo": titulo,
-        "url_original": url_final,
-        "descripcion": extraido.get("descripcion"),
-        "objetivo": extraido.get("objetivo"),
-        "fecha_cierre": extraido.get("fecha_cierre"),
-        "fecha_publicacion": extraido.get("fecha_publicacion"),
-        "fecha_inicio": extraido.get("fecha_inicio"),
-        "monto_minimo": extraido.get("monto_minimo"),
-        "monto_maximo": extraido.get("monto_maximo"),
-        "moneda": extraido.get("moneda") or "MXN",
-        "organismo_id": extraido.get("organismo_id"),
-        "categoria_id": extraido.get("categoria_id"),
-        "fuente_id": fuente["id"] if fuente else None,
-    }
-
-    # Mismas restricciones que la tabla (si no, el guardado fallaría).
-    if datos["fecha_inicio"] and datos["fecha_cierre"] and datos["fecha_inicio"] > datos["fecha_cierre"]:
-        datos["fecha_inicio"] = None
-    if (
-        datos["monto_minimo"] is not None
-        and datos["monto_maximo"] is not None
-        and datos["monto_minimo"] > datos["monto_maximo"]
-    ):
-        datos["monto_minimo"] = None
-
-    validacion = evaluar_convocatoria({"id": 0, **datos})
-    datos["tipo"] = validacion["tipo"]
-    datos["dirigido_a"] = validacion["dirigido_a"]
-
     return {
         "url_final": url_final,
         "fuente": fuente["nombre"] if fuente else None,
         "existente": existente,
-        "datos": {clave: _json(valor) for clave, valor in datos.items()},
-        "requisitos": [
-            r.get("descripcion") if isinstance(r, dict) else str(r)
-            for r in (extraido.get("requisitos") or [])
-        ][:15],
-        "validacion": {
-            "publicable": validacion["publicable"],
-            "score": validacion["score"],
-            "umbral": validacion["umbral"],
-            "razones": validacion["razones"],
-            "bloqueos": validacion["bloqueos"],
-        },
-        "documentos": extraido.get("documentos_procesados") or [],
+        **datos_y_validacion(extraido, titulo, url_final, fuente["id"] if fuente else None),
     }
 
 
