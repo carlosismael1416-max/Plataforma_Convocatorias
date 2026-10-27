@@ -253,6 +253,16 @@
         gap: 12px;
     }
 
+    /* Partida del clasificador: ocupa toda la fila, con su detalle. */
+    .cog-campo { grid-column: 1 / -1; order: 3; }
+    .cog-buscar { margin-bottom: 8px; }
+    .cog-detalle { margin-top: 10px; padding: 12px 14px; border: 1px solid #DBEAFE; border-radius: 12px; background: #F5F9FF; }
+    .cog-fila { display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 10px; padding: 3px 0; font-size: 13px; }
+    .cog-fila span { color: #64748B; }
+    .cog-fila strong { color: #0F1827; font-weight: 700; }
+    .cog-desc { margin: 8px 0 0; color: #334155; font-size: 13px; line-height: 1.55; }
+    @media (max-width: 640px) { .cog-fila { grid-template-columns: 1fr; gap: 0; } }
+
     .form-grid + .form-grid {
         margin-top: 12px;
     }
@@ -661,12 +671,7 @@
                                         <td>
                                             <span class="category-tag">
                                                 {{
-                                                    $etiquetasCategoria[
-                                                        $item->categoria_gasto
-                                                        ?: 'OTRO'
-                                                    ]
-                                                    ?? $item->categoria_gasto
-                                                    ?? 'Otro'
+                                                    \App\Models\CategoriaGasto::etiqueta($item->categoria_gasto)
                                                 }}
                                             </span>
                                         </td>
@@ -804,25 +809,25 @@
 
                             </div>
 
-                            <div class="field">
+                            {{-- Partida del Clasificador por Objeto del Gasto: el docente
+                                 la busca por número o nombre y ve capítulo, concepto,
+                                 descripción y tipo de gasto. --}}
+                            <div class="field cog-campo" x-data="{ filtro: '', partidas: @js($detallePartidas), get sel() { return this.partidas[$wire.categoriaGasto] ?? null } }">
 
                                 <label>
-                                    Categoría *
+                                    Partida de gasto (clasificador por objeto del gasto) *
                                 </label>
 
-                                <select
-                                    class="select"
-                                    wire:model="categoriaGasto"
-                                >
-                                    @foreach (
-                                        $categorias
-                                        as $valor => $etiqueta
-                                    )
-                                        <option
-                                            value="{{ $valor }}"
-                                        >
-                                            {{ $etiqueta }}
-                                        </option>
+                                <input type="search" class="input cog-buscar" x-model="filtro" placeholder="Buscar por número o nombre: 3751, viáticos, cómputo…">
+
+                                <select class="select" wire:model.live="categoriaGasto" size="1">
+                                    <option value="">Elige la partida…</option>
+                                    @foreach ($categorias as $grupo => $opciones)
+                                        <optgroup label="{{ $grupo }}">
+                                            @foreach ($opciones as $valor => $etiqueta)
+                                                <option value="{{ $valor }}" x-show="! filtro || @js(\Illuminate\Support\Str::lower(\Illuminate\Support\Str::ascii($grupo . ' ' . $etiqueta))).includes(filtro.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, ''))">{{ $etiqueta }}</option>
+                                            @endforeach
+                                        </optgroup>
                                     @endforeach
                                 </select>
 
@@ -831,6 +836,17 @@
                                         {{ $message }}
                                     </div>
                                 @enderror
+
+                                <template x-if="sel">
+                                    <div class="cog-detalle">
+                                        <div class="cog-fila"><span>Capítulo</span><strong x-text="sel.capitulo"></strong></div>
+                                        <div class="cog-fila"><span>Concepto</span><strong x-text="sel.concepto"></strong></div>
+                                        <div class="cog-fila"><span>Partida genérica</span><strong x-text="sel.generica"></strong></div>
+                                        <div class="cog-fila" x-show="sel.especifica"><span>Partida específica</span><strong x-text="sel.especifica"></strong></div>
+                                        <div class="cog-fila"><span>Tipo de gasto</span><strong x-text="sel.tipo"></strong></div>
+                                        <p class="cog-desc" x-text="sel.descripcion"></p>
+                                    </div>
+                                </template>
 
                             </div>
 
@@ -988,12 +1004,7 @@
                         <div class="total-row">
 
                             <span>
-                                {{
-                                    $categorias[
-                                        $categoria
-                                    ]
-                                    ?? $categoria
-                                }}
+                                {{ $categoria === 'SIN' ? 'Sin partida asignada' : \App\Models\CategoriaGasto::etiqueta($categoria) }}
                             </span>
 
                             <strong>

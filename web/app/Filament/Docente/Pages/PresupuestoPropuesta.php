@@ -87,8 +87,8 @@ class PresupuestoPropuesta extends Page
         $this->propuestaId =
             $propuesta->id;
 
-        $this->categoriaGasto =
-            (string) array_key_first(CategoriaGasto::opciones());
+        // Sin partida elegida: el docente la busca en el clasificador.
+        $this->categoriaGasto = '';
 
         $this->moneda =
             strtoupper(
@@ -345,7 +345,7 @@ class PresupuestoPropuesta extends Page
         $this->categoriaGasto =
             (string) (
                 $item->categoria_gasto
-                ?: 'OTRO'
+                ?: ''
             );
 
         $this->cantidad =
@@ -636,8 +636,9 @@ class PresupuestoPropuesta extends Page
                     fn (
                         PresupuestoItem $item
                     ): string =>
-                        $item->categoria_gasto
-                        ?: 'OTRO'
+                        // Totales por capítulo del clasificador (1000, 2000…).
+                        CategoriaGasto::buscar($item->categoria_gasto)?->ruta()['capitulo']?->clave
+                        ?? 'SIN'
                 )
                 ->map(
                     fn ($grupo): float =>
@@ -759,10 +760,10 @@ class PresupuestoPropuesta extends Page
                 $items,
 
             'categorias' =>
-                CategoriaGasto::opciones($this->categoriaDelConceptoEditado()),
+                CategoriaGasto::opcionesAgrupadas($this->categoriaDelConceptoEditado()),
 
-            'etiquetasCategoria' =>
-                CategoriaGasto::etiquetas(),
+            'detallePartidas' =>
+                CategoriaGasto::datosParaDocente(),
 
             'totalesCategoria' =>
                 $totalesCategoria,
@@ -943,7 +944,7 @@ class PresupuestoPropuesta extends Page
         $this->itemEditandoId = null;
         $this->concepto = '';
         $this->descripcion = '';
-        $this->categoriaGasto = (string) array_key_first(CategoriaGasto::opciones());
+        $this->categoriaGasto = '';
         $this->cantidad = '1';
         $this->precioUnitario = '';
     }
