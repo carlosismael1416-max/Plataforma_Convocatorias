@@ -3,6 +3,7 @@
 namespace App\Filament\Admin\Pages;
 
 use App\Models\CategoriaGasto;
+use App\Models\PresupuestoItem;
 use App\Models\User;
 use BackedEnum;
 use Filament\Actions\Action;
@@ -21,8 +22,10 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Support\Str;
+use Livewire\Attributes\Url;
 
 /**
  * «Gestión de propuestas» (administrador y directivo): por ahora, el
@@ -56,10 +59,58 @@ class GestionPropuestas extends Page implements HasTable
             && ($usuario->tieneRol('ADMINISTRADOR') || $usuario->tieneRol('DIRECTIVO'));
     }
 
+    // Búsqueda sin acentos («viaticos» encuentra «Viáticos»).
+    private const SIN_ACENTOS_NOMBRE = "translate(lower(nombre), 'áéíóúüñ', 'aeiouun')";
+
+    private const SIN_ACENTOS_DESCRIPCION = "translate(lower(coalesce(descripcion, '')), 'áéíóúüñ', 'aeiouun')";
+
+    /** Tarjeta de capítulo seleccionada arriba de la tabla ('' = todos). */
+    #[Url(as: 'capitulo')]
+    public string $capitulo = '';
+
+    public function verCapitulo(string $capitulo): void
+    {
+        $this->capitulo = preg_match('/^[1-9]$/', $capitulo) ? $capitulo : '';
+        $this->resetPage();
+    }
+
+    /** Partidas que elige el docente: específicas, o genéricas sin específicas. */
+    private static function soloElegibles($query)
+    {
+        return $query->where(fn ($q) => $q->where('nivel', 'PARTIDA_ESPECIFICA')
+            ->orWhere(fn ($g) => $g->where('nivel', 'PARTIDA_GENERICA')
+                ->whereNotExists(fn ($h) => $h->selectRaw('1')->from('categorias_gasto as h')->whereColumn('h.padre_clave', 'categorias_gasto.clave'))));
+    }
+
+    protected function getViewData(): array
+    {
+        $capitulos = CategoriaGasto::query()->where('nivel', 'CAPITULO')->orderBy('orden')->get();
+        $elegibles = self::soloElegibles(CategoriaGasto::query())->pluck('clave');
+
+        return [
+            'capitulos' => $capitulos->map(fn (CategoriaGasto $c) => [
+                'digito' => $c->clave[0],
+                'clave' => $c->clave,
+                'nombre' => $c->nombre,
+                'tipo' => $c->tipoGastoTexto(),
+                'elegibles' => $elegibles->filter(fn ($clave) => str_starts_with((string) $clave, $c->clave[0]))->count(),
+                'conceptos' => CategoriaGasto::query()->where('padre_clave', $c->clave)->count(),
+                'activa' => $c->activa,
+            ]),
+            'totalElegibles' => $elegibles->count(),
+            'totalPartidas' => CategoriaGasto::count(),
+            'enUso' => PresupuestoItem::query()->whereNotNull('categoria_gasto')->distinct('categoria_gasto')->count('categoria_gasto'),
+        ];
+    }
+
     public function table(Table $table): Table
     {
         return $table
             ->query(CategoriaGasto::query())
+            ->modifyQueryUsing(fn ($query) => $query
+                ->addSelect(['usos_count' => PresupuestoItem::query()->selectRaw('count(*)')->whereColumn('presupuesto_items.categoria_gasto', 'categorias_gasto.clave')])
+                ->addSelect(['hijas_count' => CategoriaGasto::query()->from('categorias_gasto as h')->selectRaw('count(*)')->whereColumn('h.padre_clave', 'categorias_gasto.clave')])
+                ->when($this->capitulo !== '', fn ($q) => $q->where('clave', 'like', $this->capitulo . '%')))
             ->defaultSort('orden')
             ->paginated([25, 50, 100])
             ->defaultPaginationPageOption(25)
@@ -68,8 +119,20 @@ class GestionPropuestas extends Page implements HasTable
                 TextColumn::make('clave')
                     ->label('Clave')
                     ->weight('bold')
-                    ->searchable()
+                    ->color(fn (CategoriaGasto $record): ?string => in_array($record->nivel, ['CAPITULO', 'CONCEPTO'], true) ? 'primary' : null)
+                    ->searchable(query: fn ($query, string $search) => $query->where('clave', 'like', trim($search) . '%'))
                     ->sortable(query: fn ($query, string $direction) => $query->orderBy('orden', $direction)),
+                // Nombre con la definición debajo (recortada; completa en el tooltip).
+                TextColumn::make('nombre')
+                    ->label('Partida')
+                    ->weight(fn (CategoriaGasto $record): string => in_array($record->nivel, ['CAPITULO', 'CONCEPTO'], true) ? 'bold' : 'semibold')
+                    ->description(fn (CategoriaGasto $record): ?string => $record->descripcion ? Str::limit($record->descripcion, 150) : 'Sin definición')
+                    ->tooltip(fn (CategoriaGasto $record): ?string => mb_strlen((string) $record->descripcion) > 150 ? $record->descripcion : null)
+                    ->searchable(query: fn ($query, string $search) => $query
+                        ->orWhereRaw(self::SIN_ACENTOS_NOMBRE . ' like ?', ['%' . Str::lower(Str::ascii(trim($search))) . '%'])
+                        ->orWhereRaw(self::SIN_ACENTOS_DESCRIPCION . ' like ?', ['%' . Str::lower(Str::ascii(trim($search))) . '%']))
+                    ->wrap()
+                    ->grow(),
                 TextColumn::make('nivel')
                     ->label('Nivel')
                     ->badge()
@@ -79,41 +142,72 @@ class GestionPropuestas extends Page implements HasTable
                         'PARTIDA_GENERICA' => 'success',
                         default => 'gray',
                     })
-                    ->formatStateUsing(fn (string $state): string => CategoriaGasto::NIVELES[$state] ?? $state),
-                TextColumn::make('nombre')
-                    ->label('Nombre y definición')
-                    ->description(fn (CategoriaGasto $record): ?string => $record->descripcion ? Str::limit($record->descripcion, 160) : null)
-                    ->wrap()
-                    ->searchable(),
+                    ->formatStateUsing(fn (string $state): string => CategoriaGasto::NIVELES[$state] ?? $state)
+                    ->description(fn (CategoriaGasto $record): ?string => match (true) {
+                        in_array($record->nivel, ['CAPITULO', 'CONCEPTO'], true) => (int) $record->hijas_count . ' dentro',
+                        $record->nivel === 'PARTIDA_GENERICA' && (int) $record->hijas_count > 0 => (int) $record->hijas_count . ((int) $record->hijas_count === 1 ? ' específica' : ' específicas'),
+                        default => '✓ La elige el docente',
+                    }),
                 TextColumn::make('tipo_gasto')
                     ->label('Tipo de gasto')
-                    ->formatStateUsing(fn (string $state): string => CategoriaGasto::TIPOS_GASTO[$state] ?? $state),
-                TextColumn::make('usos')
+                    ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        'CAPITAL' => 'warning',
+                        'PENSIONES' => 'gray',
+                        default => 'info',
+                    })
+                    ->formatStateUsing(fn (string $state): string => CategoriaGasto::TIPOS_GASTO[$state] ?? $state)
+                    ->toggleable(),
+                TextColumn::make('usos_count')
                     ->label('Usos')
-                    ->state(fn (CategoriaGasto $record): int => $record->usos())
-                    ->alignCenter(),
+                    ->alignCenter()
+                    ->badge()
+                    ->color(fn ($state): string => (int) $state > 0 ? 'success' : 'gray')
+                    ->formatStateUsing(fn ($state): string => (int) $state > 0 ? (string) $state : '—')
+                    ->tooltip('Conceptos de presupuesto que la usan')
+                    ->toggleable(),
                 IconColumn::make('activa')
                     ->label('Se ofrece')
-                    ->boolean(),
+                    ->state(fn (CategoriaGasto $record): bool => $record->ofrecida())
+                    ->boolean()
+                    ->tooltip(fn (CategoriaGasto $record): string => $record->ofrecida()
+                        ? 'Disponible para el docente'
+                        : ($record->activa ? 'Oculta porque un nivel de arriba no se ofrece' : 'No se ofrece')),
+                TextColumn::make('updated_at')
+                    ->label('Modificada')
+                    ->since()
+                    ->dateTimeTooltip('d/m/Y H:i')
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                SelectFilter::make('capitulo')
-                    ->label('Capítulo')
-                    ->options(fn (): array => CategoriaGasto::query()->where('nivel', 'CAPITULO')->orderBy('orden')->get()
-                        ->mapWithKeys(fn (CategoriaGasto $c) => [$c->clave[0] => $c->clave . ' · ' . $c->nombre])->all())
-                    ->query(fn ($query, array $data) => filled($data['value'] ?? null) ? $query->where('clave', 'like', $data['value'] . '%') : $query),
                 SelectFilter::make('nivel')
                     ->label('Nivel')
                     ->options(CategoriaGasto::NIVELES),
                 SelectFilter::make('tipo_gasto')
                     ->label('Tipo de gasto')
                     ->options(CategoriaGasto::TIPOS_GASTO),
+                TernaryFilter::make('elegibles')
+                    ->label('La elige el docente')
+                    ->placeholder('Todas')
+                    ->trueLabel('Solo las que elige el docente')
+                    ->falseLabel('Solo capítulos, conceptos y genéricas con específicas')
+                    ->queries(
+                        true: fn ($query) => self::soloElegibles($query),
+                        false: fn ($query) => $query->whereNotIn('clave', self::soloElegibles(CategoriaGasto::query())->select('clave')),
+                    ),
+                TernaryFilter::make('activa')
+                    ->label('Se ofrece')
+                    ->placeholder('Todas')
+                    ->trueLabel('Se ofrecen')
+                    ->falseLabel('No se ofrecen'),
             ])
             ->headerActions([
                 CreateAction::make()
                     ->label('Nueva partida')
+                    ->icon(Heroicon::OutlinedPlus)
                     ->modalHeading('Nueva partida del clasificador')
                     ->schema($this->campos(nueva: true))
+                    ->successNotificationTitle('Partida agregada')
                     ->authorize(fn (): bool => static::canAccess()),
             ])
             ->recordActions([
@@ -121,15 +215,9 @@ class GestionPropuestas extends Page implements HasTable
                     ->label('Editar')
                     ->iconButton()
                     ->tooltip('Editar')
-                    ->modalHeading(fn (CategoriaGasto $record): string => 'Editar ' . $record->clave)
+                    ->modalHeading(fn (CategoriaGasto $record): string => 'Editar ' . $record->clave . ' · ' . $record->nombre)
                     ->schema($this->campos(nueva: false))
-                    ->authorize(fn (): bool => static::canAccess()),
-                // Si la usa algún concepto o tiene partidas dentro, no se borra: deja de ofrecerse.
-                DeleteAction::make()
-                    ->label('Eliminar')
-                    ->iconButton()
-                    ->tooltip('Eliminar')
-                    ->visible(fn (CategoriaGasto $record): bool => $record->usos() === 0 && ! $record->tieneHijas())
+                    ->successNotificationTitle('Partida actualizada')
                     ->authorize(fn (): bool => static::canAccess()),
                 Action::make('desactivar')
                     ->label(fn (CategoriaGasto $record): string => $record->activa ? 'Dejar de ofrecer' : 'Volver a ofrecer')
@@ -144,8 +232,19 @@ class GestionPropuestas extends Page implements HasTable
                         $record->update(['activa' => ! $record->activa]);
                         Notification::make()->title($record->activa ? 'Se vuelve a ofrecer' : 'Ya no se ofrece')->success()->send();
                     }),
+                // Si la usa algún concepto o tiene partidas dentro, no se borra: deja de ofrecerse.
+                DeleteAction::make()
+                    ->label('Eliminar')
+                    ->iconButton()
+                    ->tooltip('Eliminar')
+                    ->modalHeading(fn (CategoriaGasto $record): string => 'Eliminar ' . $record->clave . ' · ' . $record->nombre)
+                    ->modalDescription('Nadie la usa y no contiene partidas. Esta acción no se puede deshacer.')
+                    ->visible(fn (CategoriaGasto $record): bool => (int) $record->usos_count === 0 && (int) $record->hijas_count === 0)
+                    ->authorize(fn (): bool => static::canAccess()),
             ])
-            ->emptyStateHeading('Sin partidas');
+            ->emptyStateIcon(Heroicon::OutlinedMagnifyingGlass)
+            ->emptyStateHeading('No hay partidas con esos criterios')
+            ->emptyStateDescription('Prueba con otro número o nombre, quita los filtros o elige «Todos» en las tarjetas de arriba.');
     }
 
     private function campos(bool $nueva): array
