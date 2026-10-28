@@ -18,6 +18,7 @@ class PresupuestoItem extends Model
         'precio_unitario',
         'categoria_gasto',
         'moneda',
+        'proyecto_infraestructura_id',
     ];
 
     protected function casts(): array
@@ -26,6 +27,11 @@ class PresupuestoItem extends Model
             'cantidad' => 'decimal:2',
             'precio_unitario' => 'decimal:2',
         ];
+    }
+
+    public function proyectoInfraestructura(): BelongsTo
+    {
+        return $this->belongsTo(ProyectoInfraestructura::class, 'proyecto_infraestructura_id');
     }
 
     public function propuesta(): BelongsTo

@@ -1300,6 +1300,9 @@
                     Datos de propuesta
                 </a>
 
+                @include('filament.docente.partials.paso-infraestructura')
+
+
                 <a
                     class="
                         step

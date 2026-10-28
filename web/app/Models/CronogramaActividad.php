@@ -20,6 +20,7 @@ class CronogramaActividad extends Model
         'estado',
         'porcentaje_avance',
         'orden',
+        'proyecto_infraestructura_id',
     ];
 
     protected function casts(): array
@@ -30,6 +31,11 @@ class CronogramaActividad extends Model
             'porcentaje_avance' => 'decimal:2',
             'orden' => 'integer',
         ];
+    }
+
+    public function proyectoInfraestructura(): BelongsTo
+    {
+        return $this->belongsTo(ProyectoInfraestructura::class, 'proyecto_infraestructura_id');
     }
 
     public function propuesta(): BelongsTo

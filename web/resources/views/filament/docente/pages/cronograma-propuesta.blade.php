@@ -795,6 +795,13 @@
                                             </span>
                                         </div>
 
+                                        @if ($proyectosInfraestructura->isNotEmpty() && $item->proyecto_infraestructura_id)
+                                            <div class="meta-box">
+                                                <span class="meta-label">Proyecto</span>
+                                                <span class="meta-value">🏗 {{ $proyectosInfraestructura[$item->proyecto_infraestructura_id] ?? '' }}</span>
+                                            </div>
+                                        @endif
+
                                     </div>
 
                                     <div class="activity-progress">
@@ -1071,6 +1078,19 @@
                         </div>
 
                         <div class="form-grid">
+
+                            @if ($proyectosInfraestructura->isNotEmpty())
+                                <div class="field">
+                                    <label>Proyecto de infraestructura</label>
+                                    <select class="input" wire:model="proyectoInfraestructuraId">
+                                        <option value="">Toda la propuesta</option>
+                                        @foreach ($proyectosInfraestructura as $idProyecto => $nombreProyecto)
+                                            <option value="{{ $idProyecto }}">{{ $nombreProyecto }}</option>
+                                        @endforeach
+                                    </select>
+                                    @error('proyectoInfraestructuraId')<div class="field-error">{{ $message }}</div>@enderror
+                                </div>
+                            @endif
 
                             <div class="field">
 
@@ -1361,6 +1381,9 @@
                     </span>
                     Datos de propuesta
                 </a>
+
+                @include('filament.docente.partials.paso-infraestructura')
+
 
                 <a
                     class="

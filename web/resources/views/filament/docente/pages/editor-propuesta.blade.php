@@ -507,7 +507,7 @@
                     </div>
 
                     <span class="section-badge">
-                        Sección 1 de 7
+                        Sección 1 de {{ $propuesta->esInfraestructura() ? 8 : 7 }}
                     </span>
 
                 </div>
@@ -708,6 +708,10 @@
                             Metodología
                         </h2>
 
+                        @if ($propuesta->esInfraestructura())
+                            <div class="card-description"><strong>Opcional en infraestructura (FAM):</strong> cada proyecto lleva su propia descripción e impacto.</div>
+                        @endif
+
                         <div class="card-description">
                             Indica de forma general
                             cómo se desarrollará el
@@ -745,6 +749,10 @@
                         <h2 class="card-title">
                             Impacto esperado
                         </h2>
+
+                        @if ($propuesta->esInfraestructura())
+                            <div class="card-description"><strong>Opcional en infraestructura (FAM):</strong> cada proyecto lleva su propia descripción e impacto.</div>
+                        @endif
 
                         <div class="card-description">
                             Resume los beneficios
@@ -814,7 +822,7 @@
                         wire:loading.attr="disabled"
                         wire:target="continuarAObjetivos"
                     >
-                        Continuar a Objetivos →
+                        {{ $propuesta->esInfraestructura() ? 'Continuar a Infraestructura →' : 'Continuar a Objetivos →' }}
                     </button>
 
                 </div>
@@ -905,6 +913,9 @@
 
                     Datos de propuesta
                 </a>
+
+                @include('filament.docente.partials.paso-infraestructura')
+
 
                 <a
                     class="
@@ -1051,6 +1062,13 @@
                 </a>
 
             </div>
+
+            @unless ($propuesta->esInfraestructura())
+                <a class="step" style="font-size: 11px" href="{{ route('filament.' . filament()->getId() . '.pages.infraestructura-propuesta', ['propuesta' => $propuesta->id]) }}">
+                    <span class="step-number">🏗</span>
+                    ¿Es de infraestructura (FAM)? Usar ese formato
+                </a>
+            @endunless
 
             <div class="summary">
 

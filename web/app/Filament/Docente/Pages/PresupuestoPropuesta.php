@@ -48,6 +48,9 @@ class PresupuestoPropuesta extends Page
 
     public string $categoriaGasto = '';
 
+    /** Propuestas de infraestructura: proyecto al que se carga el concepto. */
+    public string $proyectoInfraestructuraId = '';
+
     public string $cantidad = '1';
 
     public string $precioUnitario = '';
@@ -147,6 +150,17 @@ class PresupuestoPropuesta extends Page
                     array_keys(
                         CategoriaGasto::opciones($this->categoriaDelConceptoEditado())
                     )
+                ),
+            ],
+
+            'proyectoInfraestructuraId' => [
+                'nullable',
+                Rule::in(
+                    \App\Models\ProyectoInfraestructura::query()
+                        ->where('propuesta_id', $this->propuestaId)
+                        ->pluck('id')
+                        ->map(fn ($id): string => (string) $id)
+                        ->all()
                 ),
             ],
 
@@ -277,6 +291,11 @@ class PresupuestoPropuesta extends Page
         $item->categoria_gasto =
             $this->categoriaGasto;
 
+        $item->proyecto_infraestructura_id =
+            $this->proyectoInfraestructuraId !== ''
+                ? (int) $this->proyectoInfraestructuraId
+                : null;
+
         $item->cantidad =
             $cantidad;
 
@@ -347,6 +366,9 @@ class PresupuestoPropuesta extends Page
                 $item->categoria_gasto
                 ?: ''
             );
+
+        $this->proyectoInfraestructuraId =
+            (string) ($item->proyecto_infraestructura_id ?? '');
 
         $this->cantidad =
             $this->numeroFormulario(
@@ -765,6 +787,12 @@ class PresupuestoPropuesta extends Page
             'detallePartidas' =>
                 CategoriaGasto::datosParaDocente(),
 
+            // Infraestructura (FAM): cada concepto se carga a un proyecto.
+            'proyectosInfraestructura' =>
+                $propuesta->esInfraestructura()
+                    ? $propuesta->proyectosInfraestructura()->pluck('nombre', 'id')
+                    : collect(),
+
             'totalesCategoria' =>
                 $totalesCategoria,
 
@@ -945,6 +973,7 @@ class PresupuestoPropuesta extends Page
         $this->concepto = '';
         $this->descripcion = '';
         $this->categoriaGasto = '';
+        $this->proyectoInfraestructuraId = '';
         $this->cantidad = '1';
         $this->precioUnitario = '';
     }

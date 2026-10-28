@@ -247,6 +247,12 @@ class GenerarPropuesta extends Page
                                 'propuesta_base_id' =>
                                     $base->id,
 
+                                // Convocatorias de infraestructura física
+                                // (FAM): propuesta con diagnóstico y
+                                // proyectos priorizados.
+                                'tipo' =>
+                                    self::tipoPara($convocatoria),
+
                                 'titulo' =>
                                     trim(
                                         $this
@@ -647,5 +653,17 @@ class GenerarPropuesta extends Page
                     ]
                 );
         }
+    }
+
+    public static function tipoPara(\App\Models\Convocatoria $convocatoria): string
+    {
+        $texto = mb_strtolower($convocatoria->titulo . ' ' . $convocatoria->descripcion);
+
+        return $convocatoria->origen === 'PROGRAMA'
+            || str_contains($texto, 'aportaciones múltiples')
+            || str_contains($texto, 'aportaciones multiples')
+            || str_contains($texto, 'infraestructura física educativa')
+            ? 'INFRAESTRUCTURA'
+            : 'INVESTIGACION';
     }
 }

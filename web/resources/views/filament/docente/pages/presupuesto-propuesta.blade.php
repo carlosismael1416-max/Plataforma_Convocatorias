@@ -674,6 +674,10 @@
                                                     \App\Models\CategoriaGasto::etiqueta($item->categoria_gasto)
                                                 }}
                                             </span>
+
+                                            @if ($proyectosInfraestructura->isNotEmpty())
+                                                <div class="concept-desc">🏗 {{ $proyectosInfraestructura[$item->proyecto_infraestructura_id] ?? 'Sin proyecto asignado' }}</div>
+                                            @endif
                                         </td>
 
                                         <td>
@@ -808,6 +812,19 @@
                                 @enderror
 
                             </div>
+
+                            @if ($proyectosInfraestructura->isNotEmpty())
+                                <div class="field cog-campo">
+                                    <label>Proyecto de infraestructura</label>
+                                    <select class="select" wire:model="proyectoInfraestructuraId">
+                                        <option value="">Sin proyecto asignado</option>
+                                        @foreach ($proyectosInfraestructura as $idProyecto => $nombreProyecto)
+                                            <option value="{{ $idProyecto }}">{{ $nombreProyecto }}</option>
+                                        @endforeach
+                                    </select>
+                                    @error('proyectoInfraestructuraId')<div class="field-error">{{ $message }}</div>@enderror
+                                </div>
+                            @endif
 
                             {{-- Partida del Clasificador por Objeto del Gasto: el docente
                                  la busca por número o nombre y ve capítulo, concepto,
@@ -1250,6 +1267,9 @@
                     </span>
                     Datos de propuesta
                 </a>
+
+                @include('filament.docente.partials.paso-infraestructura')
+
 
                 <a
                     class="

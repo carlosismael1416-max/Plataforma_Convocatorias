@@ -42,13 +42,12 @@ class RevisionPropuesta
         $conTexto = fn ($consulta) => $consulta->whereRaw("BTRIM(descripcion) <> ''");
 
         $secciones = [
-            'Datos generales' => collect([
-                $propuesta->titulo,
-                $propuesta->resumen,
-                $propuesta->justificacion,
-                $propuesta->metodologia,
-                $propuesta->impacto_esperado,
-            ])->every(fn ($valor): bool => \App\Support\TextoEnriquecido::texto($valor) !== ''),
+            // En infraestructura (FAM) la metodología y el impacto van por
+            // proyecto, no en los datos generales.
+            'Datos generales' => collect($propuesta->esInfraestructura()
+                ? [$propuesta->titulo, $propuesta->resumen, $propuesta->justificacion]
+                : [$propuesta->titulo, $propuesta->resumen, $propuesta->justificacion, $propuesta->metodologia, $propuesta->impacto_esperado]
+            )->every(fn ($valor): bool => \App\Support\TextoEnriquecido::texto($valor) !== ''),
 
             'Objetivos' => $conTexto($propuesta->objetivos()->where('tipo', 'GENERAL'))->exists()
                 && $conTexto($propuesta->objetivos()->where('tipo', 'ESPECIFICO'))->exists(),
@@ -61,6 +60,14 @@ class RevisionPropuesta
 
             'Entregables' => $propuesta->entregables()->exists(),
         ];
+
+        if ($propuesta->esInfraestructura()) {
+            $proyectos = $propuesta->proyectosInfraestructura()->with(['itemsPresupuesto', 'laminas'])->get();
+
+            $secciones['Diagnóstico de infraestructura'] = \App\Support\TextoEnriquecido::texto($propuesta->diagnostico) !== '';
+            $secciones['Proyectos de infraestructura (objetivo, justificación, descripción, presupuesto y láminas)'] =
+                $proyectos->isNotEmpty() && $proyectos->every(fn ($proyecto): bool => $proyecto->completo());
+        }
 
         return array_keys(array_filter($secciones, fn (bool $completa): bool => ! $completa));
     }

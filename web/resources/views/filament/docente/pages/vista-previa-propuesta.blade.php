@@ -962,6 +962,20 @@
 
                 </section>
 
+                {{-- INFRAESTRUCTURA (FAM) --}}
+                @if ($propuesta->esInfraestructura())
+                    <section class="section">
+                        <div class="section-heading">
+                            <h2 class="section-title">
+                                <span class="section-number">🏗</span>
+                                Infraestructura: diagnóstico y proyectos
+                            </h2>
+                            <a class="edit-link" href="{{ route('filament.' . filament()->getId() . '.pages.infraestructura-propuesta', ['propuesta' => $propuesta->id]) }}">Editar</a>
+                        </div>
+                        @include('filament.docente.partials.infraestructura-resumen')
+                    </section>
+                @endif
+
                 {{-- OBJETIVOS --}}
                 <section class="section">
 

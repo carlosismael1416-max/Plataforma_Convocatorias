@@ -17,6 +17,8 @@ class Evidencia extends Model
         'descripcion',
         'ruta_archivo',
         'url_archivo',
+        'proyecto_infraestructura_id',
+        'tipo_lamina',
     ];
 
     public function propuesta(): BelongsTo

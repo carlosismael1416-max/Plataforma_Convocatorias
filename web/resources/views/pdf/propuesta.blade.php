@@ -260,6 +260,13 @@
     <div class="rico">{!! \App\Support\TextoEnriquecido::mostrar($propuesta->impacto_esperado, 'Sin información registrada.') !!}</div>
 </div>
 
+@if ($propuesta->esInfraestructura())
+    <div class="section">
+        <h2>Infraestructura: diagnóstico y proyectos</h2>
+        @include('filament.docente.partials.infraestructura-resumen')
+    </div>
+@endif
+
 <div class="section">
     <h2>6. Objetivos</h2>
 

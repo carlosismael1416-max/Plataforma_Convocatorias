@@ -156,8 +156,11 @@ class EditorPropuesta extends Page
             }
         }
 
+        // Infraestructura (FAM): después de los datos van el diagnóstico y
+        // los proyectos.
         return redirect()->route(
-            'filament.' . filament()->getId() . '.pages.objetivos-propuesta',
+            'filament.' . filament()->getId() . '.pages.'
+                . ($propuesta->esInfraestructura() ? 'infraestructura-propuesta' : 'objetivos-propuesta'),
             [
                 'propuesta' =>
                     $this->propuestaId,
@@ -177,7 +180,12 @@ class EditorPropuesta extends Page
     {
         $faltan = [];
 
-        foreach (self::CAMPOS_PARA_CONTINUAR as $campo => $nombre) {
+        $campos = $this->propuestaDelUsuario()->esInfraestructura()
+            // Infraestructura: metodología e impacto van en cada proyecto.
+            ? array_intersect_key(self::CAMPOS_PARA_CONTINUAR, array_flip(['resumen', 'justificacion']))
+            : self::CAMPOS_PARA_CONTINUAR;
+
+        foreach ($campos as $campo => $nombre) {
             if (TextoEnriquecido::longitud($this->{$campo}) < 30) {
                 $this->addError($campo, "Escribe {$nombre} (al menos 30 caracteres) antes de continuar.");
                 $faltan[] = $nombre;
@@ -337,8 +345,21 @@ class EditorPropuesta extends Page
             + ($cronogramaCompleto ? 1 : 0)
             + ($entregablesCompletos ? 1 : 0);
 
+        $secciones = 7;
+
+        // Infraestructura (FAM): el diagnóstico y los proyectos son un
+        // paso más.
+        $infraestructuraCompleta = $propuesta->esInfraestructura()
+            && TextoEnriquecido::texto($propuesta->diagnostico) !== ''
+            && $propuesta->proyectosInfraestructura()->exists();
+
+        if ($propuesta->esInfraestructura()) {
+            $secciones = 8;
+            $puntaje += $infraestructuraCompleta ? 1 : 0;
+        }
+
         $progreso = (int) round(
-            ($puntaje / 7) * 100
+            ($puntaje / $secciones) * 100
         );
 
         $convocatoria =

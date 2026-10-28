@@ -65,6 +65,9 @@ class CronogramaPropuesta extends Page
 
     public string $responsable = '';
 
+    /** Propuestas de infraestructura: proyecto de la actividad. */
+    public string $proyectoInfraestructuraId = '';
+
     public string $estado = 'PENDIENTE';
 
     public string $porcentajeAvance = '0';
@@ -151,6 +154,17 @@ class CronogramaPropuesta extends Page
                 'max:255',
             ],
 
+            'proyectoInfraestructuraId' => [
+                'nullable',
+                \Illuminate\Validation\Rule::in(
+                    \App\Models\ProyectoInfraestructura::query()
+                        ->where('propuesta_id', $this->propuestaId)
+                        ->pluck('id')
+                        ->map(fn ($id): string => (string) $id)
+                        ->all()
+                ),
+            ],
+
             'estado' => [
                 'required',
                 Rule::in(
@@ -212,6 +226,11 @@ class CronogramaPropuesta extends Page
             $this->textoONull(
                 $this->responsable
             );
+
+        $registro->proyecto_infraestructura_id =
+            $this->proyectoInfraestructuraId !== ''
+                ? (int) $this->proyectoInfraestructuraId
+                : null;
 
         $registro->estado =
             $this->estado;
@@ -294,6 +313,9 @@ class CronogramaPropuesta extends Page
                 $registro->responsable
                 ?? ''
             );
+
+        $this->proyectoInfraestructuraId =
+            (string) ($registro->proyecto_infraestructura_id ?? '');
 
         $this->estado =
             $registro->estado
@@ -733,6 +755,11 @@ class CronogramaPropuesta extends Page
             'actividades' =>
                 $actividades,
 
+            'proyectosInfraestructura' =>
+                $propuesta->esInfraestructura()
+                    ? $propuesta->proyectosInfraestructura()->pluck('nombre', 'id')
+                    : collect(),
+
             'estados' =>
                 self::ESTADOS,
 
@@ -1048,6 +1075,7 @@ class CronogramaPropuesta extends Page
         $this->fechaInicio = '';
         $this->fechaFin = '';
         $this->responsable = '';
+        $this->proyectoInfraestructuraId = '';
         $this->estado = 'PENDIENTE';
         $this->porcentajeAvance = '0';
     }

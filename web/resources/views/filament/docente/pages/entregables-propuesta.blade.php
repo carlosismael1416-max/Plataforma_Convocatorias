@@ -1411,6 +1411,9 @@
                         {{ $config[1] }}
                     </a>
 
+                @include('filament.docente.partials.paso-infraestructura')
+
+
                 @endforeach
 
                 <a

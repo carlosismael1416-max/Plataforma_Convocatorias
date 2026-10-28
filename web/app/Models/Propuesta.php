@@ -17,11 +17,13 @@ class Propuesta extends Model
         'user_id',
         'convocatoria_id',
         'propuesta_base_id',
+        'tipo',
         'titulo',
         'resumen',
         'justificacion',
         'metodologia',
         'impacto_esperado',
+        'diagnostico',
         'estado',
         'version',
         'fecha_envio',
@@ -82,6 +84,23 @@ class Propuesta extends Model
         return $this->hasMany(PropuestaRevision::class)
             ->latest()
             ->latest('id');
+    }
+
+    public const TIPOS = [
+        'INVESTIGACION' => 'Proyecto de investigación',
+        'INFRAESTRUCTURA' => 'Infraestructura (FAM)',
+    ];
+
+    public function esInfraestructura(): bool
+    {
+        return $this->tipo === 'INFRAESTRUCTURA';
+    }
+
+    /** Proyectos de una propuesta de infraestructura, por prioridad. */
+    public function proyectosInfraestructura(): HasMany
+    {
+        return $this->hasMany(ProyectoInfraestructura::class)
+            ->orderBy('prioridad');
     }
 
     public function entregables(): HasMany
