@@ -402,6 +402,11 @@ def ejecutar_descubridor(
 # Tiempo mínimo que debe quedar del ciclo para empezar una fuente.
 SEGUNDOS_MIN_FUENTE = 420
 
+# Convocatorias NUEVAS por fuente y corrida (las ya registradas se saltan sin
+# contar). Secuencial y con 2 s entre peticiones: unos 2-3 minutos por fuente
+# aun en el peor caso.
+LIMITE_FUENTES = 30
+
 
 def fuentes_pendientes(conexion) -> list[dict]:
     """
@@ -441,7 +446,7 @@ def fuentes_pendientes(conexion) -> list[dict]:
 def ejecutar_fuentes_oficiales(
     *,
     terminar_antes_de: float,
-    limite: int = 10,
+    limite: int = LIMITE_FUENTES,
 ) -> dict:
     """
     Extrae las convocatorias de las fuentes oficiales configuradas.
@@ -513,7 +518,7 @@ def ejecutar_ciclo(
     cantidad_google: int,
     max_dominios: int,
     max_publicaciones: int,
-    limite_fuentes: int = 10,
+    limite_fuentes: int = LIMITE_FUENTES,
     max_revalidaciones: int | None = None,
 ) -> dict:
     terminar_antes_de = (
@@ -926,11 +931,11 @@ def main() -> None:
     )
 
     # Carga inicial: más convocatorias por fuente y más pendientes
-    # validadas en un solo ciclo (el ciclo normal usa 10 y 3).
+    # validadas en un solo ciclo.
     parser.add_argument(
         "--limite-fuentes",
         type=int,
-        default=10,
+        default=LIMITE_FUENTES,
     )
 
     parser.add_argument(

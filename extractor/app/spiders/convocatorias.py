@@ -15,7 +15,8 @@ from app.urls import hash_url
 
 # Páginas de una categoría de SECIHTI que se recorren buscando
 # convocatorias nuevas (las registradas no cuentan para el límite).
-MAX_PAGINAS_CATEGORIA = 5
+# Páginas de listado por categoría (las ya registradas no cuentan en el límite).
+MAX_PAGINAS_CATEGORIA = 8
 
 # Noticias del sitio que anuncian una convocatoria con página propia
 # («Realizarán Primer Congreso de Humanidades…» → /congresohumanidades/).

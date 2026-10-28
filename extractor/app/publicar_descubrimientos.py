@@ -2050,6 +2050,9 @@ def procesar_aprobados(
 # (no por un descubrimiento). Sin este paso nadie las volvía a
 # enriquecer ni validar. Las MANUAL las revisa un directivo.
 MAX_REVALIDACIONES = 5
+# Recién llegadas (de las fuentes oficiales) que se completan por ciclo; el
+# plazo del ciclo las corta antes si no alcanza el tiempo.
+MAX_NUEVAS_POR_CICLO = 20
 HORAS_ENTRE_REVALIDACIONES = 20
 # Extracción en vista previa (300 s) + PDF del enriquecimiento.
 SEGUNDOS_MAX_POR_REVALIDACION = 600
@@ -2114,34 +2117,49 @@ def revalidar_pendientes(
 
     cursor.execute(
         """
-        SELECT id, titulo
-        FROM convocatorias
-        WHERE estado = 'PENDIENTE_REVISION'
-          AND origen = 'SCRAPING'
-          AND (
-                (
-                    (
-                        fecha_cierre IS NULL
-                        OR fecha_cierre >= CURRENT_DATE
-                    )
-                    AND updated_at < NOW()
-                        - make_interval(hours => %s)
-                )
-                -- Recién guardada y nunca revisada (p. ej. por la fase de
-                -- fuentes oficiales): se enriquece y valida en el siguiente
-                -- ciclo, aunque ya haya vencido, para que quede completa.
-                OR updated_at <= created_at + INTERVAL '1 minute'
-              )
-        ORDER BY (updated_at <= created_at + INTERVAL '1 minute') DESC, updated_at, id
-        LIMIT %s
+        (
+            -- Recién guardadas y nunca revisadas (p. ej. por la fase de
+            -- fuentes oficiales): se enriquecen y validan en el siguiente
+            -- ciclo, aunque ya hayan vencido, para que lleguen completas al
+            -- historial. Tienen cupo propio para no esperar días en cola.
+            SELECT id, titulo, 0 AS orden, updated_at
+            FROM convocatorias
+            WHERE estado = 'PENDIENTE_REVISION'
+              AND origen = 'SCRAPING'
+              AND updated_at <= created_at + INTERVAL '1 minute'
+            ORDER BY id
+            LIMIT %s
+        )
+        UNION ALL
+        (
+            -- Rotación de las ya revisadas que siguen vigentes o sin fecha.
+            SELECT id, titulo, 1 AS orden, updated_at
+            FROM convocatorias
+            WHERE estado = 'PENDIENTE_REVISION'
+              AND origen = 'SCRAPING'
+              AND updated_at > created_at + INTERVAL '1 minute'
+              AND (
+                    fecha_cierre IS NULL
+                    OR fecha_cierre >= CURRENT_DATE
+                  )
+              AND updated_at < NOW()
+                  - make_interval(hours => %s)
+            ORDER BY updated_at, id
+            LIMIT %s
+        )
+        ORDER BY orden, updated_at, id
         """,
         (
+            MAX_NUEVAS_POR_CICLO,
             HORAS_ENTRE_REVALIDACIONES,
             limite,
         ),
     )
 
-    pendientes = cursor.fetchall()
+    pendientes = [
+        (fila[0], fila[1])
+        for fila in cursor.fetchall()
+    ]
 
     conexion.commit()
     conexion.close()
