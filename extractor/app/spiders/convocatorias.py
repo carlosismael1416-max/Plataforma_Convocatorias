@@ -11,6 +11,28 @@ from app.procesar_revision_resultado import (
 )
 from app.analizar_pdf import analizar_pdf_bytes
 from app.resolver_fecha_cierre import resolver_fecha_cierre
+from app.urls import hash_url
+
+# Páginas de una categoría de SECIHTI que se recorren buscando
+# convocatorias nuevas (las registradas no cuentan para el límite).
+MAX_PAGINAS_CATEGORIA = 5
+
+# Noticias del sitio que anuncian una convocatoria con página propia
+# («Realizarán Primer Congreso de Humanidades…» → /congresohumanidades/).
+MAX_NOTAS_POR_FUENTE = 5
+RUTAS_NOTA = re.compile(r"/(noticias?|prensa|comunicados?|boletin(es)?|blog)/", re.I)
+PALABRAS_NOTA_CONVOCATORIA = re.compile(
+    r"(?i)\b(convocatorias?|congreso|premios?|concurso|feria|foro|simposio|coloquio|encuentro|becas?|apoyos?|fondos?|registro|inscripciones|participa)\b"
+)
+
+# Micrositios anunciados con un banner (imagen sin texto) en la portada
+# de la fuente: /congresohumanidades/. Solo rutas de un nivel cuyo nombre
+# dice qué es (los nombres van pegados, por eso se busca como subcadena).
+PALABRAS_MICROSITIO = (
+    "convocatoria", "congreso", "premio", "concurso", "feria", "foro",
+    "expo", "encuentro", "festival", "jornada", "simposio", "coloquio",
+    "hackat", "reto", "innova", "beca", "fondo", "semana",
+)
 
 # Rutas de SECIHTI que nunca son convocatorias para ITSVA (plazas y
 # nombramientos). Se omiten para no descargarlas. Las becas sí se procesan
@@ -45,7 +67,7 @@ class ConvocatoriasSpider(scrapy.Spider):
         "TELNETCONSOLE_ENABLED": False,
     }
 
-    def __init__(self, url=None, limite=1, **kwargs):
+    def __init__(self, url=None, limite=1, conocidas=None, **kwargs):
         super().__init__(**kwargs)
 
         if not url:
@@ -71,6 +93,25 @@ class ConvocatoriasSpider(scrapy.Spider):
         # Utilizar 0 significa procesarlas todas.
         self.limite = int(limite)
 
+        # url_hash de las convocatorias ya registradas. Se saltan sin
+        # contarlas en el límite: si no, cada ciclo volvía a leer las
+        # mismas (las primeras del listado) y nunca llegaba a las nuevas.
+        # Las vigentes las revisa el seguimiento del ciclo.
+        self.conocidas = set(conocidas or ())
+        self.omitidas_conocidas = set()
+        self.notas_visitadas = set()
+
+    def ya_registrada(self, url):
+        clave = hash_url(url)
+        if clave in self.conocidas:
+            self.omitidas_conocidas.add(clave)
+            return True
+        return False
+
+    def closed(self, reason):
+        if self.omitidas_conocidas:
+            print(f"Ya registradas (omitidas): {len(self.omitidas_conocidas)}")
+
     def parse(self, response):
 
         # PASO 1: Desde la página principal,
@@ -89,9 +130,22 @@ class ConvocatoriasSpider(scrapy.Spider):
             )
             return
 
-        # Fuentes distintas de SECIHTI: listado genérico.
+        # TecNM: tarjetas con título, estatus y PDF (sin página por
+        # convocatoria).
+        if self.dominio == "tecnm.mx":
+            yield from self.convocatorias_tecnm(response)
+            return
+
+        # Fuentes distintas de SECIHTI: listado genérico y, en la portada
+        # del sitio, los banners que llevan a micrositios.
         if self.dominio != "secihti.mx":
             yield from self.convocatorias_de_listado(response)
+
+            portada = f"{urlparse(response.url).scheme}://{urlparse(response.url).netloc}/"
+            if response.url.rstrip("/") + "/" == portada:
+                yield from self.micrositios_de_portada(response)
+            else:
+                yield scrapy.Request(url=portada, callback=self.micrositios_de_portada, priority=-5)
             return
 
         if ruta_actual == "/convocatorias":
@@ -197,7 +251,7 @@ class ConvocatoriasSpider(scrapy.Spider):
         if (
             self.limite == 0
             or len(self.enlaces_encontrados) < self.limite
-        ):
+        ) and numero_pagina < MAX_PAGINAS_CATEGORIA:
             ruta_siguiente = (
                 f"{categoria_base}/page/{numero_pagina + 1}"
             )
@@ -275,6 +329,9 @@ class ConvocatoriasSpider(scrapy.Spider):
             if clave in self.enlaces_encontrados:
                 continue
 
+            if self.ya_registrada(url):
+                continue
+
             titulo = (
                 enlace.xpath(
                     "normalize-space(.)"
@@ -344,6 +401,27 @@ class ConvocatoriasSpider(scrapy.Spider):
             ):
                 continue
 
+            titulo_enlace = " ".join(
+                (enlace.xpath("normalize-space(.)").get() or "").split()
+            )
+
+            # Noticia del propio sitio que anuncia una convocatoria: se abre
+            # para llegar a la página propia que enlaza.
+            if (
+                RUTAS_NOTA.search(ruta_min + "/")
+                and PALABRAS_NOTA_CONVOCATORIA.search(titulo_enlace)
+                and ruta not in self.notas_visitadas
+                and len(self.notas_visitadas) < MAX_NOTAS_POR_FUENTE
+            ):
+                self.notas_visitadas.add(ruta)
+                yield scrapy.Request(
+                    url=url,
+                    callback=self.parse_nota,
+                    cb_kwargs={"titulo_nota": titulo_enlace},
+                    priority=-5,
+                )
+                continue
+
             cuelga_del_listado = bool(ruta_listado) and ruta.startswith(ruta_listado + "/")
 
             if not cuelga_del_listado and "convocatoria" not in ruta_min:
@@ -356,7 +434,7 @@ class ConvocatoriasSpider(scrapy.Spider):
 
             clave = (self.dominio, ruta)
 
-            if clave in self.enlaces_encontrados:
+            if clave in self.enlaces_encontrados or self.ya_registrada(url):
                 continue
 
             titulo = " ".join(
@@ -370,6 +448,147 @@ class ConvocatoriasSpider(scrapy.Spider):
                 callback=self.parse_detalle,
                 cb_kwargs={"titulo_enlace": titulo},
             )
+
+    def convocatorias_tecnm(self, response):
+        """
+        www.tecnm.mx/?vista=Convocatorias_Tecnm: cada convocatoria es un
+        bloque con su título, el estatus («Abierta», «Concluida»,
+        «Permanente») y los PDF (convocatoria, términos de referencia…).
+        Solo se toman las abiertas o permanentes; su enlace es el PDF de la
+        convocatoria sin «?doc=», que cambia entre visitas.
+        """
+        for bloque in response.css("div.row.justify-content-center.mb-3"):
+            if (
+                self.limite > 0
+                and len(self.enlaces_encontrados) >= self.limite
+            ):
+                return
+
+            titulo = " ".join(" ".join(bloque.css("div.bg-tecnm")[:1].xpath("normalize-space(.)").getall()).split())
+            estatus = " ".join(" ".join(bloque.css("span.text-success::text, span.text-danger::text, span.text-warning::text, span.text-primary::text").getall()).split()).lower()
+
+            if not titulo or not any(e in estatus for e in ("abierta", "permanente", "vigente")):
+                continue
+
+            documentos = []
+            for enlace in bloque.css("a[href]"):
+                url = response.urljoin(enlace.attrib.get("href", "").strip())
+                parsed = urlparse(url)
+                if not parsed.path.lower().endswith(".pdf"):
+                    continue
+                url = f"{parsed.scheme}://{parsed.netloc}{parsed.path}"
+                nombre = " ".join((enlace.xpath("normalize-space(.)").get() or "").split())
+                if url not in [d["url"] for d in documentos]:
+                    documentos.append({"nombre": nombre or "Documento", "url": url})
+
+            if not documentos:
+                continue
+
+            principal = next((d for d in documentos if "convocatoria" in d["nombre"].lower()), documentos[0])
+            parsed = urlparse(principal["url"])
+            clave = (self.dominio, parsed.path.rstrip("/"))
+
+            if clave in self.enlaces_encontrados or self.ya_registrada(principal["url"]):
+                continue
+
+            self.enlaces_encontrados.add(clave)
+
+            resultado = {
+                "titulo": titulo,
+                "url_original": principal["url"],
+                "descripcion": None,
+                "fecha_cierre_web": None,
+                "hora_cierre_web": None,
+                "tipo_fecha_cierre": "SIN_FECHA",
+                "etiqueta_fecha_cierre": None,
+                "documentos": documentos,
+            }
+            resultado["clasificacion_tematica"] = clasificar_convocatoria(resultado)
+
+            yield scrapy.Request(
+                url=principal["url"],
+                callback=self.parse_pdf_cierre,
+                cb_kwargs={"resultado": resultado, "documento_pdf": principal},
+            )
+
+    def micrositios_de_portada(self, response):
+        for enlace in response.css("a[href]"):
+            if (
+                self.limite > 0
+                and len(self.enlaces_encontrados) >= self.limite
+            ):
+                return
+
+            # Banner: el enlace es una imagen, sin texto propio.
+            if (enlace.xpath("normalize-space(.)").get() or "").strip() or not enlace.css("img"):
+                continue
+
+            url, _ = urldefrag(response.urljoin(enlace.attrib.get("href", "").strip()))
+            parsed = urlparse(url)
+            segmentos = [s for s in parsed.path.split("/") if s]
+
+            if (
+                parsed.scheme not in ("http", "https")
+                or (parsed.hostname or "").removeprefix("www.") != self.dominio
+                or len(segmentos) != 1
+                or parsed.query
+                or not any(p in segmentos[0].lower() for p in PALABRAS_MICROSITIO)
+            ):
+                continue
+
+            clave = (self.dominio, parsed.path.rstrip("/"))
+
+            if clave in self.enlaces_encontrados or self.ya_registrada(url):
+                continue
+
+            self.enlaces_encontrados.add(clave)
+
+            yield scrapy.Request(
+                url=url,
+                callback=self.parse_detalle,
+                cb_kwargs={"titulo_enlace": (enlace.css("img").attrib.get("alt") or "").strip()},
+            )
+
+    def parse_nota(self, response, titulo_nota):
+        """Noticia del sitio → página propia de la convocatoria que anuncia."""
+        from app.descubrimiento.pagina_propia import (
+            buscar_pagina_propia,
+            enlaces_del_cuerpo,
+        )
+
+        if (
+            self.limite > 0
+            and len(self.enlaces_encontrados) >= self.limite
+        ):
+            return
+
+        titulo = titulo_nota or (response.css("h1::text").get() or "").strip()
+        propia = buscar_pagina_propia(
+            enlaces_del_cuerpo(response.text, response.url),
+            titulo,
+            response.url,
+        )
+
+        if propia is None or self.ya_registrada(propia["url"]):
+            return
+
+        parsed = urlparse(propia["url"])
+        clave = ((parsed.hostname or "").removeprefix("www."), parsed.path.rstrip("/"))
+
+        if clave in self.enlaces_encontrados:
+            return
+
+        self.enlaces_encontrados.add(clave)
+
+        if propia["pdf"]:
+            # Las bases en PDF se resuelven desde la página que las publica.
+            return
+
+        yield scrapy.Request(
+            url=propia["url"],
+            callback=self.parse_detalle,
+            cb_kwargs={"titulo_enlace": titulo},
+        )
 
     def convocatorias_de_portada(self, response):
         for enlace in response.css("a[href]"):
@@ -396,7 +615,7 @@ class ConvocatoriasSpider(scrapy.Spider):
 
             clave = (self.dominio, parsed.path.rstrip("/"))
 
-            if clave in self.enlaces_encontrados:
+            if clave in self.enlaces_encontrados or self.ya_registrada(url):
                 continue
 
             titulo = " ".join(
@@ -423,9 +642,15 @@ class ConvocatoriasSpider(scrapy.Spider):
             url_pagina=response.url,
         )
 
-        # Utilizar el título del enlace como respaldo.
+        # Utilizar el título del enlace como respaldo y, si tampoco hay
+        # (banner de un micrositio), el og:title, h1 o <title> de la página.
         if not resultado["titulo"]:
             resultado["titulo"] = titulo_enlace
+
+        if not resultado["titulo"]:
+            from app.importar_desde_url import titulo_de_pagina
+
+            resultado["titulo"] = titulo_de_pagina(response.text) or ""
 
         # Clasificación temática preliminar.
         # No descarta convocatorias ni modifica la BD.

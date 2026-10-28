@@ -19,6 +19,19 @@ DEFAULT_URL_INICIAL = "https://www.secihti.mx/convocatorias/"
 DEFAULT_FUENTE_ID = 2
 
 
+def urls_registradas() -> set[str]:
+    """url_hash de todas las convocatorias guardadas (cualquier estado)."""
+    from app.descubrimiento.guardar_descubrimientos import conectar
+
+    conexion = conectar()
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute("SELECT url_hash FROM convocatorias WHERE url_hash IS NOT NULL")
+            return {fila[0] for fila in cursor.fetchall()}
+    finally:
+        conexion.close()
+
+
 def ejecutar(
     limite,
     guardar,
@@ -119,6 +132,8 @@ def ejecutar(
         ConvocatoriasSpider,
         url=url_inicial,
         limite=limite,
+        # Al guardar, el límite se aplica a las convocatorias nuevas.
+        conocidas=urls_registradas() if guardar else None,
     )
 
     proceso.start()

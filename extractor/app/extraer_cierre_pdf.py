@@ -80,6 +80,11 @@ def extraer_cierre_pdf(texto):
             r"conclusi[oó]n\s+de\s+recepci[oó]n\s+de\s+solicitudes",
             r"fecha\s+l[ií]mite\s+de\s+recepci[oó]n",
             r"cierre\s+del\s+sistema\s+para\s+captura",
+            r"cierre\s+de\s+registros?",
+            r"fecha\s+l[ií]mite\s+de\s+registro",
+            # «La presente convocatoria tiene vigencia hasta el 30 de
+            # noviembre del 2026» (TecNM).
+            r"convocatoria\s+(?:tiene\s+vigencia|estar[aá]\s+vigente|permanecer[aá]\s+abierta)\s+hasta(?:\s+el)?",
         ],
     )
 

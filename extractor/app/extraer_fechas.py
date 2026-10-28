@@ -31,7 +31,8 @@ PATRON_FECHA = re.compile(
     r"(enero|febrero|marzo|abril|mayo|junio|"
     r"julio|agosto|septiembre|setiembre|octubre|"
     r"noviembre|diciembre)"
-    r"\s+(?:de\s+)?(\d{4})\b",
+    # «30 de noviembre de 2026» y también «… del 2026».
+    r"\s+(?:del?\s+)?(\d{4})\b",
     re.IGNORECASE,
 )
 
