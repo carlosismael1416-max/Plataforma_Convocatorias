@@ -11,9 +11,13 @@ etapa nueva solo le agrega documentos y actualiza su etapa. Si un
 documento de la convocatoria trae fecha de cierre, se aplica el validador
 de siempre (umbral 70) y, si cumple, se publica.
 
-Canal: la página oficial del programa en DGESUI (robots lo permite). El
-DOF prohíbe leer sus notas (robots.txt: /nota_detalle.php), así que no se
-consulta. Se revisa una vez al día (ajustes_sistema).
+Canales (todos permitidos por su robots.txt):
+- la página oficial del programa en DGESUI (guía, anexos, resultados);
+- el DOF por el SIDOF (app/dof.py): avisos de distribución y lineamientos,
+  que salen antes o junto con la guía;
+- el TecNM, que publica el FAM de los tecnológicos (federales y
+  descentralizados).
+Se revisa una vez al día (ajustes_sistema).
 
 Uso manual (desde extractor/):
     ./.venv/bin/python -m app.programas_anuales           # vista previa
@@ -55,6 +59,12 @@ FAM = {
     "fuente": "DGESUI - Fondo de Aportaciones Múltiples (FAM)",
     "organismo": ("Secretaría de Educación Pública (SEP) - DGESUI", "https://dgesui.ses.sep.gob.mx"),
     # Secciones de la página → etapa (por el texto de su encabezado).
+    # DOF (SIDOF): avisos y acuerdos del fondo, que salen antes que la
+    # guía o junto con ella (distribución por entidad, lineamientos).
+    "dof": r"fondo de aportaciones multiples",
+    # TecNM publica el FAM de los tecnológicos (federales y
+    # descentralizados) en su sección de transparencia.
+    "tecnm": {"pagina": "https://www.tecnm.mx/?vista=Convocatorias_Tecnm", "ruta": "/fam/"},
     "secciones": (
         (r"normatividad|lineamientos|reglas", "REGLAS"),
         (r"gu[ií]a", "CONVOCATORIA"),
@@ -138,6 +148,56 @@ def nombre_documento(nombre_archivo: str, texto_enlace: str) -> str:
         return texto_enlace[:250]
     nombre = re.sub(r"\.(pdf|xlsx?|docx?)$", "", nombre_archivo, flags=re.I)
     return " ".join(re.sub(r"[_]+", " ", nombre).split())[:250]
+
+
+def etapa_por_nombre(texto: str) -> str:
+    texto = texto.casefold()
+    if re.search(r"asignaci[oó]n|beneficiari|resultados|seleccionad", texto):
+        return "RESULTADOS"
+    if re.search(r"convocatoria|gu[ií]a", texto):
+        return "CONVOCATORIA"
+    return "REGLAS"
+
+
+def documentos_dof(notas: list[dict], programa: dict) -> list[dict]:
+    """Notas del DOF del programa: reglas del ejercicio (distribución,
+    lineamientos) salvo que digan otra cosa."""
+    from app.dof import ejercicio_de, normalizar
+
+    documentos = []
+    for nota in notas:
+        if not re.search(programa["dof"], normalizar(nota["titulo"])):
+            continue
+        documentos.append({
+            "url": nota["url"],
+            "nombre": f"DOF {nota['fecha'].strftime('%d/%m/%Y')}: {nota['titulo']}"[:250],
+            "etapa": etapa_por_nombre(nota["titulo"]) if "convocatoria" in nota["titulo"].casefold() else "REGLAS",
+            "anio": ejercicio_de(nota["titulo"], nota["fecha"]),
+        })
+    return documentos
+
+
+def documentos_tecnm(html: str, url_pagina: str, programa: dict) -> list[dict]:
+    """Documentos del FAM en el sitio del TecNM (su menú los enlaza desde
+    cualquier página): asignación = resultados; lineamientos o
+    convocatoria según su nombre."""
+    arbol = HTMLParser(html)
+    documentos, vistos = [], set()
+    for enlace in arbol.css("a[href]"):
+        url = urljoin(url_pagina, enlace.attributes.get("href") or "").split("#", 1)[0].split("?", 1)[0]
+        ruta = unquote(urlparse(url).path)
+        if programa["tecnm"]["ruta"] not in ruta.lower() or not re.search(r"\.(pdf|xlsx?|docx?)$", ruta, re.I) or url in vistos:
+            continue
+        vistos.add(url)
+        archivo = ruta.rsplit("/", 1)[-1]
+        texto = " ".join(enlace.text().split())
+        documentos.append({
+            "url": url,
+            "nombre": f"TecNM: {nombre_documento(archivo, texto)}"[:250],
+            "etapa": etapa_por_nombre(f"{archivo} {texto}"),
+            "anio": anio_de(archivo),
+        })
+    return documentos
 
 
 def plan_por_ejercicio(documentos: list[dict], hoy: date | None = None) -> dict[int, dict]:
@@ -294,6 +354,13 @@ def revisar_programas(guardar: bool = True, forzar: bool = False) -> dict:
                 resultado["omitido"] = True
                 return resultado
 
+            # DOF: los días que faltan por revisar (una petición por día).
+            from app.dof import guardar_ultima_fecha, notas_nuevas
+
+            notas, dof_leido, errores_dof = notas_nuevas(cursor)
+            resultado["dof"] = {"notas": len(notas), "hasta": dof_leido}
+            resultado["errores"].extend({"programa": "DOF", "error": e} for e in errores_dof)
+
             for programa in PROGRAMAS:
                 partes = urlparse(programa["pagina"])
                 url_base = f"{partes.scheme}://{partes.netloc}/"
@@ -303,6 +370,19 @@ def revisar_programas(guardar: bool = True, forzar: bool = False) -> dict:
                 except Exception as error:
                     resultado["errores"].append({"programa": programa["clave"], "error": str(error)[:300]})
                     continue
+
+                documentos += documentos_dof(notas, programa)
+
+                if programa.get("tecnm"):
+                    pagina_tecnm = programa["tecnm"]["pagina"]
+                    partes_tecnm = urlparse(pagina_tecnm)
+                    try:
+                        url_tecnm, html_tecnm, _ = descargar_mismo_dominio(
+                            pagina_tecnm, f"{partes_tecnm.scheme}://{partes_tecnm.netloc}/", max_bytes=MAX_BYTES_PAGINA
+                        )
+                        documentos += documentos_tecnm(html_tecnm.decode("utf-8", "replace"), url_tecnm, programa)
+                    except Exception as error:
+                        resultado["errores"].append({"programa": f"{programa['clave']} TecNM", "error": str(error)[:300]})
 
                 resultado["revisados"] += 1
 
@@ -317,6 +397,8 @@ def revisar_programas(guardar: bool = True, forzar: bool = False) -> dict:
                     resultado["ejercicios"].append({"programa": programa["clave"], **guardar_ejercicio(cursor, programa, anio, datos, cierre)})
 
             if guardar:
+                if dof_leido:
+                    guardar_ultima_fecha(cursor, dof_leido)
                 marcar_revisado(cursor)
                 conexion.commit()
             else:
