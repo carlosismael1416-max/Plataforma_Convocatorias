@@ -71,6 +71,7 @@ load_dotenv(
 # «when:60d»: solo notas de los últimos 60 días (sin ella, Google News
 # devuelve notas de convocatorias de hace años). SECIHTI y TecNM traen
 # convocatorias nacionales, en las que el ITSVA sí puede participar.
+# La de Yucatán trae las estatales (congresos, concursos, retos).
 VENTANA_GOOGLE = "when:60d"
 
 CONSULTAS_GOOGLE = [
@@ -102,6 +103,11 @@ CONSULTAS_GOOGLE = [
     ),
     (
         '"convocatoria" TecNM investigación'
+    ),
+    # Lo que publica la Secretaría de Ciencia de Yucatán (congresos,
+    # concursos, retos) suele tener página propia.
+    (
+        '"Secretaría de Ciencia" Yucatán convocatoria'
     ),
 ]
 CONSULTAS_GOOGLE = [
