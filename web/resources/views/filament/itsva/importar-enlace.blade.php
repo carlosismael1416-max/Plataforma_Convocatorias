@@ -9,8 +9,10 @@
     $panel = filament()->getId();
     $modo = $pagina->modo;
     $desdeArchivo = isset($analisis['archivo']);
-    // Un archivo nunca trae enlace ni fuente: no es un error del documento.
-    if ($desdeArchivo && $validacion) {
+    // Enlace leído del código QR del cartel: se analizó esa página.
+    $enlaceQr = $analisis['enlace_detectado'] ?? null;
+    // Un archivo sin QR no trae enlace ni fuente: no es un error del documento.
+    if ($desdeArchivo && ! $enlaceQr && $validacion) {
         $validacion['bloqueos'] = array_values(array_filter(
             $validacion['bloqueos'] ?? [],
             fn ($b) => ! str_contains($b, 'URL oficial') && ! str_contains($b, 'fuente asociada')
@@ -110,7 +112,7 @@
         <div class="imp-fila">
             <label class="imp-archivo">
                 <input type="file" wire:model="archivoConvocatoria" accept="application/pdf,image/jpeg,image/png,image/webp" style="display: none">
-                📄 <span wire:loading.remove wire:target="archivoConvocatoria">{{ $pagina->archivoConvocatoria ? $pagina->archivoConvocatoria->getClientOriginalName() : 'Elige el PDF o la imagen (cartel, captura) — hasta 15 MB' }}</span>
+                📄 <span wire:loading.remove wire:target="archivoConvocatoria">{{ $pagina->archivoConvocatoria ? $pagina->archivoConvocatoria->getClientOriginalName() : 'Elige el PDF o la imagen (cartel con QR, captura) — hasta 15 MB' }}</span>
                 <span wire:loading wire:target="archivoConvocatoria">Subiendo archivo…</span>
             </label>
             <button type="button" class="imp-btn imp-btn-blanco" wire:click="analizarArchivo"
@@ -145,7 +147,7 @@
             </section>
         @elseif ($validacion['publicable'] ?? false)
             <section class="imp-res imp-ok">
-                @if ($desdeArchivo)<div class="imp-leido">📄 {{ $analisis['archivo'] }} · {{ number_format($analisis['caracteres_leidos'] ?? 0) }} caracteres leídos</div>@endif
+                @if ($enlaceQr)<div class="imp-leido">📷 {{ $analisis['archivo'] }} · leímos su código QR y analizamos la página: {{ $enlaceQr }}</div>@elseif ($desdeArchivo)<div class="imp-leido">📄 {{ $analisis['archivo'] }} · {{ number_format($analisis['caracteres_leidos'] ?? 0) }} caracteres leídos</div>@endif
                 <h4>✅ Cumple los criterios <span class="imp-puntaje">{{ $validacion['score'] }}/{{ $validacion['umbral'] }}</span></h4>
                 <div style="font-size: 13px">Revisa los datos que llenamos abajo y pulsa «Publicar convocatoria».</div>
                 <div class="imp-acciones">
@@ -154,7 +156,7 @@
             </section>
         @else
             <section class="imp-res imp-mal">
-                @if ($desdeArchivo)<div class="imp-leido">📄 {{ $analisis['archivo'] }} · {{ number_format($analisis['caracteres_leidos'] ?? 0) }} caracteres leídos. Si tienes el enlace oficial, agrégalo abajo: ayuda a verificarla.</div>@endif
+                @if ($enlaceQr)<div class="imp-leido">📷 {{ $analisis['archivo'] }} · leímos su código QR y analizamos la página: {{ $enlaceQr }}</div>@elseif ($desdeArchivo)<div class="imp-leido">📄 {{ $analisis['archivo'] }} · {{ number_format($analisis['caracteres_leidos'] ?? 0) }} caracteres leídos. Si tienes el enlace oficial, agrégalo abajo: ayuda a verificarla.</div>@endif
                 <h4>⚠️ No cumple todos los criterios automáticos <span class="imp-puntaje">{{ $validacion['score'] ?? 0 }}/{{ $validacion['umbral'] ?? 70 }}</span></h4>
                 <div style="font-size: 13px">El motor no la publicaría sola por:</div>
                 <ul>

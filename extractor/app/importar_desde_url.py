@@ -13,23 +13,28 @@ Uso manual (desde extractor/):
 from __future__ import annotations
 
 import json
+import re
 import sys
 from datetime import date
 from decimal import Decimal
 from urllib.parse import urlparse
 
+import requests
 from selectolax.parser import HTMLParser
 
 from app.descubrimiento.guardar_descubrimientos import conectar
 from app.enriquecer_convocatoria import (
     construir_enriquecimiento,
     construir_item_pagina_directa,
-    descargar_html_pagina_segura,
     host_url,
 )
-from app.seguridad_red import validar_url_publica
+from app.seguridad_red import descargar_mismo_dominio, validar_url_publica
 from app.urls import hash_url
 from app.validar_convocatoria import evaluar_convocatoria
+
+
+# Igual que «Subir desde un archivo».
+MAX_BYTES_ARCHIVO = 15 * 1024 * 1024
 
 
 class EnlaceInvalido(ValueError):
@@ -37,7 +42,13 @@ class EnlaceInvalido(ValueError):
 
 
 def titulo_de_pagina(html: str) -> str | None:
+    """
+    og:title, h1 o <title>. Se prefiere el primero que nombre algo (dos
+    palabras o más): en micrositios el og:title suele ser solo la marca
+    («InnovaFest») y el h1 el nombre de la convocatoria.
+    """
     arbol = HTMLParser(html)
+    candidatos = []
 
     for selector, atributo in (
         ('meta[property="og:title"]', "content"),
@@ -54,9 +65,13 @@ def titulo_de_pagina(html: str) -> str | None:
             if separador in texto and len(texto.split(separador)[0]) >= 15:
                 texto = texto.split(separador)[0]
         if len(texto) >= 8:
-            return texto[:500]
+            candidatos.append(texto[:500])
 
-    return None
+    for texto in candidatos:
+        if len(re.findall(r"[^\W\d_]{3,}", texto)) >= 2:
+            return texto
+
+    return candidatos[0] if candidatos else None
 
 
 def fuente_por_dominio(conexion, url: str) -> dict | None:
@@ -162,9 +177,30 @@ def analizar_url(url: str) -> dict:
         conexion.close()
 
     try:
-        url_final, html = descargar_html_pagina_segura(url, url_base)
+        url_final, contenido, tipo_contenido = descargar_mismo_dominio(url, url_base, max_bytes=MAX_BYTES_ARCHIVO)
     except Exception as error:
         raise EnlaceInvalido(f"No se pudo leer la página: {error}") from error
+
+    # Un enlace directo al PDF de la convocatoria (p. ej. las bases de una
+    # edición): se lee como documento, no como página.
+    if contenido.startswith(b"%PDF") or "pdf" in (tipo_contenido or "").lower():
+        from app.importar_desde_archivo import ArchivoInvalido, analizar_archivo
+
+        nombre = urlparse(url_final).path.rsplit("/", 1)[-1] or "convocatoria.pdf"
+        try:
+            resultado = analizar_archivo(contenido, nombre, url=url_final, fuente_id=fuente["id"] if fuente else None)
+        except ArchivoInvalido as error:
+            raise EnlaceInvalido(str(error)) from error
+
+        return {
+            **resultado,
+            "url_final": url_final,
+            "fuente": fuente["nombre"] if fuente else None,
+            "existente": existente,
+        }
+
+    codificacion = requests.utils.get_encoding_from_headers({"content-type": tipo_contenido}) or "utf-8"
+    html = contenido.decode(codificacion, errors="replace")
 
     titulo = titulo_de_pagina(html)
 

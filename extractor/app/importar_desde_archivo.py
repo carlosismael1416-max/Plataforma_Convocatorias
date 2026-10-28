@@ -78,6 +78,47 @@ def texto_de_imagen(contenido: bytes) -> str:
         raise ArchivoInvalido("La imagen tardó demasiado en leerse; prueba con una más pequeña o con el PDF.") from error
 
 
+def enlaces_en_imagen(contenido: bytes) -> list[str]:
+    """
+    Enlaces de los códigos QR del cartel («Convocatoria aquí», «Escanea el
+    QR»). Los carteles casi nunca traen la fecha de cierre ni las bases: eso
+    está en la página a la que lleva el QR.
+    """
+    try:
+        import zxingcpp
+        from PIL import Image, ImageOps
+
+        imagen = ImageOps.exif_transpose(Image.open(io.BytesIO(contenido)))
+        if max(imagen.size) > MAX_LADO_IMAGEN:
+            imagen.thumbnail((MAX_LADO_IMAGEN, MAX_LADO_IMAGEN))
+        codigos = zxingcpp.read_barcodes(imagen)
+    except Exception:
+        return []
+
+    enlaces = []
+    for codigo in codigos:
+        texto = (codigo.text or "").strip()
+        if re.match(r"(?i)^https?://[^\s]+$", texto) and texto not in enlaces:
+            enlaces.append(texto)
+
+    return enlaces[:3]
+
+
+def analisis_del_enlace(enlaces: list[str]) -> tuple[str, dict] | tuple[None, None]:
+    """El primer enlace del QR que se pueda analizar como «Subir desde un enlace»."""
+    from app.importar_desde_url import EnlaceInvalido, analizar_url
+
+    for enlace in enlaces:
+        try:
+            return enlace, analizar_url(enlace)
+        except EnlaceInvalido:
+            continue
+        except Exception:
+            continue
+
+    return None, None
+
+
 def titulo_de_pdf(contenido: bytes) -> str | None:
     """El texto con la letra más grande de la primera página."""
     try:
@@ -123,6 +164,13 @@ def _completar_titulo(lineas: list[str], i: int) -> str:
     return titulo.strip(" .:-")
 
 
+def _juntar_letras(linea: str) -> str:
+    """«C O N V O C A T O R I A» → «CONVOCATORIA» (títulos con letras espaciadas)."""
+    if re.fullmatch(r"(?:\w ){3,}\w", linea):
+        return linea.replace(" ", "")
+    return linea
+
+
 def titulo_de_texto(texto: str) -> str | None:
     """
     El nombre de la convocatoria en el texto. Las convocatorias mexicanas
@@ -139,7 +187,20 @@ def titulo_de_texto(texto: str) -> str | None:
     if participar and sum(c.isalpha() for c in participar.group(1)) >= 8:
         return participar.group(1).strip()
 
-    lineas = [" ".join(l.split()) for l in texto.splitlines() if len(l.strip()) >= 4][:40]
+    lineas = [_juntar_letras(" ".join(l.split())) for l in texto.splitlines() if len(l.strip()) >= 4][:40]
+
+    # Encabezado «CONVOCATORIA» solo en su renglón: el nombre va en los
+    # renglones siguientes («Exhibición de Innovación y Patentes 2026» /
+    # «Edición Mérida»), antes del primer párrafo.
+    for i, linea in enumerate(lineas[:10]):
+        if re.fullmatch(r"(?i)convocatorias?[:.]?", linea):
+            nombre = []
+            for siguiente in lineas[i + 1:i + 4]:
+                if len(siguiente) > 120 or siguiente.endswith((",", ";")) or re.match(r"(?i)(en el marco|el |la |los |las |con fundamento)", siguiente):
+                    break
+                nombre.append(siguiente)
+            if nombre and sum(c.isalpha() for c in " ".join(nombre)) >= 10:
+                return " ".join(nombre).strip(" .:-")
 
     for i, linea in enumerate(lineas):
         if re.fullmatch(r"(?i)convoca[n]?\s*[:.]?", linea) and i + 1 < len(lineas):
@@ -188,7 +249,16 @@ def organismo_en_texto(texto: str) -> int | None:
     return None
 
 
-def analizar_archivo(contenido: bytes, nombre: str = "convocatoria") -> dict:
+def analizar_archivo(
+    contenido: bytes,
+    nombre: str = "convocatoria",
+    url: str | None = None,
+    fuente_id: int | None = None,
+) -> dict:
+    """
+    Con url (un enlace que lleva directo a un PDF) el resultado se valida
+    como cualquier enlace: con su URL y la fuente de su dominio.
+    """
     if not contenido:
         raise ArchivoInvalido("El archivo está vacío.")
 
@@ -204,6 +274,19 @@ def analizar_archivo(contenido: bytes, nombre: str = "convocatoria") -> dict:
             raise ArchivoInvalido("No se pudo leer el PDF.") from error
         titulo = titulo_de_texto(texto) or titulo_de_pdf(contenido)
     else:
+        # Primero el QR (rápido): si lleva a la página de la convocatoria,
+        # sus datos son los buenos y no hace falta el OCR del cartel.
+        if url is None:
+            enlace, desde_enlace = analisis_del_enlace(enlaces_en_imagen(contenido))
+            if desde_enlace is not None:
+                return {
+                    **desde_enlace,
+                    "archivo": nombre,
+                    "tipo_archivo": tipo,
+                    "caracteres_leidos": 0,
+                    "enlace_detectado": enlace,
+                }
+
         texto = texto_de_imagen(contenido)
         titulo = titulo_de_texto(texto)
 
@@ -217,7 +300,7 @@ def analizar_archivo(contenido: bytes, nombre: str = "convocatoria") -> dict:
     contexto = {
         "convocatoria_id": None,
         "titulo": titulo,
-        "url_original": "",
+        "url_original": url or "",
         "fuente_url_base": "",
         "fuente_nombre": "",
         "categoria_objetivo": None,
@@ -243,7 +326,7 @@ def analizar_archivo(contenido: bytes, nombre: str = "convocatoria") -> dict:
         "fuente": None,
         "existente": None,
         "caracteres_leidos": len(texto.strip()),
-        **datos_y_validacion(extraido, titulo, None, None),
+        **datos_y_validacion(extraido, titulo, url, fuente_id),
     }
 
 
