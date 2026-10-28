@@ -6,6 +6,7 @@ use App\Models\Convocatoria;
 use App\Models\ConvocatoriaArchivo;
 use Filament\Notifications\Notification;
 use Illuminate\Http\Client\ConnectionException;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -198,6 +199,26 @@ trait ImportaDesdeEnlace
         $this->publicarIgual = true;
     }
 
+    /** ¿Lo analizado ya cerró? Entonces se ofrece guardarla en el historial. */
+    public function analisisVencido(): bool
+    {
+        $cierre = $this->analisis['datos']['fecha_cierre'] ?? null;
+
+        return is_string($cierre) && $cierre !== '' && Carbon::parse($cierre)->lt(today());
+    }
+
+    /**
+     * Estado con que se guarda lo que sube un docente o directivo: se
+     * publica al momento, salvo que ya haya cerrado; entonces queda en el
+     * historial (cerrada) como referencia para las siguientes ediciones.
+     */
+    protected function estadoAlGuardar(array $data): string
+    {
+        $cierre = $data['fecha_cierre'] ?? null;
+
+        return filled($cierre) && Carbon::parse($cierre)->lt(today()) ? 'CERRADA' : 'PUBLICADA';
+    }
+
     /** «No publicar»: se descarta lo analizado y el formulario queda vacío. */
     public function descartarAnalisis(): void
     {
@@ -284,7 +305,9 @@ trait ImportaDesdeEnlace
             && ! $this->publicarIgual
         ) {
             throw ValidationException::withMessages([
-                'enlace' => 'La convocatoria no cumple los criterios automáticos. Elige «Publicar de todas maneras» o «No publicar».',
+                'enlace' => $this->analisisVencido()
+                    ? 'Esta convocatoria ya cerró. Elige «Guardar en el historial» o «No guardar».'
+                    : 'La convocatoria no cumple los criterios automáticos. Elige «Publicar de todas maneras» o «No publicar».',
             ]);
         }
 

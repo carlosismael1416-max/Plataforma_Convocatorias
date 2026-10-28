@@ -12,8 +12,6 @@ use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Carbon;
-use Illuminate\Validation\ValidationException;
 
 class CreateConvocatoria extends CreateRecord
 {
@@ -74,15 +72,6 @@ class CreateConvocatoria extends CreateRecord
             'dirigido_a',
         ];
 
-        if (
-            filled($data['fecha_cierre'] ?? null)
-            && Carbon::parse($data['fecha_cierre'])->lt(today())
-        ) {
-            throw ValidationException::withMessages([
-                'data.fecha_cierre' => 'La fecha de cierre ya pasó: no se puede publicar una convocatoria vencida.',
-            ]);
-        }
-
         // Si el enlace ya era una pendiente interna del motor, se publica esa
         // en vez de crear un duplicado.
         $convocatoria = $this->validarImportacion($data) ?? new Convocatoria();
@@ -96,12 +85,21 @@ class CreateConvocatoria extends CreateRecord
         $convocatoria->subido_por_user_id = $usuario->getKey();
         $convocatoria->origen = 'MANUAL';
         // Las convocatorias se publican al momento para que todos las vean;
-        // lo que revisa el directivo son las propuestas para participar.
-        $convocatoria->estado = 'PUBLICADA';
+        // lo que revisa el directivo son las propuestas para participar. Una
+        // que ya cerró se guarda en el historial (referencia para la
+        // siguiente edición).
+        $convocatoria->estado = $this->estadoAlGuardar($data);
 
         $convocatoria->save();
         $this->adjuntarArchivoSubido($convocatoria);
 
         return $convocatoria;
+    }
+
+    protected function getCreatedNotificationTitle(): ?string
+    {
+        return $this->record?->estado === 'CERRADA'
+            ? 'Guardada en el historial: ya había cerrado'
+            : 'Convocatoria publicada';
     }
 }

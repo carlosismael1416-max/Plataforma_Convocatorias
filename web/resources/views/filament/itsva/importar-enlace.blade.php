@@ -168,7 +168,20 @@
                     @endif
                 </ul>
 
-                @if ($pagina->publicarIgual)
+                @if ($pagina->analisisVencido())
+                    <div style="font-size: 13px; margin-top: 6px">Ya cerró, pero puedes guardarla en el <strong style="display: inline">historial</strong> de Buscar convocatorias: sirve de referencia para su próxima edición. Nadie la verá como vigente.</div>
+                    @if ($pagina->publicarIgual)
+                        <div class="imp-confirmado">Se guardará en el historial. Revisa los datos (puedes agregar una nota en la descripción) y pulsa «Publicar convocatoria».</div>
+                        <div class="imp-acciones">
+                            <button type="button" class="imp-btn imp-btn-gris" wire:click="descartarAnalisis">No guardar</button>
+                        </div>
+                    @else
+                        <div class="imp-acciones">
+                            <button type="button" class="imp-btn imp-btn-ambar" wire:click="publicarDeTodasManeras">Guardar en el historial</button>
+                            <button type="button" class="imp-btn imp-btn-gris" wire:click="descartarAnalisis">No guardar</button>
+                        </div>
+                    @endif
+                @elseif ($pagina->publicarIgual)
                     <div class="imp-confirmado">Marcada para publicar de todas maneras. Revisa los datos y pulsa «Publicar convocatoria».</div>
                     <div class="imp-acciones">
                         <button type="button" class="imp-btn imp-btn-gris" wire:click="descartarAnalisis">No publicar</button>
