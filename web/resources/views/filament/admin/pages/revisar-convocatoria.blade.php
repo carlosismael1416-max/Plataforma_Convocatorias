@@ -130,7 +130,7 @@
         <div>
             <section class="rv-tarjeta">
                 <h3>1. Validador automático</h3>
-                <p class="rv-ayuda">Vuelve a leer la página oficial con el mismo validador del motor (puntaje mínimo 70) y te dice por qué no la publicó. No guarda ni cambia nada.</p>
+                <p class="rv-ayuda">Vuelve a leer la página oficial con el mismo validador del motor (puntaje mínimo 70) y te dice por qué no la publicó. Si aquí no tiene fecha de cierre y la página oficial sí la trae, la guarda sola; no cambia nada más.</p>
                 <button type="button" class="rv-boton" wire:click="validarAhora" wire:loading.attr="disabled" wire:target="validarAhora" @disabled(! $convocatoria->url_original)>
                     <span wire:loading.remove wire:target="validarAhora">🔎 Validar ahora</span>
                     <span wire:loading wire:target="validarAhora">Leyendo la página oficial…</span>
@@ -146,8 +146,12 @@
                         @if (! empty($validacion['razones']))
                             <details style="margin-top: 6px"><summary>Detalle del puntaje</summary><ul>@foreach ($validacion['razones'] as $r)<li>{{ $r }}</li>@endforeach</ul></details>
                         @endif
-                        @if (($datosMotor['fecha_cierre'] ?? null) && ($datosMotor['fecha_cierre'] !== $convocatoria->fecha_cierre?->toDateString()))
-                            <div style="margin-top: 8px">La página oficial dice que cierra el <strong style="display: inline">{{ \Illuminate\Support\Carbon::parse($datosMotor['fecha_cierre'])->format('d/m/Y') }}</strong>; aquí está guardado {{ $convocatoria->fecha_cierre?->format('d/m/Y') ?? 'sin fecha' }}. Corrígelo en «Corregir datos» si es así.</div>
+                        @if ($fechaAplicada)
+                            <div style="margin-top: 8px">📅 No tenía fecha de cierre: se guardó la de la página oficial, <strong style="display: inline">{{ \Illuminate\Support\Carbon::parse($fechaAplicada)->format('d/m/Y') }}</strong>. El motor la toma en cuenta en su próxima revisión.</div>
+                            @if ($evidenciaFecha)<div class="rv-hist-obs" style="margin-top: 4px">Según la página: «{{ \Illuminate\Support\Str::limit($evidenciaFecha, 220) }}»</div>@endif
+                        @elseif (($datosMotor['fecha_cierre'] ?? null) && ($datosMotor['fecha_cierre'] !== $convocatoria->fecha_cierre?->toDateString()))
+                            <div style="margin-top: 8px">La página oficial dice que cierra el <strong style="display: inline">{{ \Illuminate\Support\Carbon::parse($datosMotor['fecha_cierre'])->format('d/m/Y') }}</strong>; aquí está guardado {{ $convocatoria->fecha_cierre?->format('d/m/Y') ?? 'sin fecha' }}. Como ya tenía una fecha, no se cambia sola: corrígela en «Corregir datos» si es así.</div>
+                            @if ($evidenciaFecha)<div class="rv-hist-obs" style="margin-top: 4px">Según la página: «{{ \Illuminate\Support\Str::limit($evidenciaFecha, 220) }}»</div>@endif
                         @endif
                     </div>
                 @elseif (! $convocatoria->url_original)

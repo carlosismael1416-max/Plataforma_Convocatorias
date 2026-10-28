@@ -183,6 +183,8 @@ def datos_y_validacion(extraido: dict, titulo: str | None, url: str | None, fuen
             "bloqueos": validacion["bloqueos"],
         },
         "documentos": extraido.get("documentos_procesados") or [],
+        # Frase de la que salió la fecha de cierre (para mostrarla).
+        "evidencia_fecha": extraido.get("evidencia_fecha"),
     }
 
 

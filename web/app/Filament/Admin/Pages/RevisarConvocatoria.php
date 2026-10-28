@@ -42,6 +42,11 @@ class RevisarConvocatoria extends Page
 
     public ?array $datosMotor = null;
 
+    /** Fecha de cierre que se guardó sola al validar (la convocatoria no tenía). */
+    public ?string $fechaAplicada = null;
+
+    public ?string $evidenciaFecha = null;
+
     public static function canAccess(): bool
     {
         return RevisionConvocatoria::puedeRevisar(auth()->user());
@@ -69,7 +74,10 @@ class RevisarConvocatoria extends Page
         return Convocatoria::query()->with(['organismo', 'fuente', 'categoria'])->findOrFail($this->record);
     }
 
-    /** Vuelve a pasar el enlace por el validador del motor (no guarda nada). */
+    /**
+     * Vuelve a pasar el enlace por el validador del motor. Solo guarda la
+     * fecha de cierre si la convocatoria no tenía y la página oficial la trae.
+     */
     public function validarAhora(): void
     {
         $convocatoria = $this->convocatoria();
@@ -108,6 +116,8 @@ class RevisarConvocatoria extends Page
 
         $this->validacion = $respuesta->json('validacion');
         $this->datosMotor = $respuesta->json('datos');
+        $this->evidenciaFecha = $respuesta->json('evidencia_fecha');
+        $this->fechaAplicada = $this->completarFechaCierre($convocatoria, $this->datosMotor['fecha_cierre'] ?? null);
 
         if ($this->tipo === '' && isset(Convocatoria::TIPOS[$this->datosMotor['tipo'] ?? ''])) {
             $this->tipo = $this->datosMotor['tipo'];
@@ -164,6 +174,28 @@ class RevisarConvocatoria extends Page
     private function usuario(): User
     {
         return User::query()->findOrFail(auth()->id());
+    }
+
+    /**
+     * Si la convocatoria no tiene fecha de cierre y la página oficial sí la
+     * dice, se guarda sin pedírselo al administrador. Una fecha distinta a la
+     * registrada no se cambia sola: solo se avisa.
+     */
+    private function completarFechaCierre(Convocatoria $convocatoria, mixed $fecha): ?string
+    {
+        if ($convocatoria->fecha_cierre || ! is_string($fecha) || ! preg_match('/^\d{4}-\d{2}-\d{2}$/', $fecha)) {
+            return null;
+        }
+
+        // La tabla exige que el inicio no sea posterior al cierre.
+        if ($convocatoria->fecha_inicio && $convocatoria->fecha_inicio->toDateString() > $fecha) {
+            return null;
+        }
+
+        $convocatoria->fecha_cierre = $fecha;
+        $convocatoria->save();
+
+        return $fecha;
     }
 
     private function avisar(string $titulo, string $cuerpo): void

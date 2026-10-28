@@ -49,7 +49,11 @@ _CLAVES_CIERRE = (
 _OTRAS_ETAPAS = re.compile(
     r"\b(resultad|evaluaci|dictam|formalizaci|publicacion de la convocatoria|apertura|"
     r"inicio de actividades|ministraci|prevenci|seleccionad|admitid|admision|validacion de documentos|"
-    r"entrega de premios|premiacion|ceremonia|nacimiento|nacid|egresad|vigencia del apoyo|ejercicio fiscal)"
+    r"entrega de premios|premiacion|ceremonia|nacimiento|nacid|egresad|vigencia del apoyo|ejercicio fiscal|"
+    # «A más tardar el 31 de enero se publicará en el DOF la asignación» (FAM).
+    r"asignacion|se publicara|diario oficial|"
+    # Plazos de ejecución del proyecto («la etapa se concluirá a más tardar…»).
+    r"se concluir|deberan concluir|ejecucion)"
 )
 
 
@@ -145,6 +149,11 @@ def extraer_cierre_calendario(
         prioridad = _prioridad(actual) or (_prioridad(contexto) if len(actual) < 60 else 0)
 
         if not prioridad or _OTRAS_ETAPAS.search(actual):
+            continue
+
+        # La clave vino de la línea siguiente («IX. ASIGNACIÓN» + «A más
+        # tardar el 31 de enero…»): esa línea también debe ser de cierre.
+        if not _prioridad(actual) and _OTRAS_ETAPAS.search(contexto):
             continue
 
         # «Registro/recepción» que continúa una etapa posterior («Fase 4:
