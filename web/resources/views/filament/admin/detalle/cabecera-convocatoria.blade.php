@@ -17,7 +17,7 @@
         <div class="det-chips">
             <span class="det-chip">{{ $tipoTexto }}</span>
             <span @class(['det-chip', 'det-chip-ok' => $visible, 'det-chip-no' => ! $visible])>● {{ $estado }}{{ $visible ? ' · la ven docentes y directivos' : '' }}</span>
-            <span class="det-chip">{{ $c->origen === 'MANUAL' ? '✍ Subida a mano' : '🤖 Motor' }}</span>
+            <span class="det-chip">{{ match ($c->origen) { 'MANUAL' => '✍ Subida a mano', 'PROGRAMA' => '📅 Programa anual', default => '🤖 Motor' } }}</span>
             @if ($c->url_original)
                 <a class="det-chip" href="{{ $c->url_original }}" target="_blank" rel="noopener noreferrer" style="color: #fff; text-decoration: none">Sitio oficial ↗</a>
             @endif

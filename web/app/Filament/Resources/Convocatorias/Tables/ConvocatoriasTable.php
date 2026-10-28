@@ -87,7 +87,7 @@ class ConvocatoriasTable
                             'REQUIERE_CORRECCIONES', 'DESCARTADA' => 'danger',
                             default => 'gray',
                         })
-                    ->description(fn (Convocatoria $record): string => $record->origen === 'MANUAL' ? '✍ Subida a mano' : '🤖 Motor'),
+                    ->description(fn (Convocatoria $record): string => match ($record->origen) { 'MANUAL' => '✍ Subida a mano', 'PROGRAMA' => '📅 Programa anual', default => '🤖 Motor' }),
 
                 TextColumn::make('fecha_cierre')
                     ->label('Cierre')

@@ -485,6 +485,7 @@ class Reportes extends Page
                             match ($c->origen) {
                                 'SCRAPING' => 'Motor',
                                 'MANUAL' => 'Subida a mano',
+                                'PROGRAMA' => 'Programa anual',
                                 default => $c->origen ?: 'No especificado',
                             },
                         'tipo' =>

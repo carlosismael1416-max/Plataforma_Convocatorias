@@ -83,6 +83,25 @@ def buscar_convocatoria(
     return cursor.fetchone()
 
 
+TIPOS_DOCUMENTO = {
+    ".pdf": ("PDF", "application/pdf"),
+    ".xlsx": ("EXCEL", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"),
+    ".xls": ("EXCEL", "application/vnd.ms-excel"),
+    ".docx": ("WORD", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"),
+    ".doc": ("WORD", "application/msword"),
+}
+
+
+def tipo_de_documento(url):
+    """Tipo por la extensión; sin extensión de documento es un enlace a
+    otra página de la misma convocatoria."""
+    ruta = urlparse(url).path.lower()
+    return next(
+        (tipo for extension, tipo in TIPOS_DOCUMENTO.items() if ruta.endswith(extension)),
+        ("ENLACE", "text/html"),
+    )
+
+
 def guardar_documentos(
     cursor,
     convocatoria_id,
@@ -122,7 +141,7 @@ def guardar_documentos(
             existentes += 1
             continue
 
-        es_pdf = urlparse(url_archivo).path.lower().endswith(".pdf")
+        tipo_archivo, mime_type = tipo_de_documento(url_archivo)
 
         cursor.execute(
             """
@@ -148,9 +167,8 @@ def guardar_documentos(
             (
                 convocatoria_id,
                 nombre,
-                # Un enlace a otra página de la misma convocatoria.
-                "PDF" if es_pdf else "ENLACE",
-                "application/pdf" if es_pdf else "text/html",
+                tipo_archivo,
+                mime_type,
                 url_archivo,
             ),
         )

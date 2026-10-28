@@ -27,6 +27,10 @@ from app.publicar_descubrimientos import (
     revalidar_pendientes,
 )
 
+from app.programas_anuales import (
+    revisar_programas,
+)
+
 from app.seguimiento_convocatorias import (
     seguir_convocatorias,
 )
@@ -417,6 +421,8 @@ def fuentes_pendientes(conexion) -> list[dict]:
               -- Las fuentes que crea el motor al publicar un descubrimiento
               -- solo registran el origen; no son listados que raspar.
               AND COALESCE(selector_config->>'creada_automaticamente', 'false') <> 'true'
+              -- Los programas anuales (FAM) los revisa app/programas_anuales.py.
+              AND selector_config->>'programa_anual' IS NULL
               AND (
                   ultima_ejecucion IS NULL
                   OR ultima_ejecucion
@@ -714,6 +720,15 @@ def ejecutar_ciclo(
         print("Errores:", fuentes["errores"])
         print("Pospuestas por tiempo:", fuentes["pospuestas"])
 
+        # Programas anuales por etapas (FAM): una vez al día.
+        try:
+            programas = revisar_programas()
+        except Exception as error:
+            programas = {"revisados": 0, "ejercicios": [], "errores": [{"error": str(error)[:300]}], "omitido": False}
+
+        print("Programas anuales:", "omitidos (revisados hoy)" if programas["omitido"] else
+              f"{programas['revisados']} revisados, {len(programas['ejercicios'])} ejercicios, {len(programas['errores'])} errores")
+
         # =====================================================
         # 5. SEGUIMIENTO DE CONVOCATORIAS PUBLICADAS
         # =====================================================
@@ -791,6 +806,7 @@ def ejecutar_ciclo(
                 "errores"
             ] > 0
             or fuentes["errores"] > 0
+            or len(programas["errores"]) > 0
             or seguimiento["errores"] > 0
         )
 
@@ -819,6 +835,9 @@ def ejecutar_ciclo(
 
             "fuentes":
                 fuentes,
+
+            "programas":
+                programas,
 
             "seguimiento":
                 seguimiento,
