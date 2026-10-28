@@ -1,0 +1,599 @@
+{
+ "fuente": "Clasificador por Objeto del Gasto 2026 (CONAC), Ayuntamiento de Mérida; capítulo 6000 (Inversión pública). Partidas genéricas con su nombre oficial del CONAC.",
+ "partidas": [
+  {
+   "clave": "6000",
+   "nivel": "CAPITULO",
+   "nombre": "Inversión pública",
+   "descripcion": "Asignaciones destinadas a obras por contrato y proyectos productivos y acciones de fomento. Incluye los gastos en estudios de pre-inversión y preparación del proyecto.",
+   "padre": null,
+   "tipo_gasto": "CAPITAL",
+   "orden": 5790
+  },
+  {
+   "clave": "6100",
+   "nivel": "CONCEPTO",
+   "nombre": "Obra pública en bienes de dominio público",
+   "descripcion": "Asignaciones destinadas para construcciones en bienes de dominio público de acuerdo con lo establecido en el art. 7 de la Ley General de Bienes Nacionales y otras leyes aplicables. Incluye los gastos en estudios de pre-inversión y preparación del proyecto.",
+   "padre": "6000",
+   "tipo_gasto": "CAPITAL",
+   "orden": 5800
+  },
+  {
+   "clave": "611",
+   "nivel": "PARTIDA_GENERICA",
+   "nombre": "Edificación habitacional",
+   "descripcion": "Asignaciones destinadas a obras para vivienda, ya sean unifamiliares o multifamiliares. Incluye construcción nueva, ampliación, remodelación, mantenimiento o reparación integral de las construcciones, así como los gastos en estudios de pre-inversión y preparación del proyecto.",
+   "padre": "6100",
+   "tipo_gasto": "CAPITAL",
+   "orden": 5810
+  },
+  {
+   "clave": "6111",
+   "nivel": "PARTIDA_ESPECIFICA",
+   "nombre": "Edificación habitacional",
+   "descripcion": "Asignaciones destinadas a obras para vivienda, ya sean unifamiliares o multifamiliares. Incluye construcción nueva, ampliación, remodelación, mantenimiento o reparación integral de las construcciones, así como los gastos en estudios de pre-inversión y preparación del proyecto.",
+   "padre": "611",
+   "tipo_gasto": "CAPITAL",
+   "orden": 5820
+  },
+  {
+   "clave": "612",
+   "nivel": "PARTIDA_GENERICA",
+   "nombre": "Edificación no habitacional",
+   "descripcion": "Asignaciones destinadas para la construcción de edificios no residenciales para fines industriales, comerciales, institucionales y de servicios. Incluye construcción nueva, ampliación, remodelación, mantenimiento o reparación integral de las construcciones, así como, los gastos en estudios de pre-inversión y preparación del proyecto.",
+   "padre": "6100",
+   "tipo_gasto": "CAPITAL",
+   "orden": 5830
+  },
+  {
+   "clave": "6121",
+   "nivel": "PARTIDA_ESPECIFICA",
+   "nombre": "Edificación no habitacional",
+   "descripcion": "Asignaciones destinadas para la construcción de edificios no residenciales para fines industriales, comerciales, institucionales y de servicios. Incluye construcción nueva, ampliación, remodelación, mantenimiento o reparación integral de las construcciones, así como, los gastos en estudios de pre-inversión y preparación del proyecto.",
+   "padre": "612",
+   "tipo_gasto": "CAPITAL",
+   "orden": 5840
+  },
+  {
+   "clave": "6122",
+   "nivel": "PARTIDA_ESPECIFICA",
+   "nombre": "Mercados",
+   "descripcion": "Asignaciones destinadas a cubrir todas las erogaciones por construcción, ampliación, remodelación, rehabilitación y mantenimiento que se efectúen en los diversos Mercados del Municipio. Estos trabajos pueden ser ejecutados por administración o por contrato con terceras personas físicas o morales. Incluye los gastos en estudios de pre-inversión y preparación del proyecto.",
+   "padre": "612",
+   "tipo_gasto": "CAPITAL",
+   "orden": 5850
+  },
+  {
+   "clave": "6123",
+   "nivel": "PARTIDA_ESPECIFICA",
+   "nombre": "Centros recreativos y de entretenimiento",
+   "descripcion": "Asignaciones destinadas a cubrir todas las erogaciones en obras públicas relacionadas con la construcción, ampliación, remodelación, rehabilitación y mantenimiento de los diversos centros de recreación y entretenimiento del Ayuntamiento. Estos trabajos pueden ser ejecutados por administración o por contrato con terceras personas físicas o morales. Incluye los gastos en estudios de pre-inversión y preparación del proyecto.",
+   "padre": "612",
+   "tipo_gasto": "CAPITAL",
+   "orden": 5860
+  },
+  {
+   "clave": "6124",
+   "nivel": "PARTIDA_ESPECIFICA",
+   "nombre": "Parques y jardines",
+   "descripcion": "Asignaciones destinadas a cubrir todas las erogaciones en obras públicas relacionadas con la construcción, ampliación, remodelación, rehabilitación y mantenimiento de los parques, jardines y áreas verdes. Estos trabajos pueden ser ejecutados por administración o por contrato con terceras personas físicas o morales. Incluye los gastos en estudios de pre-inversión y preparación del proyecto.",
+   "padre": "612",
+   "tipo_gasto": "CAPITAL",
+   "orden": 5870
+  },
+  {
+   "clave": "6125",
+   "nivel": "PARTIDA_ESPECIFICA",
+   "nombre": "Centros deportivos",
+   "descripcion": "Asignaciones destinadas a cubrir todas las erogaciones en obra pública por la construcción, ampliación, remodelación y mantenimiento de canchas, campos deportivos y gimnasios municipales. Estos trabajos pueden ser ejecutados por administración o por contrato con terceras personas físicas o morales. Incluye los gastos en estudios de pre-inversión y preparación del proyecto.",
+   "padre": "612",
+   "tipo_gasto": "CAPITAL",
+   "orden": 5880
+  },
+  {
+   "clave": "6126",
+   "nivel": "PARTIDA_ESPECIFICA",
+   "nombre": "Cementerios y camposanto",
+   "descripcion": "Asignaciones destinadas a cubrir todas las erogaciones en obra pública por la construcción, ampliación, remodelación y mantenimiento de los cementerios de Mérida y sus comisarias. Estos trabajos pueden ser ejecutados por administración o por contrato con terceras personas físicas o morales. Incluye los gastos en estudios de pre-inversión y preparación del proyecto.",
+   "padre": "612",
+   "tipo_gasto": "CAPITAL",
+   "orden": 5890
+  },
+  {
+   "clave": "613",
+   "nivel": "PARTIDA_GENERICA",
+   "nombre": "Construcción de obras para el abastecimiento de agua, petróleo, gas, electricidad y telecomunicaciones",
+   "descripcion": "Asignaciones destinadas a la construcción de obras para el abastecimiento de agua, petróleo y gas y a la construcción de obras para la generación y construcción de energía eléctrica y para las telecomunicaciones. Incluye los gastos en estudios de pre-inversión y preparación del proyecto.",
+   "padre": "6100",
+   "tipo_gasto": "CAPITAL",
+   "orden": 5900
+  },
+  {
+   "clave": "6131",
+   "nivel": "PARTIDA_ESPECIFICA",
+   "nombre": "Sistemas y redes de agua",
+   "descripcion": "Asignaciones destinadas a cubrir todas las erogaciones que la Administración Pública Municipal efectúe en obra pública por contrato o por administración relacionada con las redes de distribución de agua potable en calles, avenidas, comisarías, tales como: construcción, ampliación, adaptación, mantenimiento en general y gastos generados en la conservación, mantenimiento y reparación de los sistemas de agua potable del municipio de Mérida. Incluye los gastos en estudios de pre-inversión y preparación del proyecto.",
+   "padre": "613",
+   "tipo_gasto": "CAPITAL",
+   "orden": 5910
+  },
+  {
+   "clave": "6132",
+   "nivel": "PARTIDA_ESPECIFICA",
+   "nombre": "Mantenimiento y conservación de sistemas y redes de agua",
+   "descripcion": "Asignaciones destinadas a cubrir todos los gastos que se generen en obra pública por contrato o por administración para el mantenimiento, rehabilitación, conservación y reubicación de las redes de distribución de agua potable del municipio de Mérida. Con relación a la reparación de fugas, mantenimiento de los sistemas de agua potable del municipio de Mérida, rehabilitación de tomas domiciliarias, así como los sistemas electromecánicos. Incluye los gastos en estudios de pre-inversión y preparación del proyecto.",
+   "padre": "613",
+   "tipo_gasto": "CAPITAL",
+   "orden": 5920
+  },
+  {
+   "clave": "6133",
+   "nivel": "PARTIDA_ESPECIFICA",
+   "nombre": "Electrificación",
+   "descripcion": "Asignaciones destinadas a cubrir todas las erogaciones en obra pública por contrato o por administración relacionada con la construcción, reconstrucción, ampliación, mejora, adaptación, conservación, rehabilitación y mantenimiento en general de las redes de distribución de energía eléctrica. Incluye los gastos en estudios de pre-inversión y preparación del proyecto.",
+   "padre": "613",
+   "tipo_gasto": "CAPITAL",
+   "orden": 5930
+  },
+  {
+   "clave": "614",
+   "nivel": "PARTIDA_GENERICA",
+   "nombre": "División de terrenos y construcción de obras de urbanización",
+   "descripcion": "Asignaciones destinadas a la división de terrenos y construcción de obras de urbanización en lotes, construcción de obras integrales para la dotación de servicios, tales como: guarniciones, banquetas, redes de energía, agua potable y alcantarillado. Incluye construcción nueva, ampliación, remodelación, mantenimiento o reparación integral de las construcciones y los gastos en estudios de pre-inversión y preparación del proyecto.",
+   "padre": "6100",
+   "tipo_gasto": "CAPITAL",
+   "orden": 5940
+  },
+  {
+   "clave": "6141",
+   "nivel": "PARTIDA_ESPECIFICA",
+   "nombre": "Banquetas y guarniciones",
+   "descripcion": "Asignaciones destinadas a cubrir todas las erogaciones que se efectúen en obra pública por contrato o por administración relacionada con la construcción, reconstrucción, rehabilitación y ampliación de banquetas, guarniciones, andadores y pisos.",
+   "padre": "614",
+   "tipo_gasto": "CAPITAL",
+   "orden": 5950
+  },
+  {
+   "clave": "6142",
+   "nivel": "PARTIDA_ESPECIFICA",
+   "nombre": "Construcción y desazolve de pozos y zanjas",
+   "descripcion": "Asignaciones destinadas a cubrir todas las erogaciones que se efectúen en obra pública por contrato o por administración en la construcción, reconstrucción, rehabilitación y otros trabajos relacionados con pozos y zanjas, así como el sistema de drenaje y alcantarillado.",
+   "padre": "614",
+   "tipo_gasto": "CAPITAL",
+   "orden": 5960
+  },
+  {
+   "clave": "6143",
+   "nivel": "PARTIDA_ESPECIFICA",
+   "nombre": "Centro histórico",
+   "descripcion": "Asignaciones destinadas a cubrir todas las erogaciones que se efectúen en obra pública por contrato o por administración que se requieran para conservar y mantener en buen estado el Centro Histórico de la Ciudad de Mérida. Estos trabajos pueden ser ejecutados por terceras personas físicas o morales.",
+   "padre": "614",
+   "tipo_gasto": "CAPITAL",
+   "orden": 5970
+  },
+  {
+   "clave": "6144",
+   "nivel": "PARTIDA_ESPECIFICA",
+   "nombre": "Conservación de la imagen urbana de la ciudad",
+   "descripcion": "Asignaciones destinadas a cubrir todas las erogaciones que se efectúen en obra pública por contrato o por administración que se requieran para conservar y mantener en buen estado la Imagen Urbana de la Ciudad de Mérida. Estos trabajos pueden ser ejecutados por terceras personas físicas o morales.",
+   "padre": "614",
+   "tipo_gasto": "CAPITAL",
+   "orden": 5980
+  },
+  {
+   "clave": "615",
+   "nivel": "PARTIDA_GENERICA",
+   "nombre": "Construcción de vías de comunicación",
+   "descripcion": "Asignaciones destinadas a la construcción de carreteras, autopistas, terracerías, puentes, pasos a desnivel y aeropistas. Incluye construcción nueva, ampliación, remodelación, mantenimiento o reparación integral de las construcciones y los gastos en estudios de pre-inversión y preparación del proyecto.",
+   "padre": "6100",
+   "tipo_gasto": "CAPITAL",
+   "orden": 5990
+  },
+  {
+   "clave": "6151",
+   "nivel": "PARTIDA_ESPECIFICA",
+   "nombre": "Construcción de calles",
+   "descripcion": "Asignaciones destinadas a cubrir todas las erogaciones que se efectúen en obra pública, por contrato o por administración relacionada con la construcción, ampliación, adaptación de calles y accesos peatonales, entre otros.",
+   "padre": "615",
+   "tipo_gasto": "CAPITAL",
+   "orden": 6000
+  },
+  {
+   "clave": "6152",
+   "nivel": "PARTIDA_ESPECIFICA",
+   "nombre": "Repavimentación y bacheo de calles",
+   "descripcion": "Asignaciones destinadas a cubrir todas las erogaciones de la obra que se originen por remodelación, mantenimiento y rehabilitación de calles y avenidas con el fin de conservarlas en buen estado para el tránsito vehicular.",
+   "padre": "615",
+   "tipo_gasto": "CAPITAL",
+   "orden": 6010
+  },
+  {
+   "clave": "6153",
+   "nivel": "PARTIDA_ESPECIFICA",
+   "nombre": "Adecuación de vialidades y nomenclatura",
+   "descripcion": "Asignaciones destinadas a cubrir todas las erogaciones que se efectúan en obra pública para adecuar las vialidades a su uso actual. Se incluyen los programas encaminados a la correcta señalización de calles y avenidas, entre otros. Estos trabajos pueden ser ejecutados por administración o por contrato con terceras personas físicas o morales. Incluye los gastos en estudios de pre-inversión y preparación del proyecto.",
+   "padre": "615",
+   "tipo_gasto": "CAPITAL",
+   "orden": 6020
+  },
+  {
+   "clave": "6154",
+   "nivel": "PARTIDA_ESPECIFICA",
+   "nombre": "Avenidas, glorietas y fuentes",
+   "descripcion": "Asignaciones destinadas a cubrir todas las erogaciones en obra pública por contrato o por administración relacionada con la construcción, reconstrucción, ampliación, adaptación y mantenimiento en general de avenidas, glorietas y fuentes.",
+   "padre": "615",
+   "tipo_gasto": "CAPITAL",
+   "orden": 6030
+  },
+  {
+   "clave": "6155",
+   "nivel": "PARTIDA_ESPECIFICA",
+   "nombre": "Aportación a programas federales",
+   "descripcion": "Cuenta concentradora de las asignaciones destinadas a cubrir erogaciones por concepto de la aportación Municipal y Federal a los programas sociales de los que el Municipio participe con proyectos de infraestructura; una vez firmados los convenios los recursos serán transferidos a las partidas aplicables.",
+   "padre": "615",
+   "tipo_gasto": "CAPITAL",
+   "orden": 6040
+  },
+  {
+   "clave": "616",
+   "nivel": "PARTIDA_GENERICA",
+   "nombre": "Otras construcciones de ingeniería civil u obra pesada",
+   "descripcion": "Asignaciones destinadas a la construcción de presas y represas, obras marítimas, fluviales y subacuáticas, obras para el transporte eléctrico y ferroviario y otras construcciones de ingeniería civil u obra pesada no clasificada en otra parte. Incluye los gastos en estudios de pre-inversión y preparación del proyecto.",
+   "padre": "6100",
+   "tipo_gasto": "CAPITAL",
+   "orden": 6050
+  },
+  {
+   "clave": "6161",
+   "nivel": "PARTIDA_ESPECIFICA",
+   "nombre": "Otras construcciones de ingeniería civil u obra pesada",
+   "descripcion": "Asignaciones destinadas a la construcción de presas y represas, obras marítimas, fluviales y subacuáticas, obras para el transporte eléctrico y ferroviario y otras construcciones de ingeniería civil u obra pesada no clasificada en otra parte. Incluye los gastos en estudios de pre-inversión y preparación del proyecto.",
+   "padre": "616",
+   "tipo_gasto": "CAPITAL",
+   "orden": 6060
+  },
+  {
+   "clave": "617",
+   "nivel": "PARTIDA_GENERICA",
+   "nombre": "Instalaciones y equipamiento en construcciones",
+   "descripcion": "Asignaciones destinadas a la realización de instalaciones eléctricas, hidrosanitarias, de gas, aire acondicionado, calefacción, instalaciones electromecánicas y otras instalaciones de construcciones. Incluye los gastos en estudios de pre-inversión y preparación del proyecto.",
+   "padre": "6100",
+   "tipo_gasto": "CAPITAL",
+   "orden": 6070
+  },
+  {
+   "clave": "6171",
+   "nivel": "PARTIDA_ESPECIFICA",
+   "nombre": "Instalaciones y equipamiento en construcciones",
+   "descripcion": "Asignaciones destinadas a la realización de instalaciones eléctricas, hidrosanitarias, de gas, aire acondicionado, calefacción, instalaciones electromecánicas y otras instalaciones de construcciones. Incluye los gastos en estudios de pre-inversión y preparación del proyecto.",
+   "padre": "617",
+   "tipo_gasto": "CAPITAL",
+   "orden": 6080
+  },
+  {
+   "clave": "619",
+   "nivel": "PARTIDA_GENERICA",
+   "nombre": "Trabajos de acabados en edificaciones y otros trabajos especializados",
+   "descripcion": "Asignaciones destinadas a la preparación de terrenos para la construcción, excavación, demolición de edificios y estructuras; alquiler de maquinaria y equipo para la construcción con operador, colocación de muros falsos, trabajos de enyesado, pintura y otros cubrimientos de paredes, colocación de pisos y azulejos, instalación de productos de carpintería, cancelería de aluminio e impermeabilización. Incluye los gastos en estudios de pre-inversión y preparación del proyecto.",
+   "padre": "6100",
+   "tipo_gasto": "CAPITAL",
+   "orden": 6090
+  },
+  {
+   "clave": "6191",
+   "nivel": "PARTIDA_ESPECIFICA",
+   "nombre": "Trabajos de acabados en edificaciones y otros trabajos especializados",
+   "descripcion": "Asignaciones destinadas a la preparación de terrenos para la construcción, excavación, demolición de edificios y estructuras; alquiler de maquinaria y equipo para la construcción con operador, colocación de muros falsos, trabajos de enyesado, pintura y otros cubrimientos de paredes, colocación de pisos y azulejos, instalación de productos de carpintería, cancelería de aluminio e impermeabilización. Incluye los gastos en estudios de pre-inversión y preparación del proyecto.",
+   "padre": "619",
+   "tipo_gasto": "CAPITAL",
+   "orden": 6100
+  },
+  {
+   "clave": "6200",
+   "nivel": "CONCEPTO",
+   "nombre": "Obra pública en bienes propios",
+   "descripcion": "Asignaciones para construcciones en bienes inmuebles propiedad de los entes públicos. Incluye los gastos en estudios de pre-inversión y preparación del proyecto.",
+   "padre": "6000",
+   "tipo_gasto": "CAPITAL",
+   "orden": 6110
+  },
+  {
+   "clave": "621",
+   "nivel": "PARTIDA_GENERICA",
+   "nombre": "Edificación habitacional",
+   "descripcion": "Asignaciones destinadas a obras para vivienda, ya sean unifamiliares o multifamiliares. Incluye construcción nueva, ampliación, remodelación, mantenimiento o reparación integral de las construcciones, así como los gastos en estudios de pre-inversión y preparación del proyecto.",
+   "padre": "6200",
+   "tipo_gasto": "CAPITAL",
+   "orden": 6120
+  },
+  {
+   "clave": "6211",
+   "nivel": "PARTIDA_ESPECIFICA",
+   "nombre": "Edificación habitacional",
+   "descripcion": "Asignaciones destinadas a obras para vivienda, ya sean unifamiliares o multifamiliares. Incluye construcción nueva, ampliación, remodelación, mantenimiento o reparación integral de las construcciones, así como los gastos en estudios de pre-inversión y preparación del proyecto.",
+   "padre": "621",
+   "tipo_gasto": "CAPITAL",
+   "orden": 6130
+  },
+  {
+   "clave": "622",
+   "nivel": "PARTIDA_GENERICA",
+   "nombre": "Edificación no habitacional",
+   "descripcion": "Asignaciones destinadas para la construcción de edificios no residenciales para fines industriales, comerciales, institucionales y de servicios. Incluye construcción nueva, ampliación, remodelación, mantenimiento o reparación integral de las construcciones, así como, los gastos en estudios de pre-inversión y preparación del proyecto.",
+   "padre": "6200",
+   "tipo_gasto": "CAPITAL",
+   "orden": 6140
+  },
+  {
+   "clave": "6221",
+   "nivel": "PARTIDA_ESPECIFICA",
+   "nombre": "Edificación no habitacional",
+   "descripcion": "Asignaciones destinadas para la construcción de edificios no residenciales para fines industriales, comerciales, institucionales y de servicios. Incluye construcción nueva, ampliación, remodelación, mantenimiento o reparación integral de las construcciones, así como los gastos en estudios de pre-inversión y preparación del proyecto.",
+   "padre": "622",
+   "tipo_gasto": "CAPITAL",
+   "orden": 6150
+  },
+  {
+   "clave": "6222",
+   "nivel": "PARTIDA_ESPECIFICA",
+   "nombre": "Mercados",
+   "descripcion": "Asignaciones destinadas a cubrir todas las erogaciones por construcción, ampliación, remodelación, rehabilitación y mantenimiento que se efectúen en los diversos Mercados del Municipio. Estos trabajos pueden ser ejecutados por administración o por contrato con terceras personas físicas o morales. Incluye los gastos en estudios de pre-inversión y preparación del proyecto.",
+   "padre": "622",
+   "tipo_gasto": "CAPITAL",
+   "orden": 6160
+  },
+  {
+   "clave": "6223",
+   "nivel": "PARTIDA_ESPECIFICA",
+   "nombre": "Centros recreativos y de entretenimiento",
+   "descripcion": "Asignaciones destinadas a cubrir todas las erogaciones en obras públicas relacionadas con la construcción, ampliación, remodelación, rehabilitación y mantenimiento de los diversos centros de recreación y entretenimiento del Ayuntamiento. Estos trabajos pueden ser ejecutados por administración o por contrato con terceras personas físicas o morales. Incluye los gastos en estudios de pre-inversión y preparación del proyecto.",
+   "padre": "622",
+   "tipo_gasto": "CAPITAL",
+   "orden": 6170
+  },
+  {
+   "clave": "6224",
+   "nivel": "PARTIDA_ESPECIFICA",
+   "nombre": "Parques y jardines",
+   "descripcion": "Asignaciones destinadas a cubrir todas las erogaciones en obras públicas relacionadas con la construcción, ampliación, remodelación, rehabilitación y mantenimiento de los parques, jardines y áreas verdes. Estos trabajos pueden ser ejecutados por administración o por contrato con terceras personas físicas o morales. Incluye los gastos en estudios de pre-inversión y preparación del proyecto.",
+   "padre": "622",
+   "tipo_gasto": "CAPITAL",
+   "orden": 6180
+  },
+  {
+   "clave": "6225",
+   "nivel": "PARTIDA_ESPECIFICA",
+   "nombre": "Centros deportivos",
+   "descripcion": "Asignaciones destinadas a cubrir todas las erogaciones en obra pública por la construcción, ampliación, remodelación, rehabilitación y mantenimiento de canchas, campos deportivos y gimnasios municipales. Estos trabajos pueden ser ejecutados por administración o por contrato con terceras personas físicas o morales. Incluye los gastos en estudios de pre-inversión y preparación del proyecto.",
+   "padre": "622",
+   "tipo_gasto": "CAPITAL",
+   "orden": 6190
+  },
+  {
+   "clave": "6226",
+   "nivel": "PARTIDA_ESPECIFICA",
+   "nombre": "Cementerios y camposanto",
+   "descripcion": "Asignaciones destinadas a cubrir todas las erogaciones en obra pública por la construcción, ampliación, remodelación, rehabilitación y mantenimiento de los cementerios de Mérida y sus comisarías. Estos trabajos pueden ser ejecutados por administración o por contrato con terceras personas físicas o morales. Incluye los gastos en estudios de pre-inversión y preparación del proyecto.",
+   "padre": "622",
+   "tipo_gasto": "CAPITAL",
+   "orden": 6200
+  },
+  {
+   "clave": "623",
+   "nivel": "PARTIDA_GENERICA",
+   "nombre": "Construcción de obras para el abastecimiento de agua, petróleo, gas, electricidad y telecomunicaciones",
+   "descripcion": "Asignaciones destinadas a la construcción de obras para el abastecimiento de agua, petróleo y gas y a la construcción de obras para la generación y construcción de energía eléctrica y para las telecomunicaciones. Incluye los gastos en estudios de pre-inversión y preparación del proyecto.",
+   "padre": "6200",
+   "tipo_gasto": "CAPITAL",
+   "orden": 6210
+  },
+  {
+   "clave": "6231",
+   "nivel": "PARTIDA_ESPECIFICA",
+   "nombre": "Sistemas y redes de agua",
+   "descripcion": "Asignaciones destinadas a cubrir todas las erogaciones que la Administración Pública Municipal efectúe en obra pública por contrato o por administración relacionada con las redes de distribución de agua potable en calles, avenidas, comisarías, tales como: construcción, ampliación, adaptación, mantenimiento en general y gastos generados en la conservación, mantenimiento y reparación de los sistemas de agua potable del municipio de Mérida. Incluye los gastos en estudios de pre-inversión y preparación del proyecto.",
+   "padre": "623",
+   "tipo_gasto": "CAPITAL",
+   "orden": 6220
+  },
+  {
+   "clave": "6232",
+   "nivel": "PARTIDA_ESPECIFICA",
+   "nombre": "Mantenimiento y conservación de sistemas y redes de agua potable",
+   "descripcion": "Asignaciones destinadas a cubrir todos los gastos que se generen en obra pública por contrato o por administración para el mantenimiento, rehabilitación, conservación y reubicación de las redes de distribución de agua potable del municipio de Mérida. Con relación a la reparación de fugas, mantenimiento de los sistemas de agua potable del municipio de Mérida, rehabilitación de tomas domiciliarias, así como los sistemas electromecánicos. Incluye los gastos en estudios de pre-inversión y preparación del proyecto.",
+   "padre": "623",
+   "tipo_gasto": "CAPITAL",
+   "orden": 6230
+  },
+  {
+   "clave": "6233",
+   "nivel": "PARTIDA_ESPECIFICA",
+   "nombre": "Electrificación",
+   "descripcion": "Asignaciones destinadas a cubrir todas las erogaciones en obra pública por contrato o por administración relacionada con la construcción, reconstrucción, ampliación, mejora, adaptación, conservación, rehabilitación y mantenimiento en general de las redes de distribución de energía eléctrica. Incluye los gastos en estudios de pre-inversión y preparación del proyecto.",
+   "padre": "623",
+   "tipo_gasto": "CAPITAL",
+   "orden": 6240
+  },
+  {
+   "clave": "624",
+   "nivel": "PARTIDA_GENERICA",
+   "nombre": "División de terrenos y construcción de obras de urbanización",
+   "descripcion": "Asignaciones destinadas a la división de terrenos y construcción de obras de urbanización en lotes, construcción de obras integrales para la dotación de servicios, tales como: guarniciones, banquetas, redes de energía, agua potable y alcantarillado. Incluye construcción nueva, ampliación, remodelación, mantenimiento o reparación integral de las construcciones y los gastos en estudios de pre-inversión y preparación del proyecto.",
+   "padre": "6200",
+   "tipo_gasto": "CAPITAL",
+   "orden": 6250
+  },
+  {
+   "clave": "6241",
+   "nivel": "PARTIDA_ESPECIFICA",
+   "nombre": "Banquetas y guarniciones",
+   "descripcion": "Asignaciones destinadas a cubrir todas las erogaciones que se efectúen en obra pública por contrato o por administración relacionada con la construcción, reconstrucción, rehabilitación y ampliación de banquetas, guarniciones, andadores y pisos.",
+   "padre": "624",
+   "tipo_gasto": "CAPITAL",
+   "orden": 6260
+  },
+  {
+   "clave": "6242",
+   "nivel": "PARTIDA_ESPECIFICA",
+   "nombre": "Construcción y desazolve de pozos y zanjas",
+   "descripcion": "Asignaciones destinadas a cubrir todas las erogaciones que se efectúen en obra pública por contrato o por administración en la construcción, reconstrucción, rehabilitación y otros trabajos relacionados con pozos y zanjas, así como el sistema de drenaje y alcantarillado.",
+   "padre": "624",
+   "tipo_gasto": "CAPITAL",
+   "orden": 6270
+  },
+  {
+   "clave": "6243",
+   "nivel": "PARTIDA_ESPECIFICA",
+   "nombre": "Centro histórico",
+   "descripcion": "Asignaciones destinadas a cubrir todas las erogaciones que se efectúen en obra pública por contrato o por administración que se requieran para conservar y mantener en buen estado el Centro Histórico de la Ciudad de Mérida. Estos trabajos pueden ser ejecutados por terceras personas físicas o morales.",
+   "padre": "624",
+   "tipo_gasto": "CAPITAL",
+   "orden": 6280
+  },
+  {
+   "clave": "6244",
+   "nivel": "PARTIDA_ESPECIFICA",
+   "nombre": "Conservación de la imagen urbana de la ciudad",
+   "descripcion": "Asignaciones destinadas a cubrir todas las erogaciones que se efectúen en obra pública por contrato o por administración que se requieran para conservar y mantener en buen estado la Imagen Urbana de la Ciudad de Mérida. Estos trabajos pueden ser ejecutados por terceras personas físicas o morales.",
+   "padre": "624",
+   "tipo_gasto": "CAPITAL",
+   "orden": 6290
+  },
+  {
+   "clave": "625",
+   "nivel": "PARTIDA_GENERICA",
+   "nombre": "Construcción de vías de comunicación",
+   "descripcion": "Asignaciones destinadas a la construcción de carreteras, autopistas, terracerías, puentes, pasos a desnivel y aeropistas. Incluye construcción nueva, ampliación, remodelación, mantenimiento o reparación integral de las construcciones y los gastos en estudios de pre-inversión y preparación del proyecto.",
+   "padre": "6200",
+   "tipo_gasto": "CAPITAL",
+   "orden": 6300
+  },
+  {
+   "clave": "6251",
+   "nivel": "PARTIDA_ESPECIFICA",
+   "nombre": "Construcción de calles",
+   "descripcion": "Asignaciones destinadas a cubrir todas las erogaciones que se efectúen en obra pública, por contrato o por administración relacionada con la construcción, ampliación y adaptación de calles y accesos peatonales, entre otros.",
+   "padre": "625",
+   "tipo_gasto": "CAPITAL",
+   "orden": 6310
+  },
+  {
+   "clave": "6252",
+   "nivel": "PARTIDA_ESPECIFICA",
+   "nombre": "Repavimentación y bacheo de calles",
+   "descripcion": "Asignaciones destinadas a cubrir todas las erogaciones de la obra que se originen por remodelación, mantenimiento y rehabilitación de calles y avenidas con el fin de conservarlas en buen estado para el tránsito vehicular.",
+   "padre": "625",
+   "tipo_gasto": "CAPITAL",
+   "orden": 6320
+  },
+  {
+   "clave": "6253",
+   "nivel": "PARTIDA_ESPECIFICA",
+   "nombre": "Adecuación de vialidades y nomenclatura urbana",
+   "descripcion": "Asignaciones destinadas a cubrir todas las erogaciones que se efectúan en obra pública para adecuar las vialidades a su uso actual. Se incluyen los programas encaminados a la correcta señalización de calles y avenidas, entre otros. Estos trabajos pueden ser ejecutados por administración o por contrato con terceras personas físicas o morales. Incluye los gastos en estudios de pre-inversión y preparación del proyecto.",
+   "padre": "625",
+   "tipo_gasto": "CAPITAL",
+   "orden": 6330
+  },
+  {
+   "clave": "6254",
+   "nivel": "PARTIDA_ESPECIFICA",
+   "nombre": "Avenidas, glorietas y fuentes",
+   "descripcion": "Asignaciones destinadas a cubrir todas las erogaciones en obra pública por contrato o por administración relacionada con la construcción, reconstrucción, ampliación, adaptación y mantenimiento en general de avenidas, glorietas y fuentes.",
+   "padre": "625",
+   "tipo_gasto": "CAPITAL",
+   "orden": 6340
+  },
+  {
+   "clave": "6255",
+   "nivel": "PARTIDA_ESPECIFICA",
+   "nombre": "Aportación a programas federales",
+   "descripcion": "Cuenta concentradora de las asignaciones destinadas a cubrir erogaciones por concepto de la aportación Municipal y Federal a los programas sociales de los que el Municipio participe con proyectos de infraestructura; una vez firmados los convenios los recursos serán transferidos a las partidas aplicables.",
+   "padre": "625",
+   "tipo_gasto": "CAPITAL",
+   "orden": 6350
+  },
+  {
+   "clave": "626",
+   "nivel": "PARTIDA_GENERICA",
+   "nombre": "Otras construcciones de ingeniería civil u obra pesada",
+   "descripcion": "Asignaciones destinadas a la construcción de presas y represas, obras marítimas, fluviales y subacuáticas, obras para el transporte eléctrico y ferroviario y otras construcciones de ingeniería civil u obra pesada no clasificada en otra parte. Incluye los gastos en estudios de pre-inversión y preparación del proyecto.",
+   "padre": "6200",
+   "tipo_gasto": "CAPITAL",
+   "orden": 6360
+  },
+  {
+   "clave": "6261",
+   "nivel": "PARTIDA_ESPECIFICA",
+   "nombre": "Otras construcciones de ingeniería civil u obra pesada",
+   "descripcion": "Asignaciones destinadas a la construcción de presas y represas, obras marítimas, fluviales y subacuáticas, obras para el transporte eléctrico y ferroviario y otras construcciones de ingeniería civil u obra pesada no clasificada en otra parte. Incluye los gastos en estudios de pre-inversión y preparación del proyecto.",
+   "padre": "626",
+   "tipo_gasto": "CAPITAL",
+   "orden": 6370
+  },
+  {
+   "clave": "627",
+   "nivel": "PARTIDA_GENERICA",
+   "nombre": "Instalaciones y equipamiento en construcciones",
+   "descripcion": "Asignaciones destinadas a la realización de instalaciones eléctricas, hidro-sanitarias, de gas, aire acondicionado, calefacción, instalaciones electromecánicas y otras instalaciones de construcciones. Incluye los gastos en estudios de pre-inversión y preparación del proyecto.",
+   "padre": "6200",
+   "tipo_gasto": "CAPITAL",
+   "orden": 6380
+  },
+  {
+   "clave": "6271",
+   "nivel": "PARTIDA_ESPECIFICA",
+   "nombre": "Instalaciones y equipamiento en construcciones",
+   "descripcion": "Asignaciones destinadas a la realización de instalaciones eléctricas, hidro-sanitarias, de gas, aire acondicionado, calefacción, instalaciones electromecánicas y otras instalaciones de construcciones. Incluye los gastos en estudios de pre-inversión y preparación del proyecto.",
+   "padre": "627",
+   "tipo_gasto": "CAPITAL",
+   "orden": 6390
+  },
+  {
+   "clave": "629",
+   "nivel": "PARTIDA_GENERICA",
+   "nombre": "Trabajos de acabados en edificaciones y otros trabajos especializados",
+   "descripcion": "Asignaciones destinadas a la preparación de terrenos para la construcción, excavación, demolición de edificios y estructuras; alquiler de maquinaria y equipo para la construcción con operador, colocación de muros falsos, trabajos de enyesado, pintura y otros cubrimientos de paredes, colocación de pisos y azulejos, instalación de productos de carpintería, cancelería de aluminio e impermeabilización. Incluye los gastos en estudios de pre-inversión y preparación del proyecto.",
+   "padre": "6200",
+   "tipo_gasto": "CAPITAL",
+   "orden": 6400
+  },
+  {
+   "clave": "6291",
+   "nivel": "PARTIDA_ESPECIFICA",
+   "nombre": "Trabajos de acabados en edificaciones y otros trabajos especializados",
+   "descripcion": "Asignaciones destinadas a la preparación de terrenos para la construcción, excavación, demolición de edificios y estructuras; alquiler de maquinaria y equipo para la construcción con operador, colocación de muros falsos, trabajos de enyesado, pintura y otros cubrimientos de paredes, colocación de pisos y azulejos, instalación de productos de carpintería, cancelería de aluminio e impermeabilización. Incluye los gastos en estudios de pre-inversión y preparación del proyecto.",
+   "padre": "629",
+   "tipo_gasto": "CAPITAL",
+   "orden": 6410
+  },
+  {
+   "clave": "6300",
+   "nivel": "CONCEPTO",
+   "nombre": "Proyectos productivos y acciones de fomento",
+   "descripcion": "Erogaciones realizadas por los entes públicos con la finalidad de ejecutar proyectos de desarrollo productivo, económico y social y otros. Incluye el costo de la preparación de proyectos.",
+   "padre": "6000",
+   "tipo_gasto": "CAPITAL",
+   "orden": 6420
+  },
+  {
+   "clave": "631",
+   "nivel": "PARTIDA_GENERICA",
+   "nombre": "Estudios, formulación y evaluación de proyectos productivos no incluidos en conceptos anteriores de este capítulo",
+   "descripcion": "Asignaciones destinadas a los estudios, formulación y evaluación de proyectos productivos no incluidos en conceptos anteriores de este capítulo (PPS), denominados, esquemas de inversión donde participan los sectores público y privado, desde las concesiones que se otorgan a particulares, hasta los proyectos de infraestructura productiva de largo plazo, en los sectores de energía eléctrica, de carretera y de agua potable, entre otros.",
+   "padre": "6300",
+   "tipo_gasto": "CAPITAL",
+   "orden": 6430
+  },
+  {
+   "clave": "632",
+   "nivel": "PARTIDA_GENERICA",
+   "nombre": "Ejecución de proyectos productivos no incluidos en conceptos anteriores de este capítulo",
+   "descripcion": "Asignaciones destinadas a la Ejecución de Proyectos Productivos no incluidos en conceptos anteriores de este capítulo PPS, denominados, esquemas de inversión donde participan los sectores público y privado, desde las concesiones que se otorgan a particulares hasta los proyectos de infraestructura productiva de largo plazo, en los sectores de energía eléctrica, de carretera y de agua potable, entre otros.",
+   "padre": "6300",
+   "tipo_gasto": "CAPITAL",
+   "orden": 6440
+  }
+ ]
+}

@@ -62,7 +62,7 @@
         <section class="gp-tabla">
             <div class="gp-tabla-cab">
                 <div class="gp-tabla-titulo">
-                    Clasificador por objeto del gasto{{ $this->capitulo !== '' ? ' · ' . ($capitulos->firstWhere('digito', $this->capitulo)['clave'] ?? '') . ' ' . ($capitulos->firstWhere('digito', $this->capitulo)['nombre'] ?? '') : ' · capítulos 1000 a 5000' }}
+                    Clasificador por objeto del gasto{{ $this->capitulo !== '' ? ' · ' . ($capitulos->firstWhere('digito', $this->capitulo)['clave'] ?? '') . ' ' . ($capitulos->firstWhere('digito', $this->capitulo)['nombre'] ?? '') : ' · capítulos 1000 a 6000' }}
                 </div>
                 <div class="gp-tabla-ayuda">
                     Capítulo, concepto, partida genérica y específica (CONAC). El docente elige la partida específica, o la genérica cuando no tiene específicas, y ve su capítulo, concepto, definición y tipo de gasto. Lo que ya usa algún concepto no se elimina: deja de ofrecerse y los conceptos lo conservan. Pasa el cursor sobre una definición recortada para leerla completa.
