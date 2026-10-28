@@ -649,6 +649,23 @@ def buscar_convocatoria_exacta(
     )
 
     fila = cursor.fetchone()
+
+    if fila is None:
+        # Misma convocatoria en otro enlace: el guardado la completó y
+        # dejó este enlace entre sus documentos (app/duplicados.py).
+        cursor.execute(
+            """
+            SELECT c.id, c.titulo, c.url_original, c.fuente_id, c.estado
+            FROM convocatoria_archivos a
+            JOIN convocatorias c ON c.id = a.convocatoria_id
+            WHERE RTRIM(a.url_archivo, '/') = RTRIM(%s, '/')
+            ORDER BY c.id
+            LIMIT 1
+            """,
+            (url,),
+        )
+        fila = cursor.fetchone()
+
     cursor.close()
 
     if fila is None:

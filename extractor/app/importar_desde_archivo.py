@@ -320,13 +320,17 @@ def analizar_archivo(
     if not extraido.get("organismo_id"):
         extraido["organismo_id"] = organismo_en_texto(texto)
 
+    from app.importar_desde_url import misma_ya_registrada
+
+    resultado = datos_y_validacion(extraido, titulo, url, fuente_id)
+
     return {
         "archivo": nombre,
         "tipo_archivo": tipo,
         "fuente": None,
-        "existente": None,
+        "existente": misma_ya_registrada(resultado["datos"]) if url is None else None,
         "caracteres_leidos": len(texto.strip()),
-        **datos_y_validacion(extraido, titulo, url, fuente_id),
+        **resultado,
     }
 
 

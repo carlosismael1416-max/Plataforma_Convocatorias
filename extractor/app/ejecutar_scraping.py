@@ -22,12 +22,16 @@ DEFAULT_FUENTE_ID = 2
 def urls_registradas() -> set[str]:
     """url_hash de todas las convocatorias guardadas (cualquier estado)."""
     from app.descubrimiento.guardar_descubrimientos import conectar
+    from app.urls import hash_url
 
     conexion = conectar()
     try:
         with conexion.cursor() as cursor:
             cursor.execute("SELECT url_hash FROM convocatorias WHERE url_hash IS NOT NULL")
-            return {fila[0] for fila in cursor.fetchall()}
+            conocidas = {fila[0] for fila in cursor.fetchall()}
+            # Otros enlaces de la misma convocatoria (app/duplicados.py).
+            cursor.execute("SELECT url_archivo FROM convocatoria_archivos WHERE tipo_archivo = 'ENLACE'")
+            return conocidas | {hash_url(fila[0]) for fila in cursor.fetchall()}
     finally:
         conexion.close()
 

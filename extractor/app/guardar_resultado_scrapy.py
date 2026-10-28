@@ -1,11 +1,12 @@
 import os
 
 from pathlib import Path
-from urllib.parse import urldefrag
+from urllib.parse import unquote, urldefrag, urlparse
 
 import psycopg
 from dotenv import load_dotenv
 
+from app.duplicados import buscar_misma
 from app.urls import hash_url
 
 
@@ -106,18 +107,22 @@ def guardar_documentos(
             SELECT id
             FROM convocatoria_archivos
             WHERE convocatoria_id = %s
-              AND url_archivo = %s
+              AND url_archivo IN (%s, %s)
             LIMIT 1
             """,
             (
                 convocatoria_id,
                 url_archivo,
+                # «Convocatoria%20X.pdf» y «Convocatoria X.pdf» son el mismo.
+                unquote(url_archivo),
             ),
         )
 
         if cursor.fetchone():
             existentes += 1
             continue
+
+        es_pdf = urlparse(url_archivo).path.lower().endswith(".pdf")
 
         cursor.execute(
             """
@@ -133,8 +138,8 @@ def guardar_documentos(
             VALUES (
                 %s,
                 %s,
-                'PDF',
-                'application/pdf',
+                %s,
+                %s,
                 %s,
                 NOW(),
                 NOW()
@@ -143,6 +148,9 @@ def guardar_documentos(
             (
                 convocatoria_id,
                 nombre,
+                # Un enlace a otra página de la misma convocatoria.
+                "PDF" if es_pdf else "ENLACE",
+                "application/pdf" if es_pdf else "text/html",
                 url_archivo,
             ),
         )
@@ -218,6 +226,44 @@ def guardar_resultado_scrapy(
                     url_original,
                     url_hash,
                 )
+
+                misma = None
+                if not existente:
+                    # El mismo enlace no está, pero puede ser la misma
+                    # convocatoria publicada en otro sitio (micrositio,
+                    # PDF de bases, página de la secretaría).
+                    misma = buscar_misma(cursor, titulo, fecha_cierre)
+
+                if misma:
+                    convocatoria_id = misma[0]
+
+                    archivos = guardar_documentos(
+                        cursor,
+                        convocatoria_id,
+                        [
+                            *documentos,
+                            {"nombre": "Otra página de la convocatoria", "url": url_original},
+                        ],
+                    )
+
+                    # Completar lo que falte; lo que ya tiene no se cambia.
+                    cursor.execute(
+                        """
+                        UPDATE convocatorias
+                        SET descripcion = COALESCE(NULLIF(descripcion, ''), %s),
+                            fecha_cierre = COALESCE(fecha_cierre, %s),
+                            updated_at = NOW()
+                        WHERE id = %s
+                        """,
+                        (resultado.get("descripcion"), fecha_cierre, convocatoria_id),
+                    )
+
+                    return {
+                        "estado": "MISMA_CONVOCATORIA",
+                        "convocatoria_id": convocatoria_id,
+                        "fecha_cierre_actual": misma[2] or fecha_cierre,
+                        "archivos": archivos,
+                    }
 
                 if existente:
                     convocatoria_id = existente[0]

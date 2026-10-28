@@ -282,6 +282,10 @@ def analizar_resultados(
         elif estado == "YA_EXISTE":
             duplicados += 1
 
+        elif estado == "MISMA_CONVOCATORIA":
+            # Otro enlace de una convocatoria ya guardada: se completó.
+            actualizadas += 1
+
         elif estado in {
             "ACTUALIZADA",
             "ACTUALIZADO",

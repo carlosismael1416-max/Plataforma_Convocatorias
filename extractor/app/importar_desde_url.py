@@ -97,6 +97,35 @@ def convocatoria_existente(conexion, url: str) -> dict | None:
     return {"id": fila[0], "titulo": fila[1], "estado": fila[2]} if fila else None
 
 
+def misma_ya_registrada(datos: dict) -> dict | None:
+    """
+    La misma convocatoria guardada con otro enlace (mismo nombre y fecha de
+    cierre; app/duplicados.py), para avisar antes de subirla otra vez.
+    """
+    from app.duplicados import buscar_misma
+
+    if not datos.get("titulo"):
+        return None
+
+    try:
+        conexion = conectar()
+    except Exception:
+        return None
+
+    try:
+        with conexion.cursor() as cursor:
+            fila = buscar_misma(cursor, datos["titulo"], datos.get("fecha_cierre"))
+            if fila is None:
+                return None
+            cursor.execute("SELECT estado FROM convocatorias WHERE id = %s", (fila[0],))
+            return {"id": fila[0], "titulo": fila[1], "estado": cursor.fetchone()[0]}
+    except Exception:
+        return None
+    finally:
+        conexion.rollback()
+        conexion.close()
+
+
 def _json(valor):
     if isinstance(valor, (date,)):
         return valor.isoformat()
@@ -196,7 +225,7 @@ def analizar_url(url: str) -> dict:
             **resultado,
             "url_final": url_final,
             "fuente": fuente["nombre"] if fuente else None,
-            "existente": existente,
+            "existente": existente or misma_ya_registrada(resultado["datos"]),
         }
 
     codificacion = requests.utils.get_encoding_from_headers({"content-type": tipo_contenido}) or "utf-8"
@@ -226,11 +255,13 @@ def analizar_url(url: str) -> dict:
     item = construir_item_pagina_directa(contexto, descarga=(url_final, html))
     extraido = construir_enriquecimiento(contexto, item=item)
 
+    resultado = datos_y_validacion(extraido, titulo, url_final, fuente["id"] if fuente else None)
+
     return {
         "url_final": url_final,
         "fuente": fuente["nombre"] if fuente else None,
-        "existente": existente,
-        **datos_y_validacion(extraido, titulo, url_final, fuente["id"] if fuente else None),
+        "existente": existente or misma_ya_registrada(resultado["datos"]),
+        **resultado,
     }
 
 
