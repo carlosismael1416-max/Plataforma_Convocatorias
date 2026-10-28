@@ -57,6 +57,12 @@ _PATRONES_NO_APLICA = (
 _EXCLUYE_MEXICANOS = r"\b(con excepcion|a excepcion|excepto|salvo)( de)? (los |las )?(estudiantes |personas |ciudadan[oa]s )?(de nacionalidad )?mexican[oa]s\b|\bno (podran participar|son elegibles) (los |las )?(estudiantes |personas )?mexican[oa]s\b"
 
 
+# El ITSVA es un Instituto Tecnológico Superior descentralizado (estatal)
+# del TecNM. Algunas convocatorias del TecNM son solo para los Institutos
+# Tecnológicos Federales (caso real: «Licencia Beca Comisión 2026»).
+_SOLO_FEDERALES = r"\b(institutos? tecnologicos? federales|its? federales)\b"
+
+
 def normalizar(valor: str | None) -> str:
     valor = unicodedata.normalize("NFKD", valor or "")
     valor = "".join(c for c in valor if not unicodedata.combining(c))
@@ -74,6 +80,16 @@ def texto_de_ruta(url: str | None) -> str:
 def excluye_mexicanos(objetivo: str | None, descripcion: str | None) -> bool:
     texto = normalizar(f"{objetivo or ''} {(descripcion or '')[:3000]}")
     return re.search(_EXCLUYE_MEXICANOS, texto) is not None
+
+
+def solo_tecnologicos_federales(objetivo: str | None, descripcion: str | None) -> bool:
+    """
+    Solo para los Tecnológicos Federales: los nombra y no menciona a los
+    descentralizados («aplica para Federales y Descentralizados» sí es
+    elegible).
+    """
+    texto = normalizar(f"{objetivo or ''} {(descripcion or '')[:3000]}")
+    return re.search(_SOLO_FEDERALES, texto) is not None and "descentralizad" not in texto
 
 
 def motivo_no_aplica(titulo: str | None, url: str | None) -> str | None:

@@ -18,6 +18,7 @@ from app.descubrimiento.guardar_descubrimientos import (
 from app.tipo_convocatoria import (
     clasificar_tipo,
     excluye_mexicanos,
+    solo_tecnologicos_federales,
 )
 
 
@@ -35,6 +36,9 @@ def bloqueo_por_objetivo(objetivo: str, descripcion: str) -> str | None:
     """Bloqueo duro que solo se ve en el objetivo o la descripción."""
     if excluye_mexicanos(objetivo, descripcion):
         return "excluye a participantes mexicanos"
+
+    if solo_tecnologicos_federales(objetivo, descripcion):
+        return "solo para Institutos Tecnológicos Federales (el ITSVA es descentralizado)"
 
     return None
 
