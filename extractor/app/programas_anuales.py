@@ -37,6 +37,7 @@ from selectolax.parser import HTMLParser
 from app.analizar_pdf import extraer_texto_pdf_bytes
 from app.descubrimiento.guardar_descubrimientos import conectar
 from app.extraer_cierre_pdf import extraer_cierre_pdf
+from app.fechas_convocatoria import fechas_en_texto, normalizar
 from app.seguridad_red import descargar_mismo_dominio
 from app.urls import hash_url
 
@@ -78,6 +79,17 @@ FAM = {
         "Coordinación Fiscal y lineamientos), después la guía para presentar la propuesta "
         "institucional (hasta 5 proyectos, capturados en el SIFAM) y, a más tardar el 31 de enero "
         "del ejercicio, la asignación publicada en el DOF."
+    ),
+    # Si la guía no fija fecha de entrega (la DGESUI notifica el calendario
+    # de recepción por correo), el cierre de referencia es la publicación de
+    # la asignación en el DOF: las propuestas deben estar entregadas antes.
+    # No confundir con «la etapa se concluirá a más tardar el 31 de marzo»
+    # (plazo para terminar la obra).
+    "cierre_referencia": r"a m[aá]s tardar el[^.]{0,40}?20\d{2},?\s+se publicar[aá] en el diario oficial",
+    "nota_referencia": (
+        "Nota: la guía no fija una fecha de entrega; la DGESUI notifica por correo el calendario "
+        "de recepción. Fecha de cierre de referencia: {fecha}, cuando a más tardar se publica en "
+        "el DOF la asignación del fondo (las propuestas deben estar entregadas antes)."
     ),
     "objetivo": (
         "Financiar la construcción, adecuación, mantenimiento y equipamiento de la infraestructura "
@@ -224,19 +236,50 @@ def plan_por_ejercicio(documentos: list[dict], hoy: date | None = None) -> dict[
     return plan
 
 
-def cierre_de_convocatoria(documentos: list[dict], url_base: str) -> str | None:
-    """Fecha de cierre de los PDF de la convocatoria (la guía), si la trae."""
+def cierre_de_convocatoria(
+    documentos: list[dict], url_base: str, programa: dict | None = None
+) -> tuple[str | None, str | None]:
+    """
+    (fecha, nota) de cierre según los PDF de la convocatoria (la guía). Si
+    no trae una fecha de entrega explícita, la fecha de referencia del
+    programa (con una nota que lo explica) o (None, None).
+    """
+    referencia = None
     for documento in documentos:
         if documento["etapa"] != "CONVOCATORIA" or not documento["url"].lower().endswith(".pdf"):
             continue
         try:
             _, contenido, _ = descargar_mismo_dominio(documento["url"], url_base, max_bytes=MAX_BYTES_PDF)
-            cierre = extraer_cierre_pdf(extraer_texto_pdf_bytes(contenido))
+            texto = extraer_texto_pdf_bytes(contenido)
         except Exception:
             continue
+        cierre = extraer_cierre_pdf(texto)
         if cierre.get("usar_como_fecha_cierre") and cierre.get("fecha_cierre_postulacion"):
-            return cierre["fecha_cierre_postulacion"]
-    return None
+            return cierre["fecha_cierre_postulacion"], None
+        if referencia is None and programa:
+            referencia = fecha_de_referencia(texto, programa)
+    if referencia:
+        return referencia, programa["nota_referencia"].format(fecha=formato_fecha(referencia))
+    return None, None
+
+
+def fecha_de_referencia(texto: str, programa: dict) -> str | None:
+    """Fecha de la frase de referencia del programa (p. ej. asignación en el DOF)."""
+    patron = programa.get("cierre_referencia")
+    if not patron:
+        return None
+    coincidencia = re.search(patron, " ".join(normalizar(texto).split()))
+    if not coincidencia:
+        return None
+    fechas = fechas_en_texto(coincidencia.group(0))
+    return fechas[0].isoformat() if fechas else None
+
+
+def formato_fecha(iso: str) -> str:
+    fecha = date.fromisoformat(iso)
+    meses = ("enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto",
+             "septiembre", "octubre", "noviembre", "diciembre")
+    return f"{fecha.day} de {meses[fecha.month - 1]} de {fecha.year}"
 
 
 def fuente_y_organismo(cursor, programa: dict) -> tuple[int, int]:
@@ -276,12 +319,16 @@ def fuente_y_organismo(cursor, programa: dict) -> tuple[int, int]:
     return fuente_id, organismo_id
 
 
-def guardar_ejercicio(cursor, programa: dict, anio: int, datos: dict, cierre: str | None) -> dict:
+def guardar_ejercicio(
+    cursor, programa: dict, anio: int, datos: dict, cierre: str | None, nota: str | None = None
+) -> dict:
     from app.guardar_resultado_scrapy import guardar_documentos
 
     titulo = programa["titulo"].format(anio=anio)
     url = f"{programa['pagina']}?ejercicio={anio}"
     descripcion = f"{programa['descripcion']}\n\nEjercicio {anio}. Etapa: {ETAPAS[datos['etapa']]}."
+    if nota:
+        descripcion += f"\n\n{nota}"
     fuente_id, organismo_id = fuente_y_organismo(cursor, programa)
 
     cursor.execute("SELECT id, estado, fecha_cierre FROM convocatorias WHERE url_hash = %s", (hash_url(url),))
@@ -292,17 +339,22 @@ def guardar_ejercicio(cursor, programa: dict, anio: int, datos: dict, cierre: st
         return {"anio": anio, "convocatoria_id": None, "accion": "OMITIDA_TERMINADA", "etapa": datos["etapa"],
                 "fecha_cierre": None, "documentos": {"insertados": 0, "existentes": 0}}
 
+    # Con resultados o con el cierre ya pasado, el ejercicio terminó: va al
+    # historial (cerrada) en vez de quedar pendiente para siempre.
+    terminado = datos["etapa"] == "RESULTADOS" or bool(cierre and str(cierre) < date.today().isoformat())
+
     if fila is None:
         cursor.execute(
             """
             INSERT INTO convocatorias (titulo, descripcion, objetivo, fecha_cierre, fuente_id, organismo_id,
                                        url_original, url_hash, origen, estado, tipo, dirigido_a,
                                        fecha_extraccion, created_at, updated_at)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, 'PROGRAMA', 'PENDIENTE_REVISION', 'FINANCIAMIENTO',
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, 'PROGRAMA', %s, 'FINANCIAMIENTO',
                     '["INSTITUCION"]'::jsonb, NOW(), NOW(), NOW())
             RETURNING id
             """,
-            (titulo, descripcion, programa["objetivo"], cierre, fuente_id, organismo_id, url, hash_url(url)),
+            (titulo, descripcion, programa["objetivo"], cierre, fuente_id, organismo_id, url, hash_url(url),
+             "CERRADA" if terminado else "PENDIENTE_REVISION"),
         )
         convocatoria_id, accion = cursor.fetchone()[0], "CREADA"
     else:
@@ -312,17 +364,59 @@ def guardar_ejercicio(cursor, programa: dict, anio: int, datos: dict, cierre: st
             UPDATE convocatorias
             SET descripcion = %s,
                 fecha_cierre = COALESCE(%s, fecha_cierre),
-                -- Con resultados, el ejercicio terminó: pasa al historial.
-                estado = CASE WHEN %s AND estado = 'PENDIENTE_REVISION' THEN 'CERRADA' ELSE estado END,
+                estado = CASE WHEN %s AND estado IN ('PENDIENTE_REVISION', 'PUBLICADA') THEN 'CERRADA' ELSE estado END,
                 updated_at = NOW()
             WHERE id = %s
             """,
-            (descripcion, cierre, datos["etapa"] == "RESULTADOS", convocatoria_id),
+            (descripcion, cierre, terminado, convocatoria_id),
         )
 
+    nuevos = documentos_nuevos(cursor, convocatoria_id, datos["documentos"])
     archivos = guardar_documentos(cursor, convocatoria_id, datos["documentos"])
+    avisados = avisar_novedad(cursor, convocatoria_id, titulo, datos["etapa"], nuevos) if nuevos else 0
     return {"anio": anio, "convocatoria_id": convocatoria_id, "accion": accion, "etapa": datos["etapa"],
-            "fecha_cierre": cierre, "documentos": archivos}
+            "fecha_cierre": cierre, "documentos": archivos, "avisados": avisados,
+            "estado_anterior": fila[1] if fila else None, "titulo": titulo, "nota": nota}
+
+
+def documentos_nuevos(cursor, convocatoria_id: int, documentos: list[dict]) -> list[dict]:
+    """Documentos que la convocatoria del ejercicio todavía no tiene."""
+    cursor.execute("SELECT url_archivo FROM convocatoria_archivos WHERE convocatoria_id = %s", (convocatoria_id,))
+    registrados = {unquote(fila[0] or "") for fila in cursor.fetchall()}
+    return [d for d in documentos if d.get("url") and unquote(d["url"]) not in registrados]
+
+
+def avisar_novedad(
+    cursor, convocatoria_id: int, titulo: str, etapa: str, nuevos: list[dict], nota: str | None = None
+) -> int:
+    """
+    Nota para docentes y directivos (sección Convocatorias de sus
+    notificaciones) cuando el programa publica algo nuevo: reglas, la guía
+    del siguiente ejercicio, avisos del DOF o resultados. Respeta la
+    preferencia «convocatorias_revision».
+    """
+    if nuevos:
+        nombres = "; ".join(d.get("nombre") or "documento" for d in nuevos[:3])
+        if len(nuevos) > 3:
+            nombres += f" y {len(nuevos) - 3} más"
+        mensaje = f"«{titulo}» ({ETAPAS[etapa].lower()}): {nombres}."
+    else:
+        # Sin documentos nuevos: el ejercicio se acaba de publicar.
+        mensaje = f"Ya puedes consultar «{titulo}» en Buscar convocatorias. {nota or ''}".strip()
+    cursor.execute(
+        """
+        INSERT INTO notificaciones (user_id, convocatoria_id, titulo, mensaje, tipo, leida, created_at, updated_at)
+        SELECT u.id, %s, %s, %s, 'NUEVA_CONVOCATORIA', FALSE, NOW(), NOW()
+        FROM users u
+        JOIN roles r ON r.id = u.role_id
+        LEFT JOIN notificacion_preferencias p ON p.user_id = u.id
+        WHERE u.estado = TRUE
+          AND r.nombre IN ('DOCENTE', 'DIRECTIVO')
+          AND COALESCE(p.convocatorias_revision, TRUE) = TRUE
+        """,
+        (convocatoria_id, "📅 Nota: novedad de un programa anual", mensaje[:1000]),
+    )
+    return cursor.rowcount
 
 
 def toca_revisar(cursor) -> bool:
@@ -387,14 +481,14 @@ def revisar_programas(guardar: bool = True, forzar: bool = False) -> dict:
                 resultado["revisados"] += 1
 
                 for anio, datos in plan_por_ejercicio(documentos).items():
-                    cierre = cierre_de_convocatoria(datos["documentos"], url_base)
+                    cierre, nota = cierre_de_convocatoria(datos["documentos"], url_base, programa)
                     if not guardar:
                         resultado["ejercicios"].append({
-                            "programa": programa["clave"], "anio": anio, "etapa": datos["etapa"], "fecha_cierre": cierre,
+                            "programa": programa["clave"], "anio": anio, "etapa": datos["etapa"], "fecha_cierre": cierre, "nota": nota,
                             "documentos": [f"[{d['etapa']}] {d['nombre']}" for d in datos["documentos"]],
                         })
                         continue
-                    resultado["ejercicios"].append({"programa": programa["clave"], **guardar_ejercicio(cursor, programa, anio, datos, cierre)})
+                    resultado["ejercicios"].append({"programa": programa["clave"], **guardar_ejercicio(cursor, programa, anio, datos, cierre, nota)})
 
             if guardar:
                 if dof_leido:
@@ -414,6 +508,19 @@ def revisar_programas(guardar: bool = True, forzar: bool = False) -> dict:
             if ejercicio.get("fecha_cierre") and str(ejercicio["fecha_cierre"]) >= date.today().isoformat():
                 validacion = validar_convocatoria(ejercicio["convocatoria_id"], publicar=True)
                 ejercicio["validacion"] = {k: validacion.get(k) for k in ("publicable", "score", "bloqueos", "estado_final")}
+
+                # Recién publicada: nota para docentes y directivos.
+                if validacion.get("estado_final") == "PUBLICADA" and ejercicio.get("estado_anterior") != "PUBLICADA":
+                    conexion = conectar()
+                    try:
+                        with conexion.cursor() as cursor:
+                            ejercicio["avisados"] = avisar_novedad(
+                                cursor, ejercicio["convocatoria_id"], ejercicio["titulo"], ejercicio["etapa"], [],
+                                nota=ejercicio.get("nota"),
+                            )
+                        conexion.commit()
+                    finally:
+                        conexion.close()
 
     return resultado
 
