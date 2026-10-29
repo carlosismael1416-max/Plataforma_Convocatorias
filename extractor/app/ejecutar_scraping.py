@@ -36,27 +36,45 @@ def urls_registradas() -> set[str]:
         conexion.close()
 
 
-def rutas_de_fuente(fuente_id: int) -> list[str]:
+def config_de_fuente(fuente_id: int) -> dict:
     """
-    selector_config.rutas de la fuente: prefijos de ruta cuyas páginas son
-    convocatorias aunque no cuelguen del listado ni digan «convocatoria»
-    (p. ej. COMEXUS: /becas_para_mexicanos/). Sin conexión, ninguna.
+    Ajustes de la fuente para el spider (sin conexión, ninguno):
+    - rutas: prefijos de ruta cuyas páginas son convocatorias aunque no
+      cuelguen del listado ni digan «convocatoria» (COMEXUS:
+      /becas_para_mexicanos/);
+    - palabras: el título del enlace debe incluir alguna (gob.mx);
+    - cubiertos: dominios de las demás fuentes activas; un enlace hacia
+      ellos se detiene (esa fuente lo trae).
     """
+    from urllib.parse import urlparse as _urlparse
+
+    vacio = {"rutas": [], "palabras": [], "cubiertos": []}
     try:
         from app.descubrimiento.guardar_descubrimientos import conectar
 
         conexion = conectar()
         try:
             with conexion.cursor() as cursor:
-                cursor.execute("SELECT selector_config->'rutas' FROM fuentes WHERE id = %s", (fuente_id,))
+                cursor.execute("SELECT selector_config FROM fuentes WHERE id = %s", (fuente_id,))
                 fila = cursor.fetchone()
+                cursor.execute("SELECT url_base FROM fuentes WHERE activa = TRUE AND id <> %s", (fuente_id,))
+                otras = [f[0] for f in cursor.fetchall()]
         finally:
             conexion.close()
     except Exception:
-        return []
+        return vacio
 
-    rutas = fila[0] if fila else None
-    return [r for r in rutas if isinstance(r, str) and r.startswith("/")] if isinstance(rutas, list) else []
+    config = fila[0] if fila and isinstance(fila[0], dict) else {}
+
+    def textos(clave):
+        valor = config.get(clave)
+        return [v for v in valor if isinstance(v, str) and v.strip()] if isinstance(valor, list) else []
+
+    return {
+        "rutas": [r for r in textos("rutas") if r.startswith("/")],
+        "palabras": textos("palabras"),
+        "cubiertos": sorted({(_urlparse(u).hostname or "").removeprefix("www.") for u in otras} - {""}),
+    }
 
 
 def ejecutar(
@@ -162,7 +180,11 @@ def ejecutar(
         limite=limite,
         # Al guardar, el límite se aplica a las convocatorias nuevas.
         conocidas=urls_registradas() if guardar else None,
-        rutas=rutas if rutas is not None else rutas_de_fuente(fuente_id),
+        **(
+            config
+            if (config := config_de_fuente(fuente_id)) and rutas is None
+            else {**config, "rutas": rutas}
+        ),
     )
 
     proceso.start()

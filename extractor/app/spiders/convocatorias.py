@@ -68,7 +68,7 @@ class ConvocatoriasSpider(scrapy.Spider):
         "TELNETCONSOLE_ENABLED": False,
     }
 
-    def __init__(self, url=None, limite=1, conocidas=None, rutas=None, **kwargs):
+    def __init__(self, url=None, limite=1, conocidas=None, rutas=None, cubiertos=None, palabras=None, **kwargs):
         super().__init__(**kwargs)
 
         if not url:
@@ -106,6 +106,15 @@ class ConvocatoriasSpider(scrapy.Spider):
         # (selector_config.rutas), además de las que cuelgan del listado.
         self.rutas = [r.rstrip("/") for r in (rutas or []) if r.strip("/")]
 
+        # Dominios que ya lee otra fuente (p. ej. secihti.mx): un enlace
+        # hacia ellos se detiene aquí; esa fuente lo trae.
+        self.cubiertos = {d.removeprefix("www.") for d in (cubiertos or ())} - {self.dominio}
+        self.omitidas_otra_fuente = set()
+
+        # selector_config.palabras: el título del enlace debe incluir alguna
+        # (gob.mx mezcla convocatorias con programas y trámites).
+        self.palabras = [p.lower() for p in (palabras or []) if p.strip()]
+
     def ya_registrada(self, url):
         clave = hash_url(url)
         if clave in self.conocidas:
@@ -113,9 +122,26 @@ class ConvocatoriasSpider(scrapy.Spider):
             return True
         return False
 
+    def de_otra_fuente(self, url):
+        """¿El enlace lleva a un sitio que ya lee otra fuente? Entonces se detiene."""
+        dominio = (urlparse(url).hostname or "").removeprefix("www.")
+        if dominio in self.cubiertos:
+            self.omitidas_otra_fuente.add(url)
+            return True
+        return False
+
+    def titulo_de_enlace(self, enlace):
+        """Texto del enlace; si es genérico («Continuar leyendo»), su aria-label o title."""
+        texto = " ".join((enlace.xpath("normalize-space(.)").get() or "").split())
+        if len(texto) < 4 or re.fullmatch(r"(?i)(continuar leyendo|leer m[aá]s|ver m[aá]s|m[aá]s informaci[oó]n|descargar)", texto):
+            texto = " ".join((enlace.attrib.get("aria-label") or enlace.attrib.get("title") or texto).split())
+        return texto
+
     def closed(self, reason):
         if self.omitidas_conocidas:
             print(f"Ya registradas (omitidas): {len(self.omitidas_conocidas)}")
+        if self.omitidas_otra_fuente:
+            print(f"Enlazan a otra fuente (omitidas): {len(self.omitidas_otra_fuente)}")
 
     def parse(self, response):
 
@@ -444,9 +470,10 @@ class ConvocatoriasSpider(scrapy.Spider):
             if clave in self.enlaces_encontrados or self.ya_registrada(url):
                 continue
 
-            titulo = " ".join(
-                (enlace.xpath("normalize-space(.)").get() or "").split()
-            )
+            titulo = self.titulo_de_enlace(enlace)
+
+            if self.palabras and not any(p in titulo.lower() for p in self.palabras):
+                continue
 
             self.enlaces_encontrados.add(clave)
 
@@ -464,6 +491,14 @@ class ConvocatoriasSpider(scrapy.Spider):
         Solo se toman las abiertas o permanentes; su enlace es el PDF de la
         convocatoria sin «?doc=», que cambia entre visitas.
         """
+        # Páginas en tabla de enlaces («Convocatorias SECIHTI»): si llevan a
+        # otra fuente o a algo ya registrado, se detiene; los PDF propios
+        # sin estatus no se toman (no se sabe si están abiertos).
+        for enlace in response.css("table.contenido a[href]"):
+            url = response.urljoin(enlace.attrib.get("href", "").strip())
+            if (urlparse(url).hostname or "").removeprefix("www.") != self.dominio:
+                self.de_otra_fuente(url) or self.ya_registrada(url)
+
         for bloque in response.css("div.row.justify-content-center.mb-3"):
             if (
                 self.limite > 0
@@ -473,6 +508,9 @@ class ConvocatoriasSpider(scrapy.Spider):
 
             titulo = " ".join(" ".join(bloque.css("div.bg-tecnm")[:1].xpath("normalize-space(.)").getall()).split())
             estatus = " ".join(" ".join(bloque.css("span.text-success::text, span.text-danger::text, span.text-warning::text, span.text-primary::text").getall()).split()).lower()
+            if not estatus:
+                # «Académicas»: el estatus va en la columna derecha, sin color.
+                estatus = " ".join(" ".join(bloque.css("div.col-lg-2 ::text").getall()).split()).lower()
 
             if not titulo or not any(e in estatus for e in ("abierta", "permanente", "vigente")):
                 continue
@@ -576,7 +614,7 @@ class ConvocatoriasSpider(scrapy.Spider):
             response.url,
         )
 
-        if propia is None or self.ya_registrada(propia["url"]):
+        if propia is None or self.ya_registrada(propia["url"]) or self.de_otra_fuente(propia["url"]):
             return
 
         parsed = urlparse(propia["url"])
