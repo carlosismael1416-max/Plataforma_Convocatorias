@@ -692,6 +692,30 @@ def extraer_seccion(
     return None
 
 
+# Documentos de apoyo (comparativas, infografías): su texto aplanado mezcla
+# columnas y no sirve de descripción. Se leen al final.
+DOCUMENTO_DE_APOYO = re.compile(
+    r"(?i)compara|comparativ|tabla|one[-_ ]?pager|infograf|resultados"
+)
+
+
+def ordenar_documentos(documentos: list[dict]) -> list[dict]:
+    """La convocatoria primero; las comparativas y tablas al final."""
+    def es_apoyo(documento: dict) -> bool:
+        nombre = documento.get("nombre") or ""
+        archivo = (documento.get("url") or "").rsplit("/", 1)[-1]
+        return bool(DOCUMENTO_DE_APOYO.search(nombre) or DOCUMENTO_DE_APOYO.search(archivo))
+
+    return sorted(documentos, key=es_apoyo)
+
+
+def parece_tabla_aplanada(linea: str) -> bool:
+    """«Recién egresados de Recién egresados de …»: columnas de una tabla mezcladas."""
+    palabras = normalizar_texto(linea).split()
+    tripletas = [" ".join(palabras[i:i + 3]) for i in range(len(palabras) - 2)]
+    return any(tripletas.count(t) >= 3 for t in set(tripletas) if len(t) > 12)
+
+
 def descripcion_literal(
     lineas: list[str],
     titulo: str,
@@ -716,6 +740,11 @@ def descripcion_literal(
             continue
 
         if parece_cabecera(
+            linea
+        ):
+            continue
+
+        if parece_tabla_aplanada(
             linea
         ):
             continue
@@ -1868,9 +1897,11 @@ def construir_enriquecimiento(
         contexto,
     )
 
-    documentos = item.get(
-        "documentos"
-    ) or []
+    documentos = ordenar_documentos(
+        item.get(
+            "documentos"
+        ) or []
+    )
 
     textos = []
 
