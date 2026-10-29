@@ -68,7 +68,7 @@ class ConvocatoriasSpider(scrapy.Spider):
         "TELNETCONSOLE_ENABLED": False,
     }
 
-    def __init__(self, url=None, limite=1, conocidas=None, **kwargs):
+    def __init__(self, url=None, limite=1, conocidas=None, rutas=None, **kwargs):
         super().__init__(**kwargs)
 
         if not url:
@@ -101,6 +101,10 @@ class ConvocatoriasSpider(scrapy.Spider):
         self.conocidas = set(conocidas or ())
         self.omitidas_conocidas = set()
         self.notas_visitadas = set()
+
+        # Prefijos de ruta de las convocatorias de esta fuente
+        # (selector_config.rutas), además de las que cuelgan del listado.
+        self.rutas = [r.rstrip("/") for r in (rutas or []) if r.strip("/")]
 
     def ya_registrada(self, url):
         clave = hash_url(url)
@@ -423,7 +427,9 @@ class ConvocatoriasSpider(scrapy.Spider):
                 )
                 continue
 
-            cuelga_del_listado = bool(ruta_listado) and ruta.startswith(ruta_listado + "/")
+            cuelga_del_listado = (
+                bool(ruta_listado) and ruta.startswith(ruta_listado + "/")
+            ) or any(ruta.startswith(r + "/") for r in self.rutas)
 
             if not cuelga_del_listado and "convocatoria" not in ruta_min:
                 continue

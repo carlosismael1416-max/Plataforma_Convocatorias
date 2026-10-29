@@ -15,6 +15,10 @@ def extraer_detalle(html, url_pagina):
         "normalize-space(.)"
     ).get()
 
+    # Los enlaces relativos se resuelven contra <base href> si existe.
+    base_href = pagina.css("base::attr(href)").get()
+    url_enlaces = urljoin(url_pagina, base_href.strip()) if base_href else url_pagina
+
     # Buscar los documentos PDF.
     documentos = []
     urls_encontradas = set()
@@ -29,7 +33,7 @@ def extraer_detalle(html, url_pagina):
             continue
 
         url_documento = urljoin(
-            url_pagina,
+            url_enlaces,
             href,
         )
 

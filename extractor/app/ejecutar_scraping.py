@@ -36,6 +36,29 @@ def urls_registradas() -> set[str]:
         conexion.close()
 
 
+def rutas_de_fuente(fuente_id: int) -> list[str]:
+    """
+    selector_config.rutas de la fuente: prefijos de ruta cuyas páginas son
+    convocatorias aunque no cuelguen del listado ni digan «convocatoria»
+    (p. ej. COMEXUS: /becas_para_mexicanos/). Sin conexión, ninguna.
+    """
+    try:
+        from app.descubrimiento.guardar_descubrimientos import conectar
+
+        conexion = conectar()
+        try:
+            with conexion.cursor() as cursor:
+                cursor.execute("SELECT selector_config->'rutas' FROM fuentes WHERE id = %s", (fuente_id,))
+                fila = cursor.fetchone()
+        finally:
+            conexion.close()
+    except Exception:
+        return []
+
+    rutas = fila[0] if fila else None
+    return [r for r in rutas if isinstance(r, str) and r.startswith("/")] if isinstance(rutas, list) else []
+
+
 def ejecutar(
     limite,
     guardar,
@@ -44,6 +67,7 @@ def ejecutar(
     fecha_referencia,
     fuente_id,
     url_inicial,
+    rutas=None,
 ):
     if limite < 1:
         raise ValueError(
@@ -138,6 +162,7 @@ def ejecutar(
         limite=limite,
         # Al guardar, el límite se aplica a las convocatorias nuevas.
         conocidas=urls_registradas() if guardar else None,
+        rutas=rutas if rutas is not None else rutas_de_fuente(fuente_id),
     )
 
     proceso.start()
@@ -333,6 +358,13 @@ def main():
     )
 
     parser.add_argument(
+        "--rutas",
+        nargs="*",
+        default=None,
+        help="Prefijos de ruta de las convocatorias (si no, los de la fuente).",
+    )
+
+    parser.add_argument(
         "--limite",
         type=int,
         default=5,
@@ -386,6 +418,7 @@ def main():
         fecha_referencia=argumentos.fecha,
         fuente_id=argumentos.fuente_id,
         url_inicial=argumentos.url,
+        rutas=argumentos.rutas,
     )
 
 

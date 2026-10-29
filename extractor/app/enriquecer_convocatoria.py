@@ -1339,6 +1339,15 @@ def construir_item_pagina_directa(
         html
     )
 
+    # Los enlaces relativos se resuelven contra <base href> si la página lo
+    # declara (COMEXUS usa <base href="/">), como hace el navegador.
+    base = arbol.css_first("base[href]")
+    url_enlaces = (
+        urljoin(url_final, base.attributes.get("href") or "")
+        if base is not None
+        else url_final
+    )
+
     documentos = []
     vistos = set()
 
@@ -1356,7 +1365,7 @@ def construir_item_pagina_directa(
             continue
 
         destino = urljoin(
-            url_final,
+            url_enlaces,
             href,
         )
 
